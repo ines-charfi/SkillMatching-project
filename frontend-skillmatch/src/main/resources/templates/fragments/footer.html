@@ -1,0 +1,121 @@
+<!-- ============================================ -->
+<!-- FOOTER SKILLMATCH -->
+<!-- ============================================ -->
+<meta charset="UTF-8">
+<th:block th:fragment="footer">
+    <footer style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); color: white; padding: 60px 0 0; margin-top: 80px; position: relative; overflow: hidden;">
+
+        <!-- Cercles décoratifs -->
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.03); border-radius: 50%;"></div>
+        <div style="position: absolute; bottom: -80px; left: -80px; width: 300px; height: 300px; background: rgba(255,255,255,0.02); border-radius: 50%;"></div>
+
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 1;">
+
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 40px; margin-bottom: 40px;">
+
+                <!-- Colonne 1 : Marque -->
+                <div>
+                    <h2 style="font-weight: 800; font-size: 24px; margin-bottom: 12px;">
+                        <span style="background: linear-gradient(135deg, #667eea, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">⚡ SkillMatch</span>
+                    </h2>
+                    <p style="color: #a5b4fc; font-size: 14px; line-height: 1.8; margin-bottom: 20px;">
+                        La plateforme qui connecte les talents avec les meilleures entreprises.
+                    </p>
+                    <div style="display: flex; gap: 12px;">
+                        <a href="#" style="width: 38px; height: 38px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; transition: all 0.3s;">
+                            <i class="bi bi-linkedin"></i>
+                        </a>
+                        <a href="#" style="width: 38px; height: 38px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; transition: all 0.3s;">
+                            <i class="bi bi-twitter-x"></i>
+                        </a>
+                        <a href="#" style="width: 38px; height: 38px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; transition: all 0.3s;">
+                            <i class="bi bi-github"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Colonne 2 : Navigation -->
+                <div>
+                    <h4 style="font-weight: 700; font-size: 14px; color: #c7d2fe; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px;">
+                        Navigation
+                    </h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 12px;">
+                            <a th:href="@{/home}" style="color: #9ca3af; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 8px; transition: all 0.3s;">
+                                <i class="bi bi-house-door"></i> Accueil
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a th:href="@{/offres}" style="color: #9ca3af; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 8px; transition: all 0.3s;">
+                                <i class="bi bi-briefcase"></i> Offres d'emploi
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a th:href="@{/login}" style="color: #9ca3af; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 8px; transition: all 0.3s;">
+                                <i class="bi bi-box-arrow-in-right"></i> Connexion
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a th:href="@{/register}" style="color: #9ca3af; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 8px; transition: all 0.3s;">
+                                <i class="bi bi-person-plus"></i> Inscription
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Colonne 3 : Légal -->
+                <div>
+                    <h4 style="font-weight: 700; font-size: 14px; color: #c7d2fe; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px;">
+                        Légal
+                    </h4>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 12px;">
+                            <a href="#" style="color: #9ca3af; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 8px; transition: all 0.3s;">
+                                <i class="bi bi-file-text"></i> Mentions légales
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a href="#" style="color: #9ca3af; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 8px; transition: all 0.3s;">
+                                <i class="bi bi-shield-check"></i> Politique de confidentialité
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a href="#" style="color: #9ca3af; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 8px; transition: all 0.3s;">
+                                <i class="bi bi-database-lock"></i> RGPD
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a href="#" style="color: #9ca3af; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 8px; transition: all 0.3s;">
+                                <i class="bi bi-cookie"></i> Cookies
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Séparateur -->
+            <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 0 0 25px 0;">
+
+            <!-- Copyright -->
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; padding-bottom: 30px;">
+                <p style="color: #6b7280; font-size: 13px; margin: 0;">
+                    &copy; 2024 SkillMatch. Tous droits réservés.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Animation hover sur les liens
+        document.querySelectorAll('footer a').forEach(link => {
+            link.addEventListener('mouseenter', function() {
+                this.style.color = '#a5b4fc';
+                this.style.transform = 'translateX(5px)';
+            });
+            link.addEventListener('mouseleave', function() {
+                this.style.color = '#9ca3af';
+                this.style.transform = 'translateX(0)';
+            });
+        });
+    </script>
+</th:block>

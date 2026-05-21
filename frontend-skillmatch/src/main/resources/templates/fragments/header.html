@@ -1,0 +1,166 @@
+<!-- ============================================ -->
+<!-- FRAGMENT HEADER SKILLMATCH -->
+<!-- ============================================ -->
+<th:block th:fragment="header">
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <i class="bi bi-lightning-charge-fill"></i> SkillMatch
+        </a>
+        <ul class="navbar-nav" id="navbarLinks">
+            <!-- Les liens sont injectés dynamiquement selon le rôle -->
+        </ul>
+        <div class="user-menu">
+            <div class="user-avatar" id="userAvatar" onclick="goToProfil()">?</div>
+            <span class="user-name" id="userNameDisplay">Utilisateur</span>
+            <button class="btn-logout" onclick="logout()">
+                <i class="bi bi-box-arrow-right"></i> Déconnexion
+            </button>
+        </div>
+    </nav>
+
+    <div id="notification" class="notification" style="display:none;"></div>
+
+    <script>
+        // ============================================
+        // CONFIGURATION
+        // ============================================
+        const API_BASE_URL = 'http://localhost:8080';
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('userId');
+        const userRole = localStorage.getItem('userRole');
+        const userEmail = localStorage.getItem('userEmail');
+
+        // ============================================
+        // INITIALISATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!token || !userId) {
+                const publicPages = ['/login', '/register', '/', '/home'];
+                if (!publicPages.includes(window.location.pathname)) {
+                    window.location.href = '/login';
+                }
+                return;
+            }
+
+            updateUserUI();
+            updateNavbar();
+        });
+
+        function updateUserUI() {
+            const initials = userEmail ? userEmail.charAt(0).toUpperCase() : '?';
+            const avatarEl = document.getElementById('userAvatar');
+            const nameEl = document.getElementById('userNameDisplay');
+            if (avatarEl) avatarEl.textContent = initials;
+            if (nameEl) nameEl.textContent = userEmail || 'Utilisateur';
+        }
+
+        function updateNavbar() {
+            const navLinks = document.getElementById('navbarLinks');
+            if (!navLinks) return;
+
+            if (userRole === 'CANDIDAT') {
+                navLinks.innerHTML = `
+                    <li><a href="/dashboard" class="nav-link">📊 Dashboard</a></li>
+                    <li><a href="/mes-candidatures" class="nav-link">📝 Candidatures</a></li>
+                    <li><a href="/profil" class="nav-link">👤 Profil</a></li>
+                `;
+            } else if (userRole === 'ENTREPRISE') {
+                navLinks.innerHTML = `
+                    <li><a href="/dashboard-entreprise" class="nav-link">📊 Dashboard</a></li>
+                    <li><a href="/offres" class="nav-link">📢 Mes offres</a></li>
+                    <li><a href="/profil-entreprise" class="nav-link">🏢 Profil</a></li>
+                `;
+            } else if (userRole === 'ADMIN') {
+                navLinks.innerHTML = `
+                    <li><a href="/admin" class="nav-link">📊 Dashboard</a></li>
+                    <li><a href="/admin/candidats" class="nav-link">👥 Candidats</a></li>
+                    <li><a href="/admin/entreprises" class="nav-link">🏢 Entreprises</a></li>
+                `;
+            }
+
+            // Marquer le lien actif
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        function goToProfil() {
+            if (userRole === 'CANDIDAT') {
+                window.location.href = '/profil';
+            } else if (userRole === 'ENTREPRISE') {
+                window.location.href = '/profil-entreprise';
+            } else {
+                window.location.href = '/admin';
+            }
+        }
+
+        // ============================================
+        // API CALL
+        // ============================================
+        async function apiCall(method, path, body = null) {
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token ? `Bearer ${token}` : ''
+                }
+            };
+
+            if (body && method !== 'GET') {
+                options.body = JSON.stringify(body);
+            }
+
+            const response = await fetch(`${API_BASE_URL}${path}`, options);
+
+            if (response.status === 401) {
+                logout();
+                return null;
+            }
+
+            if (!response.ok) {
+                const error = await response.json().catch(() => ({}));
+                throw new Error(error.message || `Erreur ${response.status}`);
+            }
+
+            const text = await response.text();
+            return text ? JSON.parse(text) : null;
+        }
+
+        // ============================================
+        // UTILITAIRES
+        // ============================================
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            if (!notification) return;
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'flex';
+
+            clearTimeout(notification._timeout);
+            notification._timeout = setTimeout(() => {
+                notification.style.display = 'none';
+            }, 4000);
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'Date inconnue';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('fr-FR', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/login';
+        }
+    </script>
+
+</th:block>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillMatch - Mes Candidatures</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <style>
+        /* Réutiliser les mêmes styles que le dashboard */
+        :root {
+            --primary: #4f46e5;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-50: #f9fafb;
+            --gray-700: #374151;
+        }
+
+        body {
+            background: var(--gray-50);
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .candidature-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .candidature-card:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .statut-badge {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .statut-en-attente { background: #fef3c7; color: #d97706; }
+        .statut-accepte { background: #d1fae5; color: #059669; }
+        .statut-refuse { background: #fef2f2; color: #dc2626; }
+    </style>
+</head>
+<body>
+<nav style="background:white; padding:15px 30px; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+    <a href="/dashboard" style="font-size:24px; font-weight:800; color:#4f46e5; text-decoration:none;">⚡ SkillMatch</a>
+</nav>
+
+<div class="container">
+    <h1 style="margin-bottom:30px;">📝 Mes Candidatures</h1>
+    <div id="candidaturesContainer">
+        <p>Chargement...</p>
+    </div>
+</div>
+
+<script>
+    const API_BASE_URL = 'http://localhost:8080';
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+
+    async function loadCandidatures() {
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/api/candidatures/candidat/${userId}`,
+                { headers: { 'Authorization': `Bearer ${token}` } }
+            );
+            const candidatures = await response.json();
+
+            const container = document.getElementById('candidaturesContainer');
+
+            if (!candidatures || candidatures.length === 0) {
+                container.innerHTML = '<p>Aucune candidature</p>';
+                return;
+            }
+
+            container.innerHTML = candidatures.map(c => `
+                    <div class="candidature-card">
+                        <div style="display:flex; justify-content:space-between; align-items:start;">
+                            <div>
+                                <h3>${c.offreTitre || 'Offre'}</h3>
+                                <p style="color:#6b7280;">${c.entrepriseNom || 'Entreprise'}</p>
+                                <p style="color:#9ca3af; font-size:14px;">
+                                    Postulé le ${new Date(c.datePostulation).toLocaleDateString('fr-FR')}
+                                </p>
+                            </div>
+                            <div style="text-align:right;">
+                                <span class="statut-badge statut-${c.statut.toLowerCase()}">
+                                    ${c.statut === 'EN_ATTENTE' ? '⏳ En attente' :
+                c.statut === 'ACCEPTE' ? '✅ Acceptée' : '❌ Refusée'}
+                                </span>
+                                <p style="margin-top:10px; font-weight:700; color:#4f46e5;">
+                                    🎯 Score: ${c.scoreMatching}%
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+        } catch (error) {
+            document.getElementById('candidaturesContainer').innerHTML =
+                '<p style="color:red;">Erreur de chargement</p>';
+        }
+    }
+
+    loadCandidatures();
+</script>
+</body>
+</html>

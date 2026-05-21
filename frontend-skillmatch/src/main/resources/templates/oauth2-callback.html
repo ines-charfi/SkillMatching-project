@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillMatch - Redirection...</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .callback-card {
+            background: white;
+            border-radius: 24px;
+            padding: 50px 40px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 450px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: #d1fae5;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: #10b981;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            50% { box-shadow: 0 0 0 20px rgba(16, 185, 129, 0); }
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            color: #4f46e5;
+        }
+
+        h2 {
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="callback-card">
+    <div class="success-icon">
+        <i class="bi bi-check-lg"></i>
+    </div>
+    <h2>Connexion réussie !</h2>
+    <p id="statusMessage">Redirection en cours...</p>
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Chargement...</span>
+    </div>
+</div>
+
+<script>
+    // Récupérer les paramètres de l'URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    const email = urlParams.get('email');
+    const role = urlParams.get('role');
+    const userId = urlParams.get('userId');
+
+    console.log('OAuth2 Callback - Paramètres reçus:', { token: !!token, email, role, userId });
+
+    if (token && email && role) {
+        // Stocker les informations de session
+        localStorage.setItem('token', token);
+        localStorage.setItem('userEmail', email);
+        localStorage.setItem('userRole', role);
+        if (userId) {
+            localStorage.setItem('userId', userId);
+        }
+
+        document.getElementById('statusMessage').textContent =
+            'Connecté en tant que ' + email + '. Redirection...';
+
+        // Rediriger selon le rôle
+        setTimeout(function() {
+            switch(role) {
+                case 'ADMIN':
+                    window.location.href = '/admin';
+                    break;
+                case 'ENTREPRISE':
+                    window.location.href = '/dashboard-entreprise';
+                    break;
+                case 'CANDIDAT':
+                default:
+                    window.location.href = '/dashboard';
+                    break;
+            }
+        }, 1500);
+    } else {
+        document.querySelector('.success-icon').style.background = '#fef2f2';
+        document.querySelector('.success-icon').style.color = '#ef4444';
+        document.querySelector('.success-icon').innerHTML = '<i class="bi bi-exclamation-triangle"></i>';
+        document.querySelector('h2').textContent = 'Erreur de connexion';
+        document.getElementById('statusMessage').textContent =
+            'Paramètres manquants. Veuillez réessayer.';
+        document.querySelector('.spinner-border').style.display = 'none';
+
+        setTimeout(function() {
+            window.location.href = '/login?error=true';
+        }, 3000);
+    }
+</script>
+</body>
+</html>
