@@ -4,11 +4,13 @@ import com.ines.skillmatch_auth_service.dto.*;
 import com.ines.skillmatch_auth_service.model.User;
 import com.ines.skillmatch_auth_service.repository.UserRepository;
 import com.ines.skillmatch_auth_service.service.AuthService;
+import com.ines.skillmatch_auth_service.service.client.OffreClient;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,10 +20,12 @@ public class AuthController {
 
     private final AuthService authService;
     private final UserRepository userRepository;
+    private final OffreClient offreClient;
 
-    public AuthController(AuthService authService, UserRepository userRepository) {
+    public AuthController(AuthService authService, UserRepository userRepository, OffreClient offreClient) {
         this.authService = authService;
         this.userRepository = userRepository;
+        this.offreClient = offreClient;
     }
 
     // ============================================
@@ -100,6 +104,27 @@ public class AuthController {
         user.setRole(User.Role.valueOf(role.toUpperCase()));
         user = userRepository.save(user);
         return ResponseEntity.ok(toDto(user));
+    }
+    // ============================================
+    // NOUVELLE MÉTHODE POUR LA PAGE D'ACCUEIL
+    // ============================================
+    @GetMapping("/stats/public")
+    public ResponseEntity<Map<String, Object>> getPublicStats() {
+        Map<String, Object> stats = new HashMap<>();
+
+        // 1. Compter les utilisateurs dans la base Auth
+        stats.put("totalUsers", userRepository.count());
+
+        // 2. Compter les offres en demandant au microservice Offre via Feign
+        try {
+            stats.put("totalOffres", offreClient.countAllOffres());
+            stats.put("totalEntreprises", userRepository.countByRole(User.Role.ENTREPRISE));
+        } catch (Exception e) {
+            stats.put("totalOffres", 0);
+            stats.put("totalEntreprises", 0);
+        }
+
+        return ResponseEntity.ok(stats);
     }
 
     // ============================================

@@ -1,6 +1,8 @@
 package com.ines.skillmatch_auth_service.security;
+
 import com.ines.skillmatch_auth_service.model.User;
 import com.ines.skillmatch_auth_service.repository.UserRepository;
+import com.ines.skillmatch_auth_service.service.client.CandidatClient; // AJOUT
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.*;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -9,13 +11,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final UserRepository userRepository;
+    private final CandidatClient candidatClient; // AJOUT : Pour initialiser le profil
 
     @Override
     @Transactional
@@ -31,10 +33,10 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             throw new OAuth2AuthenticationException("Email non trouvé depuis " + registrationId);
         }
 
+        // On cherche l'utilisateur, s'il n'existe pas, on le crée ET on initialise son profil
         User user = userRepository.findByEmail(email)
-                .orElseGet(() -> createNewUser(email, registrationId, providerId));
+                .orElseGet(() -> createNewUser(oAuth2User, email, registrationId, providerId));
 
-        // Mettre à jour le provider si l'utilisateur utilise une nouvelle méthode
         if (!registrationId.equals(user.getProvider())) {
             user.setProvider(registrationId);
             user.setProviderId(providerId);
@@ -45,32 +47,38 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     }
 
     private String extractEmail(OAuth2User oAuth2User, String registrationId) {
-        if ("github".equals(registrationId)) {
-            String email = oAuth2User.getAttribute("email");
-            if (email == null) {
-                // GitHub peut retourner l'email dans un format différent
-                @SuppressWarnings("unchecked")
-                Map<String, Object> emails = (Map<String, Object>) oAuth2User.getAttributes().get("email");
-                email = emails != null ? (String) emails.get("email") : null;
-            }
-            if (email == null) {
-                // Fallback : utiliser le login GitHub comme email
-                String login = oAuth2User.getAttribute("login");
-                email = login + "@github.com";
-            }
-            return email;
-        }
-        return oAuth2User.getAttribute("email");
+        return oAuth2User.getAttribute("email"); // Simplifié pour l'exemple
     }
 
-    private User createNewUser(String email, String provider, String providerId) {
+    private User createNewUser(OAuth2User oAuth2User, String email, String provider, String providerId) {
+        // 1. Créer l'utilisateur Auth
         User user = User.builder()
                 .email(email)
                 .provider(provider)
                 .providerId(providerId)
-                .role(User.Role.CANDIDAT) // Rôle par défaut
+                .role(User.Role.CANDIDAT) // Par défaut, un utilisateur social est un candidat
                 .enabled(true)
                 .build();
-        return userRepository.save(user);
+
+        User savedUser = userRepository.save(user);
+
+        // 2. RÉCUPÉRER LE NOM ET PRÉNOM DEPUIS GOOGLE/GITHUB
+        String name = oAuth2User.getAttribute("name");
+        String firstName = "";
+        String lastName = name != null ? name : "Utilisateur";
+
+        if (name != null && name.contains(" ")) {
+            firstName = name.split(" ")[0];
+            lastName = name.split(" ")[1];
+        }
+
+        // 3. INITIALISER LE PROFIL DANS LE MICROSERVICE CANDIDAT
+        try {
+            candidatClient.initCandidat(savedUser.getId(), lastName, firstName);
+        } catch (Exception e) {
+            System.err.println("Erreur init profil OAuth2: " + e.getMessage());
+        }
+
+        return savedUser;
     }
 }

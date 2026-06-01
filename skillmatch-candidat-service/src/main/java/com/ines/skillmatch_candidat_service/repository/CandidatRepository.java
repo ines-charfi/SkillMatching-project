@@ -12,9 +12,9 @@ public interface CandidatRepository extends JpaRepository<Candidat, Long> {
 
     Optional<Candidat> findByUserId(Long userId);
 
-    @Query("SELECT c FROM Candidat c WHERE " +
-            "LOWER(c.competences) LIKE LOWER(CONCAT('%', :competence, '%'))")
-    List<Candidat> findByCompetence(@Param("competence") String competence);
+
+    @Query("SELECT c FROM Candidat c WHERE c.competences LIKE %:skill%")
+    List<Candidat> findByCompetence(@Param("skill") String skill);
 
     @Query("SELECT c FROM Candidat c WHERE c.validationStatut = :statut")
     List<Candidat> findByValidationStatut(@Param("statut") Candidat.ValidationStatut statut);

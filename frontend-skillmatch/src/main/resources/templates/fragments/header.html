@@ -1,166 +1,47 @@
-<!-- ============================================ -->
-<!-- FRAGMENT HEADER SKILLMATCH -->
-<!-- ============================================ -->
-<th:block th:fragment="header">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+    <th:block th:fragment="header">
+    <nav style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #e5e7eb; padding: 15px 0; position: sticky; top: 0; z-index: 1000;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center;">
 
-    <!-- Navbar -->
-    <nav class="navbar">
-        <a href="/" class="navbar-brand">
-            <i class="bi bi-lightning-charge-fill"></i> SkillMatch
-        </a>
-        <ul class="navbar-nav" id="navbarLinks">
-            <!-- Les liens sont injectés dynamiquement selon le rôle -->
-        </ul>
-        <div class="user-menu">
-            <div class="user-avatar" id="userAvatar" onclick="goToProfil()">?</div>
-            <span class="user-name" id="userNameDisplay">Utilisateur</span>
-            <button class="btn-logout" onclick="logout()">
-                <i class="bi bi-box-arrow-right"></i> Déconnexion
-            </button>
+            <!-- Logo -->
+            <a th:href="@{/dashboard}" style="text-decoration: none; display: flex; align-items: center; gap: 8px;">
+                <span style="font-weight: 850; font-size: 26px; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">⚡ SkillMatch</span>
+            </a>
+
+            <!-- Liens Navigation Dynamique -->
+            <div style="display: flex; gap: 25px; align-items: center;">
+                <a th:href="@{/dashboard}" style="color: #4b5563; text-decoration: none; font-weight: 600; font-size: 14px;">Tableau de bord</a>
+
+                <!-- Menu Candidat -->
+                <th:block th:if="${session.user_role == 'CANDIDAT'}">
+                    <a th:href="@{/mes-candidatures}" style="color: #4b5563; text-decoration: none; font-weight: 600; font-size: 14px;">Mes candidatures</a>
+                    <a th:href="@{/offre}" style="color: #4b5563; text-decoration: none; font-weight: 600; font-size: 14px;">Trouver un job</a>
+                </th:block>
+
+                <!-- Menu Entreprise -->
+                <th:block th:if="${session.user_role == 'ENTREPRISE'}">
+                    <a th:href="@{/offre/nouveau}" style="color: #4b5563; text-decoration: none; font-weight: 600; font-size: 14px;">Publier une offre</a>
+                    <a th:href="@{/candidats}" style="color: #4b5563; text-decoration: none; font-weight: 600; font-size: 14px;">Rechercher des talents</a>
+                </th:block>
+            </div>
+
+            <!-- Profil & Logout -->
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="text-align: right; line-height: 1.2;" class="d-none d-md-block">
+                    <div style="font-size: 13px; font-weight: 700; color: #1f2937;" th:text="${session.user_email}">admin@skillmatch.com</div>
+                    <span style="font-size: 10px; color: #6366f1; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;" th:text="${session.user_role}">CANDIDAT</span>
+                </div>
+                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); color: #4f46e5; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; border: 1px solid #c7d2fe;" th:text="${session.user_initials}">?</div>
+                <a th:href="@{/logout-user}" style="color: #ef4444; font-size: 20px; transition: 0.3s;" title="Déconnexion"><i class="bi bi-box-arrow-right"></i></a>
+            </div>
         </div>
     </nav>
-
-    <div id="notification" class="notification" style="display:none;"></div>
-
-    <script>
-        // ============================================
-        // CONFIGURATION
-        // ============================================
-        const API_BASE_URL = 'http://localhost:8080';
-        const token = localStorage.getItem('token');
-        const userId = localStorage.getItem('userId');
-        const userRole = localStorage.getItem('userRole');
-        const userEmail = localStorage.getItem('userEmail');
-
-        // ============================================
-        // INITIALISATION
-        // ============================================
-        document.addEventListener('DOMContentLoaded', function() {
-            if (!token || !userId) {
-                const publicPages = ['/login', '/register', '/', '/home'];
-                if (!publicPages.includes(window.location.pathname)) {
-                    window.location.href = '/login';
-                }
-                return;
-            }
-
-            updateUserUI();
-            updateNavbar();
-        });
-
-        function updateUserUI() {
-            const initials = userEmail ? userEmail.charAt(0).toUpperCase() : '?';
-            const avatarEl = document.getElementById('userAvatar');
-            const nameEl = document.getElementById('userNameDisplay');
-            if (avatarEl) avatarEl.textContent = initials;
-            if (nameEl) nameEl.textContent = userEmail || 'Utilisateur';
-        }
-
-        function updateNavbar() {
-            const navLinks = document.getElementById('navbarLinks');
-            if (!navLinks) return;
-
-            if (userRole === 'CANDIDAT') {
-                navLinks.innerHTML = `
-                    <li><a href="/dashboard" class="nav-link">📊 Dashboard</a></li>
-                    <li><a href="/mes-candidatures" class="nav-link">📝 Candidatures</a></li>
-                    <li><a href="/profil" class="nav-link">👤 Profil</a></li>
-                `;
-            } else if (userRole === 'ENTREPRISE') {
-                navLinks.innerHTML = `
-                    <li><a href="/dashboard-entreprise" class="nav-link">📊 Dashboard</a></li>
-                    <li><a href="/offres" class="nav-link">📢 Mes offres</a></li>
-                    <li><a href="/profil-entreprise" class="nav-link">🏢 Profil</a></li>
-                `;
-            } else if (userRole === 'ADMIN') {
-                navLinks.innerHTML = `
-                    <li><a href="/admin" class="nav-link">📊 Dashboard</a></li>
-                    <li><a href="/admin/candidats" class="nav-link">👥 Candidats</a></li>
-                    <li><a href="/admin/entreprises" class="nav-link">🏢 Entreprises</a></li>
-                `;
-            }
-
-            // Marquer le lien actif
-            const currentPath = window.location.pathname;
-            document.querySelectorAll('.nav-link').forEach(link => {
-                if (link.getAttribute('href') === currentPath) {
-                    link.classList.add('active');
-                }
-            });
-        }
-
-        function goToProfil() {
-            if (userRole === 'CANDIDAT') {
-                window.location.href = '/profil';
-            } else if (userRole === 'ENTREPRISE') {
-                window.location.href = '/profil-entreprise';
-            } else {
-                window.location.href = '/admin';
-            }
-        }
-
-        // ============================================
-        // API CALL
-        // ============================================
-        async function apiCall(method, path, body = null) {
-            const options = {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': token ? `Bearer ${token}` : ''
-                }
-            };
-
-            if (body && method !== 'GET') {
-                options.body = JSON.stringify(body);
-            }
-
-            const response = await fetch(`${API_BASE_URL}${path}`, options);
-
-            if (response.status === 401) {
-                logout();
-                return null;
-            }
-
-            if (!response.ok) {
-                const error = await response.json().catch(() => ({}));
-                throw new Error(error.message || `Erreur ${response.status}`);
-            }
-
-            const text = await response.text();
-            return text ? JSON.parse(text) : null;
-        }
-
-        // ============================================
-        // UTILITAIRES
-        // ============================================
-        function showNotification(message, type = 'info') {
-            const notification = document.getElementById('notification');
-            if (!notification) return;
-            notification.textContent = message;
-            notification.className = `notification ${type}`;
-            notification.style.display = 'flex';
-
-            clearTimeout(notification._timeout);
-            notification._timeout = setTimeout(() => {
-                notification.style.display = 'none';
-            }, 4000);
-        }
-
-        function formatDate(dateString) {
-            if (!dateString) return 'Date inconnue';
-            const date = new Date(dateString);
-            return date.toLocaleDateString('fr-FR', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-            });
-        }
-
-        function logout() {
-            localStorage.clear();
-            window.location.href = '/login';
-        }
-    </script>
-
 </th:block>
+</html>

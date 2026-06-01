@@ -17,16 +17,12 @@ public class ExperienceController {
     private final ExperienceService experienceService;
 
     @PostMapping("/user/{userId}")
-    public ResponseEntity<Experience> addExperience(
-            @PathVariable Long userId,
-            @RequestBody ExperienceDTO dto) {
+    public ResponseEntity<Experience> addExperience(@PathVariable Long userId, @RequestBody ExperienceDTO dto) {
         return ResponseEntity.ok(experienceService.addExperience(userId, dto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Experience> updateExperience(
-            @PathVariable Long id,
-            @RequestBody ExperienceDTO dto) {
+    public ResponseEntity<Experience> updateExperience(@PathVariable Long id, @RequestBody ExperienceDTO dto) {
         return ResponseEntity.ok(experienceService.updateExperience(id, dto));
     }
 
@@ -39,10 +35,5 @@ public class ExperienceController {
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Experience>> getByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(experienceService.getExperiencesByUserId(userId));
-    }
-
-    @GetMapping("/candidat/{candidatId}")
-    public ResponseEntity<List<Experience>> getByCandidatId(@PathVariable Long candidatId) {
-        return ResponseEntity.ok(experienceService.getExperiencesByCandidat(candidatId));
     }
 }

@@ -18,15 +18,12 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final UserRepository userRepository;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request,
-                                        HttpServletResponse response,
-                                        Authentication authentication) throws IOException {
-
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
         String token = jwtService.generateToken(userDetails);
 
-        String targetUrl = UriComponentsBuilder.fromUriString("/oauth2/callback")
+        // On redirige vers le port du FRONTEND pour que le frontend crée la session
+        String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:8086/oauth2/callback")
                 .queryParam("token", token)
                 .queryParam("email", userDetails.getEmail())
                 .queryParam("role", userDetails.getRole().name())
@@ -34,7 +31,5 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .build().toUriString();
 
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
-
-        clearAuthenticationAttributes(request);
     }
 }

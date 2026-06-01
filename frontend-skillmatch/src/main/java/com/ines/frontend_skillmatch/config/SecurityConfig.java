@@ -13,25 +13,43 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // 1. Désactiver le CSRF pour permettre les requêtes POST de ton formulaire
                 .csrf(csrf -> csrf.disable())
-
-                // 2. Autoriser l'accès libre à tes routes
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/", "/home", "/login", "/register",
-                                "/css/**", "/js/**", "/images/**", "/webjars/**",
-                                "/offre", "/candidats", "/oauth2/**",
-                                "/dashboard-candidat", "/dashboard-entreprise" // Ajoute tes dashboards ici
+                                // 1. Accueil et Statiques
+                                "/", "/home", "/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico",
+
+                                // 2. Authentification et gestion des erreurs
+                                "/login", "/register", "/logout-user", "/oauth2/**", "/login-error",
+
+                                // 3. Pages Candidat
+                                "/dashboard-candidat", "/profil", "/profil/update", "/mes-candidatures", "/postuler",
+
+                                // 4. Pages Entreprise (CORRIGÉ & COMPLET)
+                                "/dashboard-entreprise",
+                                "/profil-entreprise",          // 💡 Débloque l'affichage du profil entreprise
+                                "/profil-entreprise/update",   // 💡 Débloque la modification du profil
+                                "/offre",                      // Liste générale des offres
+                                "/offre/nouveau",              // 💡 Débloque le formulaire de création
+                                "/offre/creer",                // 💡 Débloque la soumission de l'offre
+                                "/offre/supprimer/**",
+                                "/offre/modifier/**",          // 🎯 AJOUT : Autorise l'affichage du formulaire de modification
+                                "/offre/update/**",            // 🎯 AJOUT : Autorise la soumission des modifications (POST)// 💡 Débloque la suppression d'offres
+                                "/candidatures/statut",        // 💡 Débloque les boutons Accepter/Refuser
+                                "/candidats",
+
+                                // 5. Technique & Erreurs globales
+                                "/actuator/health", "/error",
+
+                                // 6. Uploader cv et avatar
+                                "/api/candidats/download/cv/**",
+                                "/api/entreprises/**", "/api/candidats/avatar/**"
+
                         ).permitAll()
-                        .anyRequest().permitAll() // Autorise tout pour le debug de ton PFE
+                        .anyRequest().authenticated()
                 )
-
-                // 3. TRÈS IMPORTANT : Désactiver le formLogin de Spring Security
-                // car c'est TOI qui gères le login dans ton LoginController
                 .formLogin(form -> form.disable())
-
-                // 4. Désactiver le logout par défaut pour utiliser le tien
+                .httpBasic(basic -> basic.disable())
                 .logout(logout -> logout.disable());
 
         return http.build();

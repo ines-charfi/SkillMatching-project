@@ -1,101 +1,89 @@
 package com.ines.skillmatch_auth_service.service;
+
 import com.ines.skillmatch_auth_service.dto.*;
 import com.ines.skillmatch_auth_service.model.User;
 import com.ines.skillmatch_auth_service.repository.UserRepository;
 import com.ines.skillmatch_auth_service.security.JwtService;
 import com.ines.skillmatch_auth_service.security.UserDetailsImpl;
+import com.ines.skillmatch_auth_service.service.client.CandidatClient;
+import com.ines.skillmatch_auth_service.service.client.EntrepriseClient;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
-@RequiredArgsConstructor
-public class AuthService {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
+    @Service
+    @RequiredArgsConstructor
+    @Slf4j
+    public class AuthService {
 
-    @Transactional
-    public AuthResponse register(RegisterRequest request) {
-        // Vérifier si l'email existe déjà
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Cet email est déjà utilisé");
-        }
+        private final UserRepository userRepository;
+        private final PasswordEncoder passwordEncoder;
+        private final AuthenticationManager authenticationManager;
+        private final JwtService jwtService;
+        private final CandidatClient candidatClient;
+        private final EntrepriseClient entrepriseClient;
 
-        // Créer l'utilisateur
-        User user = User.builder()
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(request.getRole())
-                .provider("LOCAL")
-                .enabled(true)
-                .build();
+        @Transactional
+        public AuthResponse register(RegisterRequest request) {
+            if (userRepository.existsByEmail(request.getEmail())) {
+                throw new RuntimeException("Cet email est déjà utilisé");
+            }
 
-        user = userRepository.save(user);
+            User user = User.builder()
+                    .email(request.getEmail())
+                    .password(passwordEncoder.encode(request.getPassword()))
+                    .role(request.getRole())
+                    .provider("LOCAL")
+                    .enabled(true)
+                    .build();
 
-        // Générer le token
-        UserDetailsImpl userDetails = UserDetailsImpl.build(user);
-        String token = jwtService.generateToken(userDetails);
+            user = userRepository.save(user);
 
-        return AuthResponse.builder()
-                .token(token)
-                .email(user.getEmail())
-                .role(user.getRole().name())
-                .userId(user.getId())
-                .message("Inscription réussie")
-                .build();
-    }
-
-    public AuthResponse login(LoginRequest request) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.getEmail(),
-                            request.getPassword()
-                    )
-            );
-
-            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-            String token = jwtService.generateToken(userDetails);
+            // INITIALISATION DU PROFIL DANS LES AUTRES SERVICES
+            try {
+                if (user.getRole() == User.Role.CANDIDAT) {
+                    candidatClient.initCandidat(user.getId(), request.getNom(), request.getPrenom());
+                } else if (user.getRole() == User.Role.ENTREPRISE) {
+                    candidatClient.initCandidat(user.getId(), request.getNomEntreprise(), "");
+                    // Note: Tu peux adapter selon ton EntrepriseClient
+                }
+            } catch (Exception e) {
+                log.error("Erreur communication inter-service: {}", e.getMessage());
+            }
 
             return AuthResponse.builder()
-                    .token(token)
+                    .token(jwtService.generateToken(UserDetailsImpl.build(user)))
+                    .email(user.getEmail())
+                    .role(user.getRole().name())
+                    .userId(user.getId())
+                    .message("Inscription réussie")
+                    .build();
+        }
+
+        public AuthResponse login(LoginRequest request) {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+            );
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            return AuthResponse.builder()
+                    .token(jwtService.generateToken(userDetails))
                     .email(userDetails.getEmail())
                     .role(userDetails.getRole().name())
                     .userId(userDetails.getId())
                     .message("Connexion réussie")
                     .build();
+        }
 
-        } catch (BadCredentialsException e) {
-            throw new RuntimeException("Email ou mot de passe incorrect");
-        } catch (DisabledException e) {
-            throw new RuntimeException("Compte désactivé. Contactez l'administrateur.");
+
+        public void logout(String token) {
+            // Avec JWT, on peut blacklister le token ou simplement le supprimer côté client
+            // Pour l'instant, on ne fait rien côté serveur
+
         }
     }
 
-    public AuthResponse processOAuth2Login(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
-
-        UserDetailsImpl userDetails = UserDetailsImpl.build(user);
-        String token = jwtService.generateToken(userDetails);
-
-        return AuthResponse.builder()
-                .token(token)
-                .email(user.getEmail())
-                .role(user.getRole().name())
-                .userId(user.getId())
-                .message("Connexion OAuth2 réussie")
-                .build();
-    }
-
-    public void logout(String token) {
-        // Avec JWT, on peut blacklister le token ou simplement le supprimer côté client
-        // Pour l'instant, on ne fait rien côté serveur
-    }
-}

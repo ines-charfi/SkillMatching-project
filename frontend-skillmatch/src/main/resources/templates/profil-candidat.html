@@ -2,75 +2,215 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Mon Profil - SkillMatch</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillMatch - Modifier mon Profil</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        body { background: #f8fafc; padding: 40px 0; }
-        .form-card { background: white; border-radius: 15px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        label { font-weight: 600; font-size: 0.9rem; color: #475569; }
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #7c3aed;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-700: #374151;
+            --gray-900: #111827;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-navbar: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            --radius: 20px;
+            --radius-sm: 12px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.05);
+            --shadow-xl: 0 20px 40px rgba(79,70,229,0.15);
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            color: var(--gray-700);
+            background: var(--gray-50);
+            min-height: 100vh;
+        }
+
+        .navbar-custom {
+            background: var(--gradient-navbar);
+            padding: 15px 40px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: 900;
+            color: white !important;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 40px;
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-md);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .profile-card:hover { box-shadow: var(--shadow-xl); }
+
+        .icon-box {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius-sm);
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .form-label { font-weight: 600; color: var(--gray-800); font-size: 14px; margin-bottom: 8px; }
+
+        .form-control, .form-select {
+            border-radius: var(--radius-sm);
+            padding: 12px 18px;
+            border: 2px solid var(--gray-200);
+            background-color: var(--gray-50);
+            color: var(--gray-800);
+            font-size: 15px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .form-control:focus {
+            background-color: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            outline: none;
+        }
+
+        .btn-pill { padding: 12px 32px; border-radius: 50px; font-weight: 700; font-size: 15px; transition: all 0.3s; }
+        .btn-pill-primary { background: var(--gradient); color: white; border: none; }
+        .btn-pill-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3); color: white; }
+        .btn-pill-outline { background: transparent; border: 2px solid var(--gray-200); color: var(--gray-600); }
+        .btn-pill-outline:hover { background: var(--gray-100); color: var(--gray-800); }
     </style>
 </head>
 <body>
-<div class="container" style="max-width: 800px;">
-    <div class="form-card">
-        <h2 class="fw-bold mb-4">👤 Mettre à jour mon profil</h2>
 
-        <form th:action="@{/profil/update}" method="post" enctype="multipart/form-data">
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label>Prénom</label>
-                    <input type="text" name="prenom" class="form-control" th:value="${profil['prenom']}" required>
+<nav class="navbar navbar-custom navbar-dark mb-5">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+        <a class="navbar-brand" href="/dashboard-candidat">
+            <i class="bi bi-lightning-charge-fill text-warning"></i><span>SkillMatch</span>
+        </a>
+        <div>
+            <a href="/dashboard-candidat" class="btn text-white text-decoration-none fw-semibold small">
+                <i class="bi bi-arrow-left me-1"></i> Tableau de bord
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="container pb-5">
+    <div class="row justify-content-center">
+        <div class="col-xl-9 col-lg-10">
+            <div class="card profile-card">
+
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="icon-box">
+                        <i class="bi bi-sliders2-vertical"></i>
+                    </div>
+                    <div>
+                        <h3 class="fw-bold mb-1">Configuration du profil</h3>
+                        <p class="text-muted small mb-0">Sublimez votre profil pour maximiser vos chances de matching.</p>
+                    </div>
                 </div>
-                <div class="col-md-6 mb-3">
-                    <label>Nom</label>
-                    <input type="text" name="nom" class="form-control" th:value="${profil['nom']}" required>
-                </div>
-            </div>
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label>Téléphone</label>
-                    <input type="tel" name="telephone" class="form-control" th:value="${profil['telephone']}">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label>Ville</label>
-                    <input type="text" name="ville" class="form-control" th:value="${profil['ville']}">
-                </div>
-            </div>
+                <hr class="opacity-25 mb-4">
 
-            <div class="mb-3">
-                <label>Adresse complète</label>
-                <input type="text" name="adresse" class="form-control" th:value="${profil['adresse']}">
-            </div>
+                <form th:action="@{/profil/update}" method="post" enctype="multipart/form-data">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Prénom <span class="text-danger">*</span></label>
+                            <input type="text" name="prenom" class="form-control"
+                                   th:value="${profil != null ? profil['prenom'] : ''}" required placeholder="Votre prénom">
+                        </div>
 
-            <div class="mb-3">
-                <label>Bio professionnelle</label>
-                <textarea name="bio" class="form-control" rows="3" th:text="${profil['bio']}"></textarea>
-            </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Nom <span class="text-danger">*</span></label>
+                            <input type="text" name="nom" class="form-control"
+                                   th:value="${profil != null ? profil['nom'] : ''}" required placeholder="Votre nom de famille">
+                        </div>
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label>Compétences (virgules)</label>
-                    <input type="text" name="competences" class="form-control" th:value="${profil['competences']}">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label>Niveau d'études</label>
-                    <select name="niveauScolaire" class="form-select">
-                        <option value="Bac+2" th:selected="${profil['niveauScolaire'] == 'Bac+2'}">Bac+2</option>
-                        <option value="Bac+3" th:selected="${profil['niveauScolaire'] == 'Bac+3'}">Bac+3</option>
-                        <option value="Bac+5" th:selected="${profil['niveauScolaire'] == 'Bac+5'}">Bac+5</option>
-                    </select>
-                </div>
-            </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Numéro de téléphone</label>
+                            <input type="tel" name="telephone" class="form-control"
+                                   th:value="${profil != null ? profil['telephone'] : ''}" placeholder="+212 6 00 00 00 00">
+                        </div>
 
-            <div class="mb-4">
-                <label>Votre CV (PDF)</label>
-                <input type="file" name="cv" class="form-control" accept=".pdf">
-            </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Niveau académique maximal</label>
+                            <input type="text" name="niveauScolaire" class="form-control"
+                                   th:value="${profil != null ? profil['niveau_scolaire'] : ''}" placeholder="Ex: Bac+5, Diplôme d'Ingénieur">
+                        </div>
 
-            <button type="submit" class="btn btn-primary w-100 fw-bold py-2">💾 Enregistrer les modifications</button>
-            <a href="/dashboard-candidat" class="btn btn-link w-100 mt-2">Annuler</a>
-        </form>
+                        <div class="col-12">
+                            <label class="form-label">Adresse / Ville de résidence</label>
+                            <input type="text" name="adresse" class="form-control"
+                                   th:value="${profil != null ? profil['adresse'] : ''}" placeholder="Ex: Casablanca, Maarif, Rue 14...">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Profil LinkedIn</label>
+                            <input type="url" name="linkedinUrl" class="form-control"
+                                   th:value="${profil != null ? profil['linkedin_url'] : ''}" placeholder="https://linkedin.com/in/... ">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Portfolio numérique</label>
+                            <input type="url" name="portfolioUrl" class="form-control"
+                                   th:value="${profil != null ? profil['portfolio_url'] : ''}" placeholder="https://mon-portfolio.com">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Compétences clés</label>
+                            <input type="text" name="competences" class="form-control"
+                                   th:value="${profil != null ? profil['competences'] : ''}" placeholder="Java, Spring Boot, Angular, Docker">
+                            <div class="form-text"><i class="bi bi-info-circle me-1"></i>Séparez obligatoirement vos compétences par des virgules.</div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Présentation / Biographie</label>
+                            <textarea name="bio" class="form-control" rows="4"
+                                      placeholder="Résumez vos ambitions professionnelles..."
+                                      th:text="${profil != null ? profil['bio'] : ''}"></textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="bi bi-image-fill me-1 text-primary"></i> Photo professionnelle</label>
+                            <input type="file" name="photo" class="form-control" accept="image/*">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="bi bi-file-earmark-pdf-fill me-1 text-danger"></i> Curriculum Vitae (CV)</label>
+                            <input type="file" name="cv" class="form-control" accept=".pdf,.doc,.docx">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-3 mt-5">
+                        <a href="/dashboard-candidat" class="btn btn-pill btn-pill-outline">Annuler</a>
+                        <button type="submit" class="btn btn-pill btn-pill-primary">Mettre à jour mon espace</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
     </div>
 </div>
 </body>

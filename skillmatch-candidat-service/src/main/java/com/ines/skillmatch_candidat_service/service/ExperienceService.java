@@ -1,8 +1,10 @@
 package com.ines.skillmatch_candidat_service.service;
+
 import com.ines.skillmatch_candidat_service.dto.ExperienceDTO;
 import com.ines.skillmatch_candidat_service.model.Candidat;
 import com.ines.skillmatch_candidat_service.model.Experience;
 import com.ines.skillmatch_candidat_service.repository.ExperienceRepository;
+import com.ines.skillmatch_candidat_service.repository.CandidatRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,11 +16,13 @@ import java.util.List;
 public class ExperienceService {
 
     private final ExperienceRepository experienceRepository;
-    private final CandidatService candidatService;
+    private final CandidatRepository candidatRepository;
 
     @Transactional
     public Experience addExperience(Long userId, ExperienceDTO dto) {
-        Candidat candidat = candidatService.getByUserId(userId);
+        // On vérifie que le candidat existe vraiment en base
+        Candidat candidat = candidatRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Veuillez d'abord créer votre profil (Nom, Prénom) avant d'ajouter des expériences."));
 
         Experience experience = Experience.builder()
                 .candidat(candidat)
@@ -51,12 +55,12 @@ public class ExperienceService {
         experienceRepository.deleteById(id);
     }
 
-    public List<Experience> getExperiencesByCandidat(Long candidatId) {
-        return experienceRepository.findByCandidatId(candidatId);
+    // Utilisation de la méthode optimisée du repository
+    public List<Experience> getExperiencesByUserId(Long userId) {
+        return experienceRepository.findByCandidatUserId(userId);
     }
 
-    public List<Experience> getExperiencesByUserId(Long userId) {
-        Candidat candidat = candidatService.getByUserId(userId);
-        return experienceRepository.findByCandidatId(candidat.getId());
+    public List<Experience> getExperiencesByCandidat(Long candidatId) {
+        return experienceRepository.findByCandidatId(candidatId);
     }
 }

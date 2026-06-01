@@ -64,8 +64,9 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
                         .getPayload();
 
                 // Ajouter les informations utilisateur aux headers pour les microservices suivants
+                // Dans JwtAuthenticationFilter.java, remplace la ligne de l'ID par :
                 exchange.getRequest().mutate()
-                        .header("X-User-Id", claims.get("userId", Object.class).toString())
+                        .header("X-User-Id", String.valueOf(claims.get("userId"))) // Plus robuste
                         .header("X-User-Role", claims.get("role", String.class))
                         .header("X-User-Email", claims.getSubject());
 

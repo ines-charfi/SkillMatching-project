@@ -3,6 +3,8 @@ package com.ines.skillmatch_entreprise_service.service;
 import com.ines.skillmatch_entreprise_service.dto.EntrepriseDTO;
 import com.ines.skillmatch_entreprise_service.model.Entreprise;
 import com.ines.skillmatch_entreprise_service.repository.EntrepriseRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,56 +14,60 @@ import java.nio.file.*;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class EntrepriseService {
 
-    private final EntrepriseRepository entrepriseRepository;
+    private final EntrepriseRepository repository;
 
-    public EntrepriseService(EntrepriseRepository entrepriseRepository) {
-        this.entrepriseRepository = entrepriseRepository;
+    @Value("${app.upload.dir:uploads}")
+    private String uploadDir;
+
+    // 1. INITIALISATION (Appelé par Auth-Service via Feign)
+    @Transactional
+    public void initEntreprise(Long userId, String nomEntreprise) {
+        if (!repository.existsByUserId(userId)) {
+            Entreprise entreprise = Entreprise.builder()
+                    .userId(userId)
+                    .nomEntreprise(nomEntreprise)
+                    .build();
+            repository.save(entreprise);
+        }
     }
 
     public Entreprise getById(Long id) {
-        return entrepriseRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Entreprise non trouvée avec l'ID: " + id));
+        return repository.findById(id).orElseThrow(() -> new RuntimeException("Entreprise non trouvée"));
     }
 
     public Entreprise getByUserId(Long userId) {
-        return entrepriseRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Profil entreprise non trouvé pour l'utilisateur: " + userId));
+        return repository.findByUserId(userId).orElse(new Entreprise());
     }
 
+    // 2. MISE À JOUR AVEC LOGO
     @Transactional
-    public Entreprise createOrUpdate(Long userId, EntrepriseDTO dto) {
-        Entreprise entreprise = entrepriseRepository.findByUserId(userId)
+    public Entreprise updateProfil(Long userId, EntrepriseDTO dto, MultipartFile logo) throws IOException {
+        Entreprise e = repository.findByUserId(userId)
                 .orElse(Entreprise.builder().userId(userId).build());
 
-        entreprise.setNomEntreprise(dto.getNomEntreprise());
-        entreprise.setSecteur(dto.getSecteur());
-        entreprise.setDescription(dto.getDescription());
-        entreprise.setSiteWeb(dto.getSiteWeb());
-        entreprise.setTelephone(dto.getTelephone());
-        entreprise.setContactEmail(dto.getContactEmail());
+        e.setNomEntreprise(dto.getNomEntreprise());
+        e.setSecteur(dto.getSecteur());
+        e.setDescription(dto.getDescription());
+        e.setSiteWeb(dto.getSiteWeb());
+        e.setTelephone(dto.getTelephone());
+        e.setContactEmail(dto.getContactEmail());
 
-        return entrepriseRepository.save(entreprise);
-    }
-
-    @Transactional
-    public String uploadLogo(Long userId, MultipartFile file) throws IOException {
-        Entreprise entreprise = getByUserId(userId);
-
-        Path uploadPath = Paths.get("uploads", "logos");
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
+        if (logo != null && !logo.isEmpty()) {
+            String fileName = saveFile(logo, "logos");
+            e.setLogoPath(fileName);
         }
 
+        return repository.save(e);
+    }
+
+    private String saveFile(MultipartFile file, String subDir) throws IOException {
+        Path path = Paths.get(uploadDir, subDir);
+        if (!Files.exists(path)) Files.createDirectories(path);
         String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-        Path filePath = uploadPath.resolve(fileName);
-
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-        entreprise.setLogoPath(filePath.toString());
-        entrepriseRepository.save(entreprise);
-
-        return filePath.toString();
+        Files.copy(file.getInputStream(), path.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
+        return fileName;
     }
 }

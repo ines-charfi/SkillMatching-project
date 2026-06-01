@@ -6,458 +6,215 @@
     <title>SkillMatch - Profil Entreprise</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #4f46e5;
-            --primary-light: #eef2ff;
             --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success: #10b981;
-            --danger: #ef4444;
+            --gradient-navbar: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
             --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
             --gray-200: #e5e7eb;
-            --gray-500: #6b7280;
-            --gray-700: #374151;
-            --gray-800: #1f2937;
-            --radius: 16px;
-            --radius-sm: 10px;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --gray-800: #111827;
+            --radius: 20px;
+            --radius-sm: 12px;
+            --shadow-md: 0 10px 30px rgba(0,0,0,0.02);
+            --shadow-xl: 0 20px 40px rgba(79,70,229,0.12);
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
+            font-family: 'Inter', sans-serif;
             background: var(--gray-50);
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            color: var(--gray-700);
-            line-height: 1.6;
+            color: #4b5563;
         }
 
-        .container {
-            max-width: 900px;
-            margin: 30px auto;
-            padding: 0 20px;
+        .navbar-custom {
+            background: var(--gradient-navbar);
+            padding: 15px 40px;
         }
 
-        /* Header Profil */
-        .profile-header {
+        .form-card {
             background: white;
             border-radius: var(--radius);
             padding: 40px;
-            text-align: center;
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 24px;
-            position: relative;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--gray-200);
+            transition: box-shadow 0.3s;
         }
 
-        .logo-upload {
-            width: 120px;
-            height: 120px;
-            background: var(--gradient);
-            border-radius: 20px;
-            display: inline-flex;
+        .form-card:hover {
+            box-shadow: var(--shadow-xl);
+        }
+
+        .logo-container {
+            width: 100px;
+            height: 100px;
+            background: rgba(79, 70, 229, 0.05);
+            border-radius: var(--radius-sm);
+            display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 48px;
-            color: white;
-            font-weight: 700;
-            margin-bottom: 20px;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(79,70,229,0.3);
+            font-size: 42px;
+            color: var(--primary);
+            margin: 0 auto 20px;
+            border: 2px dashed #c7d2fe;
         }
 
-        .logo-upload input {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .company-name {
-            font-size: 28px;
+        .section-separator {
+            font-size: 13px;
             font-weight: 800;
-            color: var(--gray-800);
-            margin-bottom: 8px;
-        }
-
-        .company-email {
-            color: var(--gray-500);
-            font-size: 14px;
-            margin-bottom: 8px;
-        }
-
-        .company-status {
-            display: inline-block;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 12px;
-        }
-
-        .status-valide { background: #d1fae5; color: #059669; }
-        .status-attente { background: #fef3c7; color: #d97706; }
-        .status-rejete { background: #fef2f2; color: #dc2626; }
-
-        /* Section Cards */
-        .section-card {
-            background: white;
-            border-radius: var(--radius);
-            padding: 30px;
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 24px;
-        }
-
-        .section-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--gray-800);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #10b981;
+            margin-top: 35px;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .section-title i {
-            color: var(--primary);
-        }
-
-        /* Form */
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group.full {
-            grid-column: 1 / -1;
+        .section-separator::after {
+            content: '';
+            flex-grow: 1;
+            height: 1px;
+            background: var(--gray-200);
         }
 
         .form-label {
-            display: block;
             font-weight: 600;
-            color: var(--gray-700);
+            color: var(--gray-800);
+            font-size: 14px;
             margin-bottom: 6px;
-            font-size: 13px;
         }
 
-        .form-input, .form-select, .form-textarea {
-            width: 100%;
+        .form-control {
+            border-radius: var(--radius-sm);
             padding: 12px 16px;
             border: 2px solid var(--gray-200);
-            border-radius: var(--radius-sm);
-            font-size: 14px;
-            color: var(--gray-700);
+            background-color: var(--gray-50);
+            font-size: 15px;
             transition: all 0.2s;
-            background: white;
         }
 
-        .form-input:focus, .form-select:focus, .form-textarea:focus {
-            outline: none;
+        .form-control:focus {
+            background-color: white;
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(79,70,229,0.1);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08);
+            outline: none;
         }
 
-        .form-textarea {
-            min-height: 120px;
-            resize: vertical;
+        .btn-pill {
+            padding: 12px 35px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 15px;
+            transition: all 0.3s;
         }
 
-        /* Buttons */
-        .btn-save {
-            width: 100%;
-            padding: 14px;
+        .btn-pill-primary {
             background: var(--gradient);
             color: white;
             border: none;
-            border-radius: var(--radius-sm);
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 5px 20px rgba(79,70,229,0.3);
         }
 
-        .btn-save:hover {
+        .btn-pill-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(79,70,229,0.4);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.25);
+            color: white;
         }
 
-        .btn-save:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
+        .btn-pill-outline {
+            background: transparent;
+            border: 2px solid var(--gray-200);
+            color: #6b7280;
         }
 
-        /* Message */
-        .message {
-            padding: 12px 16px;
-            border-radius: var(--radius-sm);
-            margin-top: 12px;
-            font-weight: 500;
-            font-size: 14px;
-            display: none;
-        }
-
-        .message.success {
-            background: #d1fae5;
-            color: #059669;
-            display: block;
-        }
-
-        .message.error {
-            background: #fef2f2;
-            color: #dc2626;
-            display: block;
-        }
-
-        @media (max-width: 768px) {
-            .form-grid { grid-template-columns: 1fr; }
-            .profile-header { padding: 25px; }
+        .btn-pill-outline:hover {
+            background: var(--gray-50);
+            color: var(--gray-800);
         }
     </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<div th:replace="fragments/header :: header"></div>
-
-<div class="container">
-
-    <!-- En-tête du profil -->
-    <div class="profile-header">
-        <div class="logo-upload" id="logoPreview">
-            <span id="logoText">?</span>
-            <input type="file" id="logoInput" accept="image/*" onchange="uploadLogo()" title="Changer le logo">
-        </div>
-        <h1 class="company-name" id="companyNameDisplay">Chargement...</h1>
-        <p class="company-email" id="companyEmail"></p>
-        <span class="company-status status-attente" id="companyStatus">En attente de validation</span>
+<nav class="navbar navbar-custom navbar-dark mb-5">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+        <a class="navbar-brand fw-bold text-white text-decoration-none fs-4" href="/dashboard">
+            <i class="bi bi-lightning-charge-fill text-warning me-2"></i>SkillMatch
+        </a>
+        <a href="/dashboard-entreprise" class="btn btn-outline-light btn-pill btn-sm px-3 py-1">
+            <i class="bi bi-arrow-left me-1"></i> Dashboard Recruteur
+        </a>
     </div>
+</nav>
 
-    <!-- Formulaire d'informations -->
-    <div class="section-card">
-        <h2 class="section-title">
-            <i class="bi bi-building-fill"></i> Informations de l'entreprise
-        </h2>
+<div class="container pb-5" style="max-width: 850px;">
+    <div class="form-card">
 
-        <form id="entrepriseForm" onsubmit="saveProfile(event)">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label class="form-label">Nom de l'entreprise *</label>
-                    <input type="text" class="form-input" id="nomEntreprise" placeholder="Nom de votre entreprise" required>
+        <div class="text-center mb-4">
+            <div class="logo-container">
+                <i class="bi bi-building-fill-gear"></i>
+            </div>
+            <h2 class="fw-bold text-dark mb-1" th:text="${profil != null ? profil['nomEntreprise'] : 'Identité Entreprise'}">Nom Entreprise</h2>
+            <p class="text-muted small">Mettez en valeur votre marque employeur pour attirer les meilleurs profils.</p>
+        </div>
+
+        <form th:action="@{/profil-entreprise/update}" method="post" enctype="multipart/form-data">
+
+            <div class="section-separator">Fiche d'identité</div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Raison sociale / Nom *</label>
+                    <input type="text" name="nomEntreprise" class="form-control" th:value="${profil != null ? profil['nomEntreprise'] : ''}" required placeholder="Ex: SkillMatch Corp">
                 </div>
-
-                <div class="form-group">
+                <div class="col-md-6">
                     <label class="form-label">Secteur d'activité</label>
-                    <select class="form-select" id="secteur">
-                        <option value="">Sélectionnez un secteur</option>
-                        <option value="Technologie">Technologie</option>
-                        <option value="Finance">Finance</option>
-                        <option value="Santé">Santé</option>
-                        <option value="Éducation">Éducation</option>
-                        <option value="Commerce">Commerce</option>
-                        <option value="Industrie">Industrie</option>
-                        <option value="Conseil">Conseil</option>
-                        <option value="Autre">Autre</option>
-                    </select>
+                    <input type="text" name="secteur" class="form-control" th:value="${profil != null ? profil['secteur'] : ''}" placeholder="Ex: Technologies / IA">
                 </div>
-
-                <div class="form-group">
-                    <label class="form-label">Téléphone</label>
-                    <input type="tel" class="form-input" id="telephone" placeholder="01 23 45 67 89">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Email de contact</label>
-                    <input type="email" class="form-input" id="contactEmail" placeholder="contact@entreprise.com">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Site web</label>
-                    <input type="url" class="form-input" id="siteWeb" placeholder="https://www.votre-entreprise.com">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Taille de l'entreprise</label>
-                    <select class="form-select" id="taille">
-                        <option value="">Sélectionnez</option>
-                        <option value="TPE">TPE (1-19 employés)</option>
-                        <option value="PME">PME (20-249 employés)</option>
-                        <option value="ETI">ETI (250-4999 employés)</option>
-                        <option value="GRAND_GROUPE">Grand Groupe (5000+ employés)</option>
-                        <option value="STARTUP">Startup</option>
-                    </select>
-                </div>
-
-                <div class="form-group full">
-                    <label class="form-label">Description</label>
-                    <textarea class="form-textarea" id="description" placeholder="Décrivez votre entreprise, votre mission, votre culture..."></textarea>
+                <div class="col-12">
+                    <label class="form-label">Description générale & valeurs</label>
+                    <textarea name="description" class="form-control" rows="4" th:text="${profil != null ? profil['description'] : ''}" placeholder="Partagez l'ambition et l'environnement de travail de votre entreprise..."></textarea>
                 </div>
             </div>
 
-            <button type="submit" class="btn-save" id="saveButton">
-                <i class="bi bi-check-circle-fill"></i> Enregistrer les modifications
-            </button>
+            <div class="section-separator">Coordonnées & Siège</div>
 
-            <div class="message" id="message"></div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Adresse e-mail RH</label>
+                    <input type="email" name="contactEmail" class="form-control" th:value="${profil != null ? profil['contactEmail'] : ''}" placeholder="recrutement@entreprise.com">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Téléphone standard</label>
+                    <input type="tel" name="telephone" class="form-control" th:value="${profil != null ? profil['telephone'] : ''}" placeholder="+212 500-000000">
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label">Lien site vitrine</label>
+                    <input type="url" name="siteWeb" class="form-control" th:value="${profil != null ? profil['siteWeb'] : ''}" placeholder="https://www.entreprise.com">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Ville du siège</label>
+                    <input type="text" name="ville" class="form-control" th:value="${profil != null ? profil['ville'] : ''}" placeholder="Ex: Casablanca">
+                </div>
+            </div>
+
+            <div class="section-separator">Identité Graphique</div>
+
+            <div class="mb-5">
+                <label class="form-label">Logo corporatif (PNG ou JPG)</label>
+                <input type="file" name="logo" class="form-control" accept="image/*">
+                <div th:if="${profil != null and profil['logoPath'] != null}" class="mt-2 text-primary small d-flex align-items-center gap-1">
+                    <i class="bi bi-file-earmark-image"></i> Fichier actif actuellement : <span class="fw-semibold" th:text="${profil['logoPath']}">logo.png</span>
+                </div>
+            </div>
+
+            <div class="d-flex flex-column flex-sm-row justify-content-end gap-3 pt-3 border-top">
+                <a href="/dashboard-entreprise" class="btn btn-pill btn-pill-outline text-center">Annuler</a>
+                <button type="submit" class="btn btn-pill btn-pill-primary">Enregistrer les modifications</button>
+            </div>
         </form>
     </div>
 </div>
 
-<!-- FOOTER -->
-<div th:replace="fragments/footer :: footer"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-    const API_BASE_URL = 'http://localhost:8080';
-    const token = localStorage.getItem('token');
-    const userId = localStorage.getItem('userId');
-    const userEmail = localStorage.getItem('userEmail');
-    let entrepriseData = null;
-
-    // Charger le profil au démarrage
-    document.addEventListener('DOMContentLoaded', loadProfile);
-
-    async function loadProfile() {
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/entreprises/user/${userId}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            if (response.ok) {
-                entrepriseData = await response.json();
-                fillForm(entrepriseData);
-            }
-        } catch (error) {
-            console.error('Erreur chargement profil:', error);
-            showMessage('Erreur lors du chargement du profil', 'error');
-        }
-
-        // Mettre à jour l'affichage
-        document.getElementById('companyEmail').textContent = userEmail;
-    }
-
-    function fillForm(data) {
-        document.getElementById('nomEntreprise').value = data.nomEntreprise || '';
-        document.getElementById('secteur').value = data.secteur || '';
-        document.getElementById('telephone').value = data.telephone || '';
-        document.getElementById('contactEmail').value = data.contactEmail || '';
-        document.getElementById('siteWeb').value = data.siteWeb || '';
-        document.getElementById('taille').value = data.taille || '';
-        document.getElementById('description').value = data.description || '';
-
-        // Logo
-        const initials = (data.nomEntreprise || '?').charAt(0).toUpperCase();
-        document.getElementById('logoText').textContent = initials;
-        document.getElementById('companyNameDisplay').textContent = data.nomEntreprise || 'Votre entreprise';
-
-        // Statut
-        const statusEl = document.getElementById('companyStatus');
-        if (data.validationStatut === 'VALIDE') {
-            statusEl.textContent = '✅ Validé';
-            statusEl.className = 'company-status status-valide';
-        } else if (data.validationStatut === 'REJETE') {
-            statusEl.textContent = '❌ Rejeté';
-            statusEl.className = 'company-status status-rejete';
-        } else {
-            statusEl.textContent = '⏳ En attente de validation';
-            statusEl.className = 'company-status status-attente';
-        }
-    }
-
-    async function saveProfile(event) {
-        event.preventDefault();
-
-        const saveBtn = document.getElementById('saveButton');
-        saveBtn.disabled = true;
-        saveBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Enregistrement...';
-
-        const data = {
-            nomEntreprise: document.getElementById('nomEntreprise').value,
-            secteur: document.getElementById('secteur').value,
-            telephone: document.getElementById('telephone').value,
-            contactEmail: document.getElementById('contactEmail').value,
-            siteWeb: document.getElementById('siteWeb').value,
-            taille: document.getElementById('taille').value,
-            description: document.getElementById('description').value
-        };
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/entreprises/user/${userId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(data)
-            });
-
-            if (response.ok) {
-                const result = await response.json();
-                entrepriseData = result;
-                fillForm(result);
-                showMessage('✅ Profil mis à jour avec succès !', 'success');
-            } else {
-                const error = await response.json();
-                showMessage('❌ ' + (error.message || 'Erreur lors de la mise à jour'), 'error');
-            }
-        } catch (error) {
-            console.error('Erreur:', error);
-            showMessage('❌ Erreur de connexion au serveur', 'error');
-        } finally {
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Enregistrer les modifications';
-        }
-    }
-
-    async function uploadLogo() {
-        const file = document.getElementById('logoInput').files[0];
-        if (!file) return;
-
-        // Vérifier la taille (max 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-            alert('Le fichier est trop volumineux. Maximum 5MB.');
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('file', file);
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/entreprises/user/${userId}/logo`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` },
-                body: formData
-            });
-
-            if (response.ok) {
-                document.getElementById('logoText').textContent = '✓';
-                showMessage('✅ Logo uploadé avec succès !', 'success');
-            } else {
-                showMessage('❌ Erreur lors de l\'upload du logo', 'error');
-            }
-        } catch (error) {
-            console.error('Erreur upload:', error);
-            showMessage('❌ Erreur de connexion', 'error');
-        }
-    }
-
-    function showMessage(text, type) {
-        const msg = document.getElementById('message');
-        msg.textContent = text;
-        msg.className = 'message ' + type;
-
-        setTimeout(() => {
-            msg.className = 'message';
-        }, 4000);
-    }
-</script>
 </body>
 </html>

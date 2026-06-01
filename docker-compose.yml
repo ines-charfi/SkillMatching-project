@@ -2,45 +2,43 @@ version: '3.8'
 
 services:
   # ============================================
-  # CONSUL - Service Discovery
+  # DATABASE SYSTEM (MySQL)
+  # ============================================
+  mysql:
+    image: mysql:8.0.46
+    container_name: mysql-skillmatch
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=skillmatchingApp
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    networks:
+      - skillmatch-network
+
+  # ============================================
+  # SERVICE DISCOVERY (Consul)
   # ============================================
   consul:
     image: hashicorp/consul:1.15.0
     container_name: consul-server-skillmatchpfe
     ports:
       - "8500:8500"
-    command: "agent -dev -client 0.0.0.0"
-    volumes:
-      - consul-data:/consul/data
-    networks:
-      - skillmatch-network
+    command: "agent -server -bootstrap-expect=1 -ui -client=0.0.0.0"
     healthcheck:
-      test: ["CMD", "consul", "members"]
-      interval: 10s
+      test: ["CMD", "curl", "-f", "http://localhost:8500/v1/status/leader"]
+      interval: 5s
       timeout: 5s
       retries: 5
-
-  # ============================================
-  # MYSQL - Base de données
-  # ============================================
-  mysql:
-    image: mysql:8.0
-    container_name: mysql-skillmatch
-    ports:
-      - "3307:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: skillmatchingApp
-    volumes:
-      - mysql-data:/var/lib/mysql
-
     networks:
       - skillmatch-network
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   # ============================================
   # API GATEWAY
@@ -48,13 +46,13 @@ services:
   api-gateway:
     build:
       context: ./skillmatch-api-gateway
-      dockerfile: Dockerfile
     container_name: api-gateway
     ports:
       - "8080:8080"
     environment:
-      - spring.cloud.consul.host=consul
-      - spring.cloud.consul.port=8500
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
     depends_on:
       consul:
         condition: service_healthy
@@ -62,158 +60,149 @@ services:
       - skillmatch-network
 
   # ============================================
-  # AUTH SERVICE
+  # CORE MICROSERVICES
   # ============================================
   auth-service:
     build:
       context: ./skillmatch-auth-service
-      dockerfile: Dockerfile
     container_name: auth-service
     ports:
       - "8081:8081"
     environment:
-      - spring.datasource.url=jdbc:mysql://mysql:3306/skillmatchingApp?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      - spring.datasource.username=root
-      - spring.datasource.password=password
-      - spring.cloud.consul.host=consul
-      - spring.cloud.consul.port=8500
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_HOST=mysql
+      - SPRING_DATASOURCE_DB=skillmatchingApp
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
     depends_on:
-      consul:
-        condition: service_healthy
       mysql:
+        condition: service_healthy
+      consul:
         condition: service_healthy
     networks:
       - skillmatch-network
 
-  # ============================================
-  # CANDIDAT SERVICE
-  # ============================================
   candidat-service:
     build:
       context: ./skillmatch-candidat-service
-      dockerfile: Dockerfile
     container_name: candidat-service
     ports:
       - "8082:8082"
     environment:
-      - spring.datasource.url=jdbc:mysql://mysql:3306/skillmatchingApp?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      - spring.datasource.username=root
-      - spring.datasource.password=password
-      - spring.cloud.consul.host=consul
-      - spring.cloud.consul.port=8500
-    volumes:
-      - ./uploads:/uploads
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_HOST=mysql
+      - SPRING_DATASOURCE_DB=skillmatchingApp
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
     depends_on:
-      consul:
-        condition: service_healthy
       mysql:
+        condition: service_healthy
+      consul:
         condition: service_healthy
     networks:
       - skillmatch-network
 
-  # ============================================
-  # ENTREPRISE SERVICE
-  # ============================================
   entreprise-service:
     build:
       context: ./skillmatch-entreprise-service
-      dockerfile: Dockerfile
     container_name: entreprise-service
     ports:
       - "8083:8083"
     environment:
-      - spring.datasource.url=jdbc:mysql://mysql:3306/skillmatchingApp?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      - spring.datasource.username=root
-      - spring.datasource.password=password
-      - spring.cloud.consul.host=consul
-      - spring.cloud.consul.port=8500
-    volumes:
-      - ./uploads:/uploads
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_HOST=mysql
+      - SPRING_DATASOURCE_DB=skillmatchingApp
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
     depends_on:
-      consul:
-        condition: service_healthy
       mysql:
+        condition: service_healthy
+      consul:
         condition: service_healthy
     networks:
       - skillmatch-network
 
-  # ============================================
-  # OFFRE SERVICE
-  # ============================================
   offre-service:
     build:
       context: ./skillmatch-offres-service
-      dockerfile: Dockerfile
     container_name: offre-service
     ports:
       - "8084:8084"
     environment:
-      - spring.datasource.url=jdbc:mysql://mysql:3306/skillmatchingApp?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      - spring.datasource.username=root
-      - spring.datasource.password=password
-      - spring.cloud.consul.host=consul
-      - spring.cloud.consul.port=8500
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_HOST=mysql
+      - SPRING_DATASOURCE_DB=skillmatchingApp
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
     depends_on:
-      consul:
-        condition: service_healthy
       mysql:
+        condition: service_healthy
+      consul:
         condition: service_healthy
     networks:
       - skillmatch-network
 
-  # ============================================
-  # CANDIDATURE SERVICE
-  # ============================================
   candidature-service:
     build:
       context: ./skillmatch-candidature-service
-      dockerfile: Dockerfile
     container_name: candidature-service
     ports:
       - "8085:8085"
     environment:
-      - spring.datasource.url=jdbc:mysql://mysql:3306/skillmatchingApp?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      - spring.datasource.username=root
-      - spring.datasource.password=password
-      - spring.cloud.consul.host=consul
-      - spring.cloud.consul.port=8500
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_HOST=mysql
+      - SPRING_DATASOURCE_DB=skillmatchingApp
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
     depends_on:
-      consul:
-        condition: service_healthy
       mysql:
+        condition: service_healthy
+      consul:
         condition: service_healthy
     networks:
       - skillmatch-network
 
   # ============================================
-  # FRONTEND
+  # FRONTEND SYSTEM
   # ============================================
   frontend:
     build:
       context: ./frontend-skillmatch
-      dockerfile: Dockerfile
+    image: skillmatch-project-frontend:latest
     container_name: frontend-skillmatch
     ports:
       - "8086:8086"
     environment:
-      - api.gateway.url=http://api-gateway:8080
-      - spring.cloud.consul.host=consul
-      - spring.cloud.consul.port=8500
+      - SPRING_PROFILES_ACTIVE=docker
+      - API_GATEWAY_URL=http://api-gateway:8080
+      - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
+      - SPRING_CLOUD_CONSUL_DISCOVERY_PREFER_IP_ADDRESS=true
     depends_on:
-      - api-gateway
+      mysql:
+        condition: service_healthy
+      consul:
+        condition: service_healthy
     networks:
       - skillmatch-network
 
 # ============================================
-# VOLUMES
-# ============================================
-volumes:
-  consul-data:
-  mysql-data:
-
-# ============================================
-# NETWORK
+# NETWORKS & VOLUMES CONFIGURATION
 # ============================================
 networks:
   skillmatch-network:
     driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local

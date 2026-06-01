@@ -3,200 +3,120 @@ package com.ines.skillmatch_auth_service.controller;
 import com.ines.skillmatch_auth_service.dto.UserDto;
 import com.ines.skillmatch_auth_service.model.User;
 import com.ines.skillmatch_auth_service.repository.UserRepository;
+import com.ines.skillmatch_auth_service.service.client.CandidatClient;
+import com.ines.skillmatch_auth_service.service.client.EntrepriseClient;
+import com.ines.skillmatch_auth_service.service.client.OffreClient;
+import com.ines.skillmatch_auth_service.service.client.CandidatureClient;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
 @RequestMapping("/api/admin")
-@PreAuthorize("hasRole('ADMIN')")
+@RequiredArgsConstructor
+@Slf4j
 public class AdminController {
 
     private final UserRepository userRepository;
-    private final RestTemplate restTemplate;
-
-    // Injection par constructeur (plus propre que @RequiredArgsConstructor)
-    public AdminController(UserRepository userRepository) {
-        this.userRepository = userRepository;
-        this.restTemplate = new RestTemplate();
-    }
+    private final CandidatClient candidatClient;
+    private final EntrepriseClient entrepriseClient;
+    private final OffreClient offreClient;
+    private final CandidatureClient candidatureClient;
 
     // ============================================
-    // USERS
+    // 1. STATISTIQUES GLOBALES (Pour les 4 cartes du haut)
     // ============================================
-
-    @GetMapping("/users")
-    public ResponseEntity<List<UserDto>> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        List<UserDto> dtos = users.stream()
-                .map(this::toDto)
-                .toList();
-        return ResponseEntity.ok(dtos);
-    }
-
-    @GetMapping("/users/{id}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'ID: " + id));
-        return ResponseEntity.ok(toDto(user));
-    }
-
-    @PutMapping("/users/{id}/toggle-status")
-    public ResponseEntity<UserDto> toggleUserStatus(@PathVariable Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'ID: " + id));
-        user.setEnabled(!user.getEnabled());
-        user = userRepository.save(user);
-        return ResponseEntity.ok(toDto(user));
-    }
-
-    @PutMapping("/users/{id}/role")
-    public ResponseEntity<UserDto> changeUserRole(@PathVariable Long id, @RequestParam String role) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'ID: " + id));
-        user.setRole(User.Role.valueOf(role.toUpperCase()));
-        user = userRepository.save(user);
-        return ResponseEntity.ok(toDto(user));
-    }
-
-    @DeleteMapping("/users/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new RuntimeException("Utilisateur non trouvé avec l'ID: " + id);
-        }
-        userRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
-    }
-
     @GetMapping("/stats")
-    public ResponseEntity<Map<String, Object>> getStats() {
-        List<User> allUsers = userRepository.findAll();
-
-        long totalUsers = allUsers.size();
-        long candidats = allUsers.stream().filter(u -> u.getRole() == User.Role.CANDIDAT).count();
-        long entreprises = allUsers.stream().filter(u -> u.getRole() == User.Role.ENTREPRISE).count();
-        long admins = allUsers.stream().filter(u -> u.getRole() == User.Role.ADMIN).count();
-        long enabled = allUsers.stream().filter(User::getEnabled).count();
-
+    public ResponseEntity<Map<String, Object>> getGlobalStats() {
         Map<String, Object> stats = new HashMap<>();
-        stats.put("totalUsers", totalUsers);
-        stats.put("candidats", candidats);
-        stats.put("entreprises", entreprises);
-        stats.put("admins", admins);
-        stats.put("enabled", enabled);
-        stats.put("disabled", totalUsers - enabled);
+
+        // Stats locales (Auth DB)
+        List<User> allUsers = userRepository.findAll();
+        stats.put("totalUsers", allUsers.size());
+        stats.put("candidats", allUsers.stream().filter(u -> u.getRole() == User.Role.CANDIDAT).count());
+        stats.put("entreprises", allUsers.stream().filter(u -> u.getRole() == User.Role.ENTREPRISE).count());
+        stats.put("admins", allUsers.stream().filter(u -> u.getRole() == User.Role.ADMIN).count());
+
+        // Stats distantes (via OpenFeign)
+        try {
+            stats.put("totalOffres", offreClient.countAllOffres());
+            stats.put("totalCandidatures", candidatureClient.countAllCandidatures());
+        } catch (Exception e) {
+            log.error("Erreur récupération stats distantes: {}", e.getMessage());
+            stats.put("totalOffres", 0);
+            stats.put("totalCandidatures", 0);
+        }
 
         return ResponseEntity.ok(stats);
     }
 
     // ============================================
-    // VÉRIFICATION FICHIERS
+    // 2. GESTION DES UTILISATEURS
     // ============================================
+    @GetMapping("/users")
+    public ResponseEntity<List<UserDto>> getAllUsers() {
+        return ResponseEntity.ok(userRepository.findAll().stream().map(this::toDto).toList());
+    }
 
+    @GetMapping("/latest-users")
+    public ResponseEntity<List<UserDto>> getLatestUsers() {
+        // Retourne les 5 derniers inscrits pour le tableau de droite
+        return ResponseEntity.ok(userRepository.findTop5ByOrderByDateCreationDesc().stream().map(this::toDto).toList());
+    }
+
+    @PutMapping("/users/{id}/toggle")
+    public ResponseEntity<Void> toggleUser(@PathVariable Long id) {
+        User user = userRepository.findById(id).orElseThrow();
+        user.setEnabled(!user.getEnabled());
+        userRepository.save(user);
+        return ResponseEntity.ok().build();
+    }
+
+    // ============================================
+    // 3. VÉRIFICATION IA DES FICHIERS
+    // ============================================
     @GetMapping("/fichiers-a-verifier")
     public ResponseEntity<List<Map<String, Object>>> getFichiersAVerifier() {
         List<Map<String, Object>> fichiers = new ArrayList<>();
-        List<User> users = userRepository.findAll();
 
-        for (User user : users) {
-            // Candidats
-            if (user.getRole() == User.Role.CANDIDAT) {
-                try {
-                    Map<String, Object> candidat = restTemplate.getForObject(
-                            "http://candidat-service/api/candidats/user/" + user.getId(),
-                            Map.class);
-
-                    if (candidat != null) {
-                        if (candidat.get("cvPath") != null) {
+        // On parcourt les candidats pour trouver les CV
+        userRepository.findAll().stream()
+                .filter(u -> u.getRole() == User.Role.CANDIDAT)
+                .forEach(user -> {
+                    try {
+                        Map<String, Object> candidat = candidatClient.getCandidatByUserId(user.getId());
+                        if (candidat != null && candidat.get("cvPath") != null) {
                             Map<String, Object> f = new HashMap<>();
-                            f.put("id", "cv_" + candidat.get("id"));
-                            f.put("userId", user.getId());
+                            f.put("id", user.getId());
                             f.put("type", "CV");
-                            f.put("nom", candidat.get("cvPath").toString());
-                            f.put("candidatNom", candidat.get("prenom") + " " + candidat.get("nom"));
-                            f.put("dateUpload", candidat.get("dateCreation"));
-                            f.put("statut", "EN_ATTENTE");
-                            f.put("url", candidat.get("cvPath").toString());
+                            f.put("nom", candidat.get("cvPath"));
+                            f.put("proprietaire", candidat.get("prenom") + " " + candidat.get("nom"));
+                            f.put("date", candidat.get("dateCreation"));
                             fichiers.add(f);
                         }
-                        if (candidat.get("photoPath") != null) {
-                            Map<String, Object> f = new HashMap<>();
-                            f.put("id", "photo_" + candidat.get("id"));
-                            f.put("userId", user.getId());
-                            f.put("type", "PHOTO");
-                            f.put("nom", candidat.get("photoPath").toString());
-                            f.put("candidatNom", candidat.get("prenom") + " " + candidat.get("nom"));
-                            f.put("dateUpload", candidat.get("dateCreation"));
-                            f.put("statut", "EN_ATTENTE");
-                            f.put("url", candidat.get("photoPath").toString());
-                            fichiers.add(f);
-                        }
-                    }
-                } catch (Exception ignored) {}
-            }
-
-            // Entreprises
-            if (user.getRole() == User.Role.ENTREPRISE) {
-                try {
-                    Map<String, Object> entreprise = restTemplate.getForObject(
-                            "http://entreprise-service/api/entreprises/user/" + user.getId(),
-                            Map.class);
-
-                    if (entreprise != null && entreprise.get("logoPath") != null) {
-                        Map<String, Object> f = new HashMap<>();
-                        f.put("id", "logo_" + entreprise.get("id"));
-                        f.put("userId", user.getId());
-                        f.put("type", "LOGO");
-                        f.put("nom", entreprise.get("logoPath").toString());
-                        f.put("entrepriseNom", entreprise.get("nomEntreprise"));
-                        f.put("dateUpload", entreprise.get("dateCreation"));
-                        f.put("statut", "EN_ATTENTE");
-                        f.put("url", entreprise.get("logoPath").toString());
-                        fichiers.add(f);
-                    }
-                } catch (Exception ignored) {}
-            }
-        }
+                    } catch (Exception ignored) {}
+                });
 
         return ResponseEntity.ok(fichiers);
     }
 
     @PostMapping("/analyser-contenu")
-    public ResponseEntity<Map<String, Object>> analyserContenu(@RequestBody Map<String, String> request) {
-        String typeFichier = request.get("type");
-        Map<String, Object> resultat = analyserAvecIA(typeFichier);
-        return ResponseEntity.ok(resultat);
+    public ResponseEntity<Map<String, Object>> analyser(@RequestBody Map<String, String> req) {
+        // Appelle la simulation IA que tu as déjà écrite
+        return ResponseEntity.ok(analyserAvecIA(req.get("type")));
     }
 
-    @PutMapping("/approuver-fichier/{id}")
-    public ResponseEntity<Map<String, String>> approuverFichier(@PathVariable String id) {
-        return ResponseEntity.ok(Map.of("message", "Fichier approuvé"));
-    }
-
-    @PutMapping("/rejeter-fichier/{id}")
-    public ResponseEntity<Map<String, String>> rejeterFichier(@PathVariable String id,
-                                                              @RequestBody Map<String, String> body) {
-        return ResponseEntity.ok(Map.of("message", "Fichier rejeté", "motif", body.getOrDefault("motif", "")));
-    }
-
-    // ============================================
-    // PRIVATE METHODS
-    // ============================================
-
+    // --- UTILS ---
     private UserDto toDto(User user) {
         return UserDto.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .role(user.getRole().name())
-                .enabled(user.getEnabled())
-                .provider(user.getProvider())
-                .dateCreation(user.getDateCreation())
-                .build();
+                .id(user.getId()).email(user.getEmail()).role(user.getRole().name())
+                .enabled(user.getEnabled()).dateCreation(user.getDateCreation()).build();
     }
+
 
     /**
      * Simulation d'analyse IA

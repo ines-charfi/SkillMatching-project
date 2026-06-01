@@ -7,189 +7,133 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
     <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-        }
-        .register-card {
-            background: white;
-            border-radius: 15px;
-            padding: 40px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            max-width: 500px;
-            width: 100%;
-        }
-        .role-card {
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .role-card:hover {
-            border-color: #667eea;
-            transform: translateY(-2px);
-        }
-        .role-card.selected {
-            border-color: #667eea;
-            background: #f0f0ff;
-        }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; font-family: 'Segoe UI', sans-serif; }
+        .register-card { background: white; border-radius: 20px; padding: 40px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); max-width: 550px; width: 100%; }
+        .role-card { border: 2px solid #f1f5f9; border-radius: 15px; padding: 20px; cursor: pointer; transition: 0.3s; }
+        .role-card:hover { border-color: #667eea; transform: translateY(-3px); }
+        .role-card.selected { border-color: #4f46e5; background: #eef2ff; }
+        .form-control { border-radius: 10px; padding: 12px; border: 2px solid #f1f5f9; }
+        .btn-register { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 10px; padding: 12px; font-weight: 700; color: white; transition: 0.3s; }
+        .btn-register:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(118, 75, 162, 0.4); }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="register-card mx-auto">
-        <h2 class="text-center mb-4">📝 Créer un compte</h2>
+        <h2 class="text-center fw-bold mb-4" style="color: #1e1b4b;">📝 Créer un compte</h2>
 
-        <form id="registerForm">
+        <!-- MESSAGE D'ERREUR -->
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <!-- FORMULAIRE REDIRIGÉ VERS JAVA -->
+        <form th:action="@{/register}" method="post">
+
             <!-- Sélection du rôle -->
             <div class="mb-4">
-                <label class="form-label fw-bold">Je suis :</label>
-                <div class="row">
+                <label class="form-label fw-bold small text-uppercase text-muted">Je suis :</label>
+                <div class="row g-3">
                     <div class="col-6">
-                        <div class="role-card text-center selected" data-role="CANDIDAT"
-                             onclick="selectRole('CANDIDAT', this)">
-                            <i class="bi bi-person-circle display-4"></i>
-                            <h5 class="mt-2">Candidat</h5>
-                            <p class="text-muted small">Je cherche un emploi</p>
+                        <div class="role-card text-center selected" id="cardCandidat" onclick="selectRole('CANDIDAT')">
+                            <i class="bi bi-person-circle fs-1 text-primary"></i>
+                            <h6 class="mt-2 fw-bold">Candidat</h6>
+                            <p class="text-muted small mb-0">Je cherche un job</p>
                         </div>
                     </div>
                     <div class="col-6">
-                        <div class="role-card text-center" data-role="ENTREPRISE"
-                             onclick="selectRole('ENTREPRISE', this)">
-                            <i class="bi bi-building display-4"></i>
-                            <h5 class="mt-2">Entreprise</h5>
-                            <p class="text-muted small">Je recrute</p>
+                        <div class="role-card text-center" id="cardEntreprise" onclick="selectRole('ENTREPRISE')">
+                            <i class="bi bi-building fs-1 text-success"></i>
+                            <h6 class="mt-2 fw-bold">Entreprise</h6>
+                            <p class="text-muted small mb-0">Je recrute</p>
                         </div>
                     </div>
                 </div>
-                <input type="hidden" id="selectedRole" value="CANDIDAT">
-            </div>
-
-            <!-- Champs communs -->
-            <div class="mb-3">
-                <label class="form-label">Email</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                    <input type="email" class="form-control" id="email"
-                           placeholder="vous@exemple.com" required>
-                </div>
+                <!-- Champ caché pour envoyer le rôle au contrôleur -->
+                <input type="hidden" name="role" id="selectedRole" value="CANDIDAT">
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Mot de passe</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                    <input type="password" class="form-control" id="password"
-                           placeholder="Minimum 6 caractères" minlength="6" required>
-                </div>
+                <label class="form-label fw-bold small">Email</label>
+                <input type="email" class="form-control" name="email" placeholder="vous@exemple.com" required>
             </div>
 
-            <!-- Champs spécifiques au rôle -->
+            <div class="mb-3">
+                <label class="form-label fw-bold small">Mot de passe</label>
+                <input type="password" class="form-control" name="password" placeholder="Min. 6 caractères" minlength="6" required>
+            </div>
+
+            <!-- Champs dynamiques selon le rôle -->
             <div id="candidatFields">
                 <div class="row">
                     <div class="col-6 mb-3">
-                        <label class="form-label">Prénom</label>
-                        <input type="text" class="form-control" id="prenom"
-                               placeholder="Paul">
+                        <label class="form-label fw-bold small">Prénom</label>
+                        <input type="text" class="form-control" name="prenom" id="inputPrenom" placeholder="Paul">
                     </div>
                     <div class="col-6 mb-3">
-                        <label class="form-label">Nom</label>
-                        <input type="text" class="form-control" id="nom"
-                               placeholder="Dupont">
+                        <label class="form-label fw-bold small">Nom</label>
+                        <input type="text" class="form-control" name="nom" id="inputNom" placeholder="Dupont">
                     </div>
                 </div>
             </div>
 
             <div id="entrepriseFields" style="display: none;">
                 <div class="mb-3">
-                    <label class="form-label">Nom de l'entreprise</label>
-                    <input type="text" class="form-control" id="nomEntreprise"
-                           placeholder="TechCorp">
+                    <label class="form-label fw-bold small">Nom de l'entreprise</label>
+                    <input type="text" class="form-control" name="nomEntreprise" id="inputEntreprise" placeholder="TechCorp">
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary w-100 py-2 mt-3">
-                <i class="bi bi-person-plus"></i> S'inscrire
+            <button type="submit" class="btn-register w-100 mt-3">
+                <i class="bi bi-person-plus-fill me-2"></i> Créer mon compte
             </button>
         </form>
 
         <div class="text-center mt-4">
-            <p>Ou inscrivez-vous avec :</p>
-            <a th:href="@{/oauth2/authorization/google}" class="btn btn-outline-dark me-2">
-                <i class="bi bi-google"></i> Google
-            </a>
-            <a th:href="@{/oauth2/authorization/github}" class="btn btn-outline-dark">
-                <i class="bi bi-github"></i> GitHub
-            </a>
+            <p class="small text-muted">Ou inscrivez-vous avec :</p>
+            <div class="d-flex justify-content-center gap-2">
+                <a th:href="@{/oauth2/authorization/google}" class="btn btn-light border btn-sm px-3 rounded-pill">
+                    <i class="bi bi-google text-danger"></i> Google
+                </a>
+                <a th:href="@{/oauth2/authorization/github}" class="btn btn-light border btn-sm px-3 rounded-pill">
+                    <i class="bi bi-github text-dark"></i> GitHub
+                </a>
+            </div>
         </div>
 
-        <p class="text-center mt-4">
-            Déjà un compte ? <a href="/login" class="text-decoration-none">Se connecter</a>
+        <p class="text-center mt-4 mb-0 small">
+            Déjà inscrit ? <a th:href="@{/login}" class="fw-bold text-primary text-decoration-none">Se connecter</a>
         </p>
     </div>
 </div>
 
 <script>
-    let selectedRole = 'CANDIDAT';
-
-    function selectRole(role, element) {
-        selectedRole = role;
+    function selectRole(role) {
         document.getElementById('selectedRole').value = role;
 
-        // Mise à jour visuelle
-        document.querySelectorAll('.role-card').forEach(card => {
-            card.classList.remove('selected');
-        });
-        element.classList.add('selected');
+        // Mise à jour visuelle des cartes
+        const cardC = document.getElementById('cardCandidat');
+        const cardE = document.getElementById('cardEntreprise');
 
-        // Afficher/masquer les champs spécifiques
-        document.getElementById('candidatFields').style.display =
-            role === 'CANDIDAT' ? 'block' : 'none';
-        document.getElementById('entrepriseFields').style.display =
-            role === 'ENTREPRISE' ? 'block' : 'none';
-    }
-
-    document.getElementById('registerForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const formData = {
-            email: document.getElementById('email').value,
-            password: document.getElementById('password').value,
-            role: selectedRole
-        };
-
-        // Ajouter les champs spécifiques
-        if (selectedRole === 'CANDIDAT') {
-            formData.nom = document.getElementById('nom').value;
-            formData.prenom = document.getElementById('prenom').value;
+        if (role === 'CANDIDAT') {
+            cardC.classList.add('selected');
+            cardE.classList.remove('selected');
+            document.getElementById('candidatFields').style.display = 'block';
+            document.getElementById('entrepriseFields').style.display = 'none';
+            // On rend les champs obligatoires selon le rôle
+            document.getElementById('inputPrenom').required = true;
+            document.getElementById('inputNom').required = true;
+            document.getElementById('inputEntreprise').required = false;
         } else {
-            formData.nomEntreprise = document.getElementById('nomEntreprise').value;
+            cardE.classList.add('selected');
+            cardC.classList.remove('selected');
+            document.getElementById('candidatFields').style.display = 'none';
+            document.getElementById('entrepriseFields').style.display = 'block';
+            document.getElementById('inputPrenom').required = false;
+            document.getElementById('inputNom').required = false;
+            document.getElementById('inputEntreprise').required = true;
         }
-
-        try {
-            const response = await fetch('http://localhost:8080/api/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                localStorage.setItem('token', data.token);
-                alert('Inscription réussie !');
-                window.location.href = '/dashboard';
-            } else {
-                alert(data.message || 'Erreur d\'inscription');
-            }
-        } catch (error) {
-            console.error('Erreur:', error);
-            alert('Erreur de connexion au serveur');
-        }
-    });
+    }
+    // Initialisation
+    window.onload = () => selectRole('CANDIDAT');
 </script>
 </body>
 </html>

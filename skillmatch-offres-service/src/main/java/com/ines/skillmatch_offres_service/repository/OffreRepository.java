@@ -12,7 +12,7 @@ import java.util.List;
 public interface OffreRepository extends JpaRepository<Offre, Long> {
 
     List<Offre> findByEntrepriseId(Long entrepriseId);
-
+    List<Offre> findByEntrepriseIdAndActiveTrue(Long entrepriseId);
     List<Offre> findByActiveTrue();
 
     @Query("SELECT o FROM Offre o WHERE o.active = true AND " +

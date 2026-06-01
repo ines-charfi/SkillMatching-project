@@ -1,133 +1,120 @@
 package com.ines.frontend_skillmatch.controller;
 
-import com.ines.frontend_skillmatch.service.ApiService;
+import com.ines.frontend_skillmatch.service.client.AuthClient;
 import com.ines.frontend_skillmatch.service.SessionService;
-import jakarta.servlet.http.HttpSession;
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.HashMap;
 
 @Controller
 public class LoginController {
 
     private final SessionService sessionService;
-    private final ApiService apiService;  // AJOUTEZ CETTE LIGNE
+    private final AuthClient authClient;
 
-    // AJOUTE CE CONSTRUCTEUR MANUELLEMENT ICI
-    public LoginController(SessionService sessionService, ApiService apiService) {
+    public LoginController(SessionService sessionService, AuthClient authClient) {
         this.sessionService = sessionService;
-        this.apiService = apiService;
+        this.authClient = authClient;
     }
 
-
+    @GetMapping("/")
+    public String home(Model model) {
+        try {
+            Map<String, Object> stats = authClient.getPublicStats();
+            model.addAttribute("totalUsers", stats.get("totalUsers"));
+            model.addAttribute("totalOffres", stats.get("totalOffres"));
+        } catch (Exception e) {
+            model.addAttribute("totalUsers", 0);
+            model.addAttribute("totalOffres", 0);
+        }
+        return "home";
+    }
 
     @GetMapping("/login")
     public String loginPage(@RequestParam(required = false) String error,
                             @RequestParam(required = false) String logout,
-                            @RequestParam(required = false) String role,
+                            @RequestParam(required = false) String success,
                             Model model) {
-
-        if (sessionService.isAuthenticated()) {
+        // CORRECTION : On commente le "if" pour empêcher la redirection automatique sauvage
+        /* if (sessionService.isAuthenticated()) {
             return "redirect:" + sessionService.getRedirectUrlByRole();
         }
+        */
 
-        if (error != null) {model.addAttribute("error", "Email ou mot de passe incorrect");
-        }
-        if (logout != null) {
-            model.addAttribute("message", "Déconnexion réussie");
-        }
+        if (error != null) model.addAttribute("error", "Email ou mot de passe incorrect");
+        if (logout != null) model.addAttribute("message", "Déconnexion réussie");
+        if (success != null) model.addAttribute("successMessage", "Votre compte a été créé avec succès !");
 
-        model.addAttribute("role", role != null ? role : "CANDIDAT");
         return "login";
     }
 
-    // ============================================
-    // AJOUTEZ CETTE MÉTHODE POUR LA CONNEXION POST
-    // ============================================
     @PostMapping("/login")
-    public String login(@RequestParam String email,
-                        @RequestParam String password,
-                        Model model) {
+    public String login(@RequestParam String email, @RequestParam String password, Model model) {
         try {
-            // 1. Appel API
-            Map<String, Object> response = apiService.login(email, password);
+            Map<String, String> credentials = Map.of("email", email, "password", password);
+            Map<String, Object> response = authClient.login(credentials);
 
             if (response != null && response.containsKey("token")) {
-                // 2. Extraction des données
                 String token = (String) response.get("token");
                 String role = (String) response.get("role");
                 String userEmail = (String) response.get("email");
-
-                // Conversion sécurisée de l'ID (JSON donne souvent un Integer, on veut un Long)
                 Number userIdNum = (Number) response.get("userId");
                 Long userId = (userIdNum != null) ? userIdNum.longValue() : null;
 
-                // 3. UTILISE TON SESSION SERVICE (Très important !)
-                // Cela évite les erreurs de clés (user_token, etc.)
                 sessionService.createSession(token, userId, userEmail, role);
-
-                System.out.println("DEBUG: Connexion réussie pour " + userEmail + " (Rôle: " + role + ")");
-
-                // 4. REDIRECTION VERS LES DASHBOARDS SPÉCIFIQUES
-                if ("CANDIDAT".equalsIgnoreCase(role)) {
-                    return "redirect:/dashboard-candidat";
-                } else if ("ENTREPRISE".equalsIgnoreCase(role)) {
-                    return "redirect:/dashboard-entreprise";
-                } else {
-                    // Si c'est un autre rôle (ex: ADMIN)
-                    return "redirect:" + sessionService.getRedirectUrlByRole();
-                }
+                return "redirect:" + sessionService.getRedirectUrlByRole();
             } else {
-                model.addAttribute("error", "Email ou mot de passe incorrect");
+                model.addAttribute("error", "Identifiants invalides");
                 return "login";
             }
         } catch (Exception e) {
-            // Affiche l'erreur dans ta console IntelliJ pour débugger !
-            System.err.println("ERREUR LOGIN: " + e.getMessage());
-            e.printStackTrace();
-            model.addAttribute("error", "Erreur de connexion : " + e.getMessage());
+            model.addAttribute("error", "Service d'authentification indisponible.");
             return "login";
         }
     }
 
     @GetMapping("/register")
     public String registerPage() {
+        // CORRECTION : On commente aussi ici pour pouvoir créer des comptes sans être bloqué
+        /*
         if (sessionService.isAuthenticated()) {
             return "redirect:" + sessionService.getRedirectUrlByRole();
         }
+        */
         return "register";
     }
 
-    @GetMapping("/")
-    public String home() {
-        return "home";
-    }
+    @PostMapping("/register")
+    public String register(@RequestParam String email,
+                           @RequestParam String password,
+                           @RequestParam String role,
+                           @RequestParam(required = false) String prenom,
+                           @RequestParam(required = false) String nom,
+                           @RequestParam(required = false) String nomEntreprise,
+                           Model model) {
+        try {
+            Map<String, Object> registrationData = new HashMap<>();
+            registrationData.put("email", email);
+            registrationData.put("password", password);
+            registrationData.put("role", role);
 
-    @GetMapping("/dashboard")
-    public String dashboard() {
-        if (!sessionService.isAuthenticated()) {
-            return "redirect:/login";
+            if ("CANDIDAT".equals(role)) {
+                registrationData.put("prenom", prenom);
+                registrationData.put("nom", nom);
+            } else if ("ENTREPRISE".equals(role)) {
+                registrationData.put("nomEntreprise", nomEntreprise);
+            }
+
+            authClient.register(registrationData);
+            return "redirect:/login?success=true";
+
+        } catch (Exception e) {
+            model.addAttribute("error", "Une erreur est survenue lors de l'inscription. L'email est peut-être déjà utilisé.");
+            return "register";
         }
-        return sessionService.getDashboardPage();
-    }
-
-    @GetMapping("/oauth2/callback")
-    public String oauth2Callback(@RequestParam String token,
-                                 @RequestParam String email,
-                                 @RequestParam String role,
-                                 @RequestParam(required = false) Long userId,
-                                 Model model) {
-
-        sessionService.createOAuth2Session(token, email, role, userId);
-
-        model.addAttribute("token", token);
-        model.addAttribute("email", email);
-        model.addAttribute("role", role);
-
-        return "oauth2-callback";
     }
 
     @GetMapping("/logout-user")

@@ -1,6 +1,5 @@
 package com.ines.skillmatch_auth_service.security;
 
-
 import com.ines.skillmatch_auth_service.model.User;
 import com.ines.skillmatch_auth_service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,20 +15,22 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true) // Optimisation : indique à Hibernate que c'est une lecture seule
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        // Recherche l'utilisateur par email
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(
-                        "Utilisateur non trouvé avec l'email : " + email));
+                        "Aucun utilisateur trouvé avec l'email : " + email));
 
+        // Vérification si le compte est activé (très important pour l'admin)
         if (!user.getEnabled()) {
-            throw new DisabledException("Compte désactivé");
+            throw new DisabledException("Ce compte a été désactivé par l'administrateur.");
         }
 
         return UserDetailsImpl.build(user);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public UserDetailsImpl loadUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException(

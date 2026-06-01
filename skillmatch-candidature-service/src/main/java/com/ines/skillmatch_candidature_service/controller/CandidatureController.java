@@ -1,5 +1,6 @@
 package com.ines.skillmatch_candidature_service.controller;
 
+import com.ines.skillmatch_candidature_service.dto.CandidatureDTO;
 import com.ines.skillmatch_candidature_service.model.Candidature;
 import com.ines.skillmatch_candidature_service.service.CandidatureService;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,8 @@ public class CandidatureController {
         return ResponseEntity.ok(candidatureService.getByOffre(offreId));
     }
 
-    @PutMapping("/{id}/statut")
+    // Changé en @PostMapping pour coller au Feign client
+    @PostMapping("/{id}/statut")
     public ResponseEntity<Candidature> updateStatut(@PathVariable Long id,
                                                     @RequestParam String statut) {
         return ResponseEntity.ok(candidatureService.updateStatut(id, statut));
@@ -42,6 +44,13 @@ public class CandidatureController {
 
     @GetMapping("/offre/{offreId}/count")
     public ResponseEntity<Long> countByOffre(@PathVariable Long offreId) {
+        return ResponseEntity.ok(candidatureService.countByOffre(offreId));
+    }
+
+    // Écoute sur /api/candidatures/count?offreId=... pour satisfaire le client Feign de offre-service
+    @GetMapping("/count")
+    public ResponseEntity<Long> countByOffreIdParam(@RequestParam("offreId") Long offreId) {
+        // On réutilise la méthode existante de ton service qui fonctionne déjà !
         return ResponseEntity.ok(candidatureService.countByOffre(offreId));
     }
 
@@ -54,4 +63,11 @@ public class CandidatureController {
     public ResponseEntity<Map<String, Object>> statsEntreprise(@PathVariable Long entrepriseId) {
         return ResponseEntity.ok(candidatureService.getStatsEntreprise(entrepriseId));
     }
+
+    @GetMapping("/entreprise/{entrepriseId}")
+    public List<CandidatureDTO> getByEntreprise(@PathVariable Long entrepriseId) {
+        return candidatureService.findAllByEntrepriseId(entrepriseId);
+    }
+
+
 }

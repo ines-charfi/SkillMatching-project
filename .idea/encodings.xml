@@ -6,6 +6,7 @@
     <file url="file://$PROJECT_DIR$/skillmatch-api-gateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/skillmatch-auth-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/skillmatch-candidat-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/skillmatch-candidat-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/skillmatch-candidature-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/skillmatch-entreprise-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/skillmatch-offres-service/src/main/java" charset="UTF-8" />

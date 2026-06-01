@@ -9,8 +9,11 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        // Redirections simples
+        // 1. Redirige la racine (/) vers le login automatiquement
+        // C'est très bien pour éviter d'avoir une page vide au démarrage
         registry.addViewController("/").setViewName("redirect:/login");
-        registry.addRedirectViewController("/dashboard", "/dashboard-candidat");
+
+        // 2. SUPPRIME ou COMMENTE la ligne du dashboard ici !
+        // registry.addRedirectViewController("/dashboard", "/dashboard-candidat");
     }
 }

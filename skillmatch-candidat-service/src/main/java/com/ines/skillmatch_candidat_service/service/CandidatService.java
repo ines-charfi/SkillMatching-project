@@ -1,13 +1,13 @@
 package com.ines.skillmatch_candidat_service.service;
+
 import com.ines.skillmatch_candidat_service.dto.CandidatDTO;
 import com.ines.skillmatch_candidat_service.model.Candidat;
 import com.ines.skillmatch_candidat_service.repository.CandidatRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-// Import pour @Value
-import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -20,89 +20,65 @@ public class CandidatService {
 
     private final CandidatRepository candidatRepository;
 
-    @Value("${app.upload.dir}")
+    @Value("${app.upload.dir:uploads}")
     private String uploadDir;
 
+    // 1. RÉCUPÉRATION PAR ID
     public Candidat getById(Long id) {
         return candidatRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Candidat non trouvé avec l'ID: " + id));
     }
 
+    // 2. RÉCUPÉRATION PAR USER_ID (Sécurisé pour le Dashboard)
     public Candidat getByUserId(Long userId) {
         return candidatRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Profil candidat non trouvé pour l'utilisateur: " + userId));
+                .orElseGet(() -> Candidat.builder().userId(userId).nom("Utilisateur").prenom("Nouveau").build());
     }
 
+    // 3. INITIALISATION (Feign)
     @Transactional
-    public Candidat createOrUpdate(Long userId, CandidatDTO dto) {
-        Candidat candidat = candidatRepository.findByUserId(userId)
-                .orElse(Candidat.builder().userId(userId).build());
-
-        // Mise à jour des champs
-        candidat.setNom(dto.getNom());
-        candidat.setPrenom(dto.getPrenom());
-        candidat.setTelephone(dto.getTelephone());
-        candidat.setAdresse(dto.getAdresse());
-        candidat.setBio(dto.getBio());
-        candidat.setCompetences(dto.getCompetences());
-        candidat.setLinkedinUrl(dto.getLinkedinUrl());
-        candidat.setPortfolioUrl(dto.getPortfolioUrl());
-        candidat.setNiveauScolaire(dto.getNiveauScolaire());
-
-        return candidatRepository.save(candidat);
+    public void initCandidat(Long userId, String nom, String prenom) {
+        if (candidatRepository.findByUserId(userId).isEmpty()) {
+            Candidat c = Candidat.builder()
+                    .userId(userId)
+                    .nom(nom)
+                    .prenom(prenom)
+                    .validationStatut(Candidat.ValidationStatut.EN_ATTENTE)
+                    .build();
+            candidatRepository.save(c);
+        }
     }
 
+    // 4. MISE À JOUR AVEC CV
     @Transactional
-    public String uploadCV(Long userId, MultipartFile file) throws IOException {
-        Candidat candidat = getByUserId(userId);
+    public Candidat updateProfil(Long userId, String prenom, String nom, String portfolioUrl, MultipartFile cv, MultipartFile photo) throws IOException {
 
-        // Créer le dossier uploads s'il n'existe pas
-        Path uploadPath = Paths.get(uploadDir, "cv");
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
+        Candidat c = candidatRepository.findByUserId(userId).orElseThrow();
+
+        c.setPortfolioUrl(portfolioUrl);
+
+        // Sauvegarde de la Photo
+        if (photo != null && !photo.isEmpty()) {
+            String photoName = "photo_" + userId + ".jpg";
+            Path path = Paths.get("uploads/photos/");
+            if (!Files.exists(path)) Files.createDirectories(path);
+            Files.copy(photo.getInputStream(), path.resolve(photoName), StandardCopyOption.REPLACE_EXISTING);
+            c.setPhotoPath(photoName);
         }
 
-        // Générer un nom de fichier unique
-        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-        Path filePath = uploadPath.resolve(fileName);
 
-        // Sauvegarder le fichier
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-        // Mettre à jour le chemin dans la base
-        candidat.setCvPath(filePath.toString());
-        candidatRepository.save(candidat);
-
-        return filePath.toString();
+        return candidatRepository.save(c);
     }
 
-    @Transactional
-    public String uploadPhoto(Long userId, MultipartFile file) throws IOException {
-        Candidat candidat = getByUserId(userId);
-
-        Path uploadPath = Paths.get(uploadDir, "photos");
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
-        }
-
-        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-        Path filePath = uploadPath.resolve(fileName);
-
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-        candidat.setPhotoPath(filePath.toString());
-        candidatRepository.save(candidat);
-
-        return filePath.toString();
-    }
-
+    // 5. VALIDATION ADMIN (Correction du nom ValidationStatut)
     @Transactional
     public Candidat updateValidationStatus(Long id, Candidat.ValidationStatut statut) {
-        Candidat candidat = getById(id);
+        Candidat candidat = this.getById(id); // Utilisation de la méthode interne
         candidat.setValidationStatut(statut);
         return candidatRepository.save(candidat);
     }
 
+    // 6. RECHERCHE
     public List<Candidat> searchByCompetence(String competence) {
         return candidatRepository.findByCompetence(competence);
     }
@@ -111,5 +87,50 @@ public class CandidatService {
         return candidatRepository.findAll();
     }
 
+    // Utilitaire de sauvegarde de fichier
+    private String saveFile(MultipartFile file, String subDir) throws IOException {
+        Path uploadPath = Paths.get(uploadDir, subDir);
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+        Path filePath = uploadPath.resolve(fileName);
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+        return fileName;
+    }
 
+    // 4. MISE À JOUR AVEC CV
+    @Transactional // Assure le commit SQL en fin de traitement
+    public Candidat updateProfilWithFile(Long userId, CandidatDTO dto, MultipartFile cv, MultipartFile photo) throws IOException {
+
+        // 1. On récupère le candidat existant lié à cet utilisateur
+        Candidat candidatExistant = candidatRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Candidat introuvable pour le user ID : " + userId));
+
+        // 2. On injecte l'intégralité des valeurs textuelles
+        candidatExistant.setPrenom(dto.getPrenom());
+        candidatExistant.setNom(dto.getNom());
+        candidatExistant.setTelephone(dto.getTelephone());
+        candidatExistant.setAdresse(dto.getAdresse());
+        candidatExistant.setBio(dto.getBio());
+        candidatExistant.setCompetences(dto.getCompetences());
+        candidatExistant.setLinkedinUrl(dto.getLinkedinUrl());
+        candidatExistant.setPortfolioUrl(dto.getPortfolioUrl());
+        candidatExistant.setNiveauScolaire(dto.getNiveauScolaire());
+
+        // 3. Traitement sécurisé du fichier CV
+        if (cv != null && !cv.isEmpty()) {
+            String cvName = saveFile(cv, "cvs");
+            candidatExistant.setCvPath(cvName);
+        }
+
+        // 4. Traitement sécurisé de la Photo
+        if (photo != null && !photo.isEmpty()) {
+            String photoName = saveFile(photo, "photos");
+            candidatExistant.setPhotoPath(photoName);
+        }
+
+        // 5. Sauvegarde de l'entité mise à jour (Déclenche un SQL UPDATE automatique)
+        return candidatRepository.save(candidatExistant);
+    }
 }

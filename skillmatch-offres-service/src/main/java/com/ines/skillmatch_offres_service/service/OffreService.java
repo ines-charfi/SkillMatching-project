@@ -1,26 +1,26 @@
 package com.ines.skillmatch_offres_service.service;
 
+import com.ines.skillmatch_offres_service.service.client.CandidatureClient;
+import com.ines.skillmatch_offres_service.service.client.EntrepriseClient;
 import com.ines.skillmatch_offres_service.dto.OffreDTO;
 import com.ines.skillmatch_offres_service.model.Offre;
 import com.ines.skillmatch_offres_service.repository.OffreRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor // Génère le constructeur pour injecter les repos et clients
+@Slf4j // Pour les logs
 public class OffreService {
 
     private final OffreRepository offreRepository;
-    private final RestTemplate restTemplate;
-
-    public OffreService(OffreRepository offreRepository, RestTemplate restTemplate) {
-        this.offreRepository = offreRepository;
-        this.restTemplate = restTemplate;
-    }
-
+    private final EntrepriseClient entrepriseClient; // Client Feign
+    private final CandidatureClient candidatureClient; // Client Feign
     @Transactional
     public Offre create(OffreDTO dto) {
         Offre offre = Offre.builder()
@@ -30,7 +30,7 @@ public class OffreService {
                 .competencesRequises(dto.getCompetencesRequises())
                 .niveauRequis(dto.getNiveauRequis())
                 .salaire(dto.getSalaire())
-                .active(true)
+                .active(true) // Uniquement les champs présents dans ton script SQL
                 .build();
         return offreRepository.save(offre);
     }
@@ -49,9 +49,10 @@ public class OffreService {
     @Transactional
     public void delete(Long id) {
         Offre offre = getById(id);
-        offre.setActive(false);
+        offre.setActive(false); // Soft delete pour garder l'historique
         offreRepository.save(offre);
     }
+
 
     public Offre getById(Long id) {
         Offre offre = offreRepository.findById(id)
@@ -66,8 +67,10 @@ public class OffreService {
         return offres;
     }
 
+
     public List<Offre> getByEntreprise(Long entrepriseId) {
-        List<Offre> offres = offreRepository.findByEntrepriseId(entrepriseId);
+        // 🎯 FIX : On appelle une méthode qui filtre par entreprise ID ET statut actif
+        List<Offre> offres = offreRepository.findByEntrepriseIdAndActiveTrue(entrepriseId);
         offres.forEach(this::enrichOffre);
         return offres;
     }
@@ -76,34 +79,38 @@ public class OffreService {
         return offreRepository.searchOffres(keyword);
     }
 
+    /**
+     * Méthode d'enrichissement via OpenFeign
+     * Remplit les champs @Transient pour le Frontend
+     */
+    private void enrichOffre(Offre offre) {
+        // 1. Récupérer les infos de l'entreprise
+        try {
+            Map<String, Object> entreprise = entrepriseClient.getEntrepriseByUserId(offre.getEntrepriseId());
+            if (entreprise != null) {
+                offre.setEntrepriseNom((String) entreprise.get("nomEntreprise"));
+                offre.setEntrepriseLogo((String) entreprise.get("logoPath"));
+            }
+        } catch (Exception e) {
+            log.warn("Impossible de récupérer l'entreprise pour l'offre {}: {}", offre.getId(), e.getMessage());
+            offre.setEntrepriseNom("Entreprise inconnue");
+        }
+
+        // 2. Récupérer le nombre de candidatures
+        try {
+            Long count = candidatureClient.CountByOffreId(offre.getId());
+            offre.setNombreCandidatures(count != null ? count : 0L);
+        } catch (Exception e) {
+            log.warn("Impossible de compter les candidatures pour l'offre {}: {}", offre.getId(), e.getMessage());
+            offre.setNombreCandidatures(0L);
+        }
+    }
+
     public long countByEntreprise(Long entrepriseId) {
         return offreRepository.countByEntrepriseId(entrepriseId);
     }
 
     public List<Offre> getLatest() {
         return offreRepository.findLatestOffres();
-    }
-
-    private void enrichOffre(Offre offre) {
-        try {
-            Map entreprise = restTemplate.getForObject(
-                    "http://entreprise-service/api/entreprises/" + offre.getEntrepriseId(),
-                    Map.class);
-            if (entreprise != null) {
-                offre.setEntrepriseNom((String) entreprise.get("nomEntreprise"));
-                offre.setEntrepriseLogo((String) entreprise.get("logoPath"));
-            }
-        } catch (Exception e) {
-            offre.setEntrepriseNom("Entreprise inconnue");
-        }
-
-        try {
-            Long count = restTemplate.getForObject(
-                    "http://candidature-service/api/candidatures/offre/" + offre.getId() + "/count",
-                    Long.class);
-            offre.setNombreCandidatures(count != null ? count : 0L);
-        } catch (Exception e) {
-            offre.setNombreCandidatures(0L);
-        }
     }
 }
