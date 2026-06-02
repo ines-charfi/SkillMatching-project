@@ -28,4 +28,14 @@ public interface CandidatureClient {
     // AJOUTE CETTE MÉTHODE AVEC LES VALUE EXPLICITES POUR LES PARAMS
     @GetMapping(value = "/api/matching/score", consumes = "application/json")
     int getScore(@RequestParam(value = "userId") Long userId, @RequestParam(value = "offreId") Long offreId);
+    @PostMapping("/api/candidatures/entretiens")
+    Map<String, Object> planifierEntretien(
+            @RequestParam("candidatureId") Long candidatureId,
+            @RequestParam("dateStr") String dateStr,
+            @RequestParam("lieu") String lieu,
+            @RequestParam("notes") String notes);
+
+    @GetMapping("/api/candidatures/entretiens/candidature/{candidatureId}")
+    List<Map<String, Object>> getEntretiensByCandidature(@PathVariable("candidatureId") Long candidatureId);
+
 }

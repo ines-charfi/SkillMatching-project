@@ -8,6 +8,8 @@ import java.util.List;
 
 @Repository
 public interface EntretienRepository extends JpaRepository<Entretien, Long> {
-
     List<Entretien> findByCandidatureId(Long candidatureId);
+
+    // Pour compter les entretiens programmés d'une liste de candidatures (Dashboard)
+    long countByCandidatureIdInAndStatut(List<Long> candidatureIds, Entretien.Statut statut);
 }

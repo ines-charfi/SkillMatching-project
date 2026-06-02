@@ -1,5 +1,7 @@
 package com.ines.skillmatch_candidature_service.service;
 
+import com.ines.skillmatch_candidature_service.model.Entretien;
+import com.ines.skillmatch_candidature_service.repository.EntretienRepository;
 import com.ines.skillmatch_candidature_service.service.client.CandidatClient;
 import com.ines.skillmatch_candidature_service.service.client.OffreClient;
 import com.ines.skillmatch_candidature_service.dto.CandidatureDTO;
@@ -10,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -18,6 +21,7 @@ import java.util.*;
 public class CandidatureService {
 
     private final CandidatureRepository candidatureRepository;
+    private final EntretienRepository entretienRepository;
     private final MatchingService matchingService;
     private final CandidatClient candidatClient;
     private final OffreClient offreClient;
@@ -111,17 +115,60 @@ public class CandidatureService {
         return candidatureRepository.save(candidature);
     }
 
+
+    // 🎯 MÉTHODE POUR CRÉER UN ENTRETIEN
+    @Transactional
+    public Entretien planifierEntretien(Long candidatureId, LocalDateTime date, String lieu, String notes) {
+        // En option, on bascule le statut de la candidature en "ACCEPTE" ou un statut dédié si besoin
+        Candidature candidature = candidatureRepository.findById(candidatureId)
+                .orElseThrow(() -> new RuntimeException("Candidature introuvable"));
+
+        Entretien entretien = Entretien.builder()
+                .candidatureId(candidatureId)
+                .dateEntretien(date)
+                .lieu(lieu)
+                .notes(notes)
+                .statut(Entretien.Statut.PROGRAMME)
+                .build();
+
+        return entretienRepository.save(entretien);
+    }
+
+    // 🎯 MÉTHODE POUR RÉCUPÉRER LES ENTRETIENS D'UNE CANDIDATURE
+    public List<Entretien> getEntretiensByCandidature(Long candidatureId) {
+        return entretienRepository.findByCandidatureId(candidatureId);
+    }
+
+    // 🎯 ENRICHISSEMENT DES STATS POUR AFFICHER LE COMPTEUR SUR LE DASHBOARD
     public Map<String, Object> getStatsEntreprise(Long entrepriseId) {
         Map<String, Object> stats = new HashMap<>();
         List<Map<String, Object>> offres = offreClient.getOffresByEntreprise(entrepriseId);
-        long total = 0;
+
+        long totalCandidatures = 0;
+        List<Long> candidatureIds = new ArrayList<>();
+
         if (offres != null) {
             for (Map<String, Object> o : offres) {
-                total += countByOffre(Long.valueOf(o.get("id").toString()));
+                Long oId = Long.valueOf(o.get("id").toString());
+                List<Candidature> candList = candidatureRepository.findByOffreId(oId);
+                totalCandidatures += candList.size();
+
+                // On récupère tous les IDs de candidatures pour compter les entretiens
+                for (Candidature c : candList) {
+                    candidatureIds.add(c.getId());
+                }
             }
         }
-        stats.put("totalCandidatures", total);
+
+        // Calcul du nombre d'entretiens programmés (actifs)
+        long entretiensPrevus = 0;
+        if (!candidatureIds.isEmpty()) {
+            entretiensPrevus = entretienRepository.countByCandidatureIdInAndStatut(candidatureIds, Entretien.Statut.PROGRAMME);
+        }
+
+        stats.put("totalCandidatures", totalCandidatures);
         stats.put("offresActives", offres != null ? offres.size() : 0);
+        stats.put("entretiensPrevus", entretiensPrevus); // VALEUR POUR LA CASE DU DASHBOARD !
         return stats;
     }
 }

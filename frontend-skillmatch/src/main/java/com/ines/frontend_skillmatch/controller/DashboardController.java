@@ -132,7 +132,7 @@ public class DashboardController {
         return "redirect:/dashboard-entreprise";
     }
 
-// =========================================================================
+    // =========================================================================
     // GESTION DES OFFRES (CRUD)
     // =========================================================================
 
@@ -195,11 +195,9 @@ public class DashboardController {
     public String modifierOffreForm(@PathVariable Long id, Model model, RedirectAttributes ra) {
         if (!sessionService.isAuthenticated() || !sessionService.isEntreprise()) return "redirect:/login";
         try {
-            // Récupération du profil de l'entreprise pour le layout/header
             Map<String, Object> profil = entrepriseClient.getByUserId(sessionService.getUserId());
             model.addAttribute("profil", profil != null ? profil : new HashMap<>());
 
-            // 🎯 OPTIMISATION : Appel direct par ID au lieu de filtrer toute la liste active
             Map<String, Object> offreCible = (Map<String, Object>) (Object) offreClient.getById(id);
 
             model.addAttribute("offre", offreCible);
@@ -211,7 +209,7 @@ public class DashboardController {
     }
 
     /**
-     * 🎯 AJOUT : Traite la soumission du formulaire de modification (Évite les doublons de création)
+     * Traite la soumission du formulaire de modification (Restauration complète de la méthode).
      */
     @PostMapping("/offre/update/{id}")
     public String handleOffreUpdate(@PathVariable("id") Long id,
@@ -223,7 +221,6 @@ public class DashboardController {
                                     RedirectAttributes ra) {
         if (!sessionService.isAuthenticated() || !sessionService.isEntreprise()) return "redirect:/login";
         try {
-            // Préparation de la Map contenant les valeurs modifiées
             Map<String, Object> offreData = new HashMap<>();
             offreData.put("titre", titre);
             offreData.put("description", description);
@@ -231,7 +228,6 @@ public class DashboardController {
             offreData.put("niveauRequis", niveauRequis);
             offreData.put("salaire", salaire);
 
-            // Appel de la méthode de mise à jour (PUT) de l'OffreClient
             offreClient.update(id, offreData);
 
             ra.addFlashAttribute("message", "L'offre a été mise à jour avec succès !");
@@ -242,7 +238,7 @@ public class DashboardController {
     }
 
     /**
-     * Supprime une offre d'emploi (Requête transmise via méthode POST).
+     * Supprime une offre d'emploi.
      */
     @PostMapping("/offre/supprimer/{id}")
     public String supprimerOffre(@PathVariable("id") Long id, RedirectAttributes ra) {
@@ -254,6 +250,7 @@ public class DashboardController {
         }
         return "redirect:/dashboard-entreprise";
     }
+
     // =========================================================================
     // CANDIDATURES & CANDIDATS
     // =========================================================================
@@ -276,20 +273,14 @@ public class DashboardController {
     /**
      * Permet à une entreprise de consulter le profil détaillé d'un candidat ayant postulé.
      */
-    /**
-     * Permet à une entreprise de consulter le profil détaillé d'un candidat ayant postulé.
-     * Accès sécurisé via l'ID de la candidature pour parer aux données de Map nulles.
-     */
     @GetMapping("/candidat/profil/{candidatureId}")
     public String voirProfilCandidat(@PathVariable("candidatureId") Long candidatureId, Model model, RedirectAttributes ra) {
         if (!sessionService.isAuthenticated() || !sessionService.isEntreprise()) return "redirect:/login";
         try {
-            // 1. Récupère la liste des candidatures de l'entreprise pour retrouver la bonne
             Map<String, Object> profilEntreprise = entrepriseClient.getByUserId(sessionService.getUserId());
             Long entId = Long.valueOf(profilEntreprise.get("id").toString());
             List<Map<String, Object>> candidatures = candidatureClient.getByEntreprise(entId);
 
-            // 2. Extrait le candidatId associé à cette candidature spécifique
             Long candidatId = null;
             for (Map<String, Object> c : candidatures) {
                 if (c.get("id") != null && Long.valueOf(c.get("id").toString()).equals(candidatureId)) {
@@ -303,7 +294,6 @@ public class DashboardController {
                 return "redirect:/dashboard-entreprise";
             }
 
-            // 3. Récupère et injecte le profil du candidat trouvé
             Map<String, Object> candidatProfil = candidatClient.getProfil(candidatId);
             model.addAttribute("candidat", candidatProfil != null ? candidatProfil : new HashMap<>());
             model.addAttribute("profil", profilEntreprise != null ? profilEntreprise : new HashMap<>());
@@ -447,12 +437,36 @@ public class DashboardController {
     }
 
     // =========================================================================
-    // API ENDPOINTS (PROXIES POUR IMAGES ET AVATARS BINAIRES)
+    // PLANIFICATION ENTRETIEN (PROXIED TO BACKEND)
     // =========================================================================
 
     /**
-     * Proxy HTTP récupérant l'image de profil (Avatar) d'un candidat.
+     * Transmet la planification de l'entretien vers le microservice Backend via Feign.
      */
+    @PostMapping("/entreprise/entretiens/planifier")
+    public String planifierEntretien(
+            @RequestParam("candidatureId") Long candidatureId,
+            @RequestParam("date") String dateStr,
+            @RequestParam("lieu") String lieu,
+            @RequestParam("notes") String notes,
+            RedirectAttributes redirectAttributes) {
+
+        if (!sessionService.isAuthenticated() || !sessionService.isEntreprise()) return "redirect:/login";
+
+        try {
+            candidatureClient.planifierEntretien(candidatureId, dateStr, lieu, notes);
+            redirectAttributes.addFlashAttribute("message", "L'entretien a été planifié avec succès.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Erreur lors de la planification de l'entretien via le service backend.");
+        }
+
+        return "redirect:/dashboard-entreprise";
+    }
+
+    // =========================================================================
+    // API ENDPOINTS (PROXIES POUR IMAGES ET AVATARS BINAIRES)
+    // =========================================================================
+
     @GetMapping("/api/candidats/avatar/{userId}")
     @ResponseBody
     public ResponseEntity<byte[]> proxyAvatar(@PathVariable Long userId) {
@@ -463,11 +477,6 @@ public class DashboardController {
         }
     }
 
-    /**
-     * Proxy HTTP récupérant le logo d'une entreprise depuis son microservice.
-     *  FIX : URL corrigée de /api/entreprises/logo/{id} vers /api/entreprises/{id}/logo
-     * pour correspondre au chemin exact utilisé par le template Thymeleaf.
-     */
     @GetMapping("/api/entreprises/{id}/logo")
     @ResponseBody
     public ResponseEntity<byte[]> proxyLogo(@PathVariable("id") Long entrepriseId) {
@@ -478,9 +487,6 @@ public class DashboardController {
         }
     }
 
-    /**
-     * Proxy HTTP permettant le téléchargement et la lecture en ligne du document CV (PDF).
-     */
     @GetMapping("/api/candidats/download/cv/{userId}")
     public ResponseEntity<byte[]> proxyDownloadCv(@PathVariable Long userId) {
         try {
