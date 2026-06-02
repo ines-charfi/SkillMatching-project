@@ -70,6 +70,7 @@ public class DashboardController {
         model.addAttribute("offres", new ArrayList<>());
         model.addAttribute("stats", new HashMap<>());
         model.addAttribute("candidaturesRecues", new ArrayList<>());
+        // 💡 Pas besoin d'initialiser une liste "entretiens" vide ici puisque tout passera par "stats"
 
         try {
             Map<String, Object> profil = entrepriseClient.getByUserId(sessionService.getUserId());
@@ -81,16 +82,17 @@ public class DashboardController {
 
                     try {
                         model.addAttribute("offres", offreClient.getByEntreprise(entId));
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
+
                     try {
+                        // 🎯 C'est cet appel qui récupère TOUTES les stats d'un coup (offres, candidatures ET entretiens) !
                         model.addAttribute("stats", candidatureClient.getStatsEntreprise(entId));
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
+
                     try {
                         model.addAttribute("candidaturesRecues", candidatureClient.getByEntreprise(entId));
-                    } catch (Exception e) {
-                    }
+                    } catch (Exception e) {}
+
                 }
             }
         } catch (Exception e) {

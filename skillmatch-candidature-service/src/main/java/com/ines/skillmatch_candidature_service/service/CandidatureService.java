@@ -5,6 +5,7 @@ import com.ines.skillmatch_candidature_service.service.client.OffreClient;
 import com.ines.skillmatch_candidature_service.dto.CandidatureDTO;
 import com.ines.skillmatch_candidature_service.model.Candidature;
 import com.ines.skillmatch_candidature_service.repository.CandidatureRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class CandidatureService {
     private final MatchingService matchingService;
     private final CandidatClient candidatClient;
     private final OffreClient offreClient;
+    private final com.ines.skillmatch_candidature_service.repository.EntretienRepository entretienRepository;
 
     @Transactional
     public Candidature postuler(Long userId, Long offreId) {
@@ -114,14 +116,34 @@ public class CandidatureService {
     public Map<String, Object> getStatsEntreprise(Long entrepriseId) {
         Map<String, Object> stats = new HashMap<>();
         List<Map<String, Object>> offres = offreClient.getOffresByEntreprise(entrepriseId);
-        long total = 0;
+
+        long totalCandidatures = 0;
+        long totalEntretiens = 0; // 🎯 Compteur d'entretiens
+
         if (offres != null) {
             for (Map<String, Object> o : offres) {
-                total += countByOffre(Long.valueOf(o.get("id").toString()));
+                Long oId = Long.valueOf(o.get("id").toString());
+
+                // 1. On compte les candidatures liées à cette offre
+                totalCandidatures += countByOffre(oId);
+
+                // 2. On compte les entretiens liés aux candidatures de cette offre
+                totalEntretiens += entretienRepository.countByCandidatureIdIn(
+                        candidatureRepository.findByOffreId(oId).stream().map(Candidature::getId).toList()
+                );
             }
         }
-        stats.put("totalCandidatures", total);
+
+        stats.put("totalCandidatures", totalCandidatures);
         stats.put("offresActives", offres != null ? offres.size() : 0);
+
+        // 🎯 IMPORTANT : Ajoute l'envoi de la statistique pour Thymeleaf
+        // (Vérifie dans ton fichier HTML si la variable s'appelle 'entretiensCount' ou 'totalEntretiens')
+        stats.put("entretiensCount", totalEntretiens);
+        stats.put("totalEntretiens", totalEntretiens); // On met les deux par sécurité !
+
         return stats;
     }
+
+
 }
