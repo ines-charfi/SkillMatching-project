@@ -32,16 +32,12 @@
             --gray-800: #1f2937;
             --gray-900: #111827;
             --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-dark: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
             --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
-            --shadow-lg: 0 10px 40px rgba(0,0,0,0.15);
             --radius: 16px;
             --radius-sm: 10px;
             --radius-xs: 6px;
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             background: var(--gray-50);
@@ -49,21 +45,16 @@
             color: var(--gray-700);
             display: flex;
             min-height: 100vh;
+            margin: 0;
         }
 
-        /* ============================================ */
-        /* SIDEBAR */
-        /* ============================================ */
         .sidebar {
             width: 280px;
             background: var(--gray-900);
             color: white;
             padding: 24px 0;
             position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            overflow-y: auto;
+            top: 0; left: 0; bottom: 0;
             z-index: 200;
             display: flex;
             flex-direction: column;
@@ -82,21 +73,9 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
-        .sidebar-brand p {
-            color: var(--gray-400);
-            font-size: 12px;
-            margin-top: 4px;
-        }
-
-        .sidebar-nav {
-            flex: 1;
-            padding: 0 12px;
-        }
+        .sidebar-nav { flex: 1; padding: 0 12px; }
 
         .sidebar-section {
             color: var(--gray-500);
@@ -105,7 +84,6 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             padding: 16px 12px 8px;
-            margin-top: 8px;
         }
 
         .sidebar-link {
@@ -120,800 +98,156 @@
             margin-bottom: 4px;
             font-weight: 500;
             font-size: 14px;
-            cursor: pointer;
-            border: none;
-            background: none;
-            width: 100%;
-            text-align: left;
         }
 
-        .sidebar-link:hover {
-            background: rgba(255,255,255,0.08);
-            color: white;
-        }
+        .sidebar-link:hover { background: rgba(255,255,255,0.08); color: white; }
+        .sidebar-link.active { background: var(--primary); color: white; font-weight: 600; }
 
-        .sidebar-link.active {
-            background: var(--primary);
-            color: white;
-            font-weight: 600;
-        }
+        .main-content { flex: 1; margin-left: 280px; padding: 30px; min-height: 100vh; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .page-title { font-size: 28px; font-weight: 800; color: var(--gray-900); }
+        .page-subtitle { color: var(--gray-500); font-size: 14px; }
+        .date-time { color: var(--gray-500); font-size: 14px; font-weight: 500; }
 
-        .sidebar-link .badge-count {
-            margin-left: auto;
-            background: var(--danger);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 700;
-        }
-
-        .sidebar-link .badge-count.success {
-            background: var(--success);
-        }
-
-        .sidebar-user {
-            padding: 16px 24px;
-            border-top: 1px solid var(--gray-700);
-            margin-top: auto;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .sidebar-avatar {
-            width: 40px;
-            height: 40px;
-            background: var(--gradient);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 16px;
-        }
-
-        .sidebar-user-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .sidebar-user-name {
-            font-weight: 600;
-            font-size: 14px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .sidebar-user-role {
-            font-size: 12px;
-            color: var(--gray-400);
-        }
-
-        /* ============================================ */
-        /* MAIN CONTENT */
-        /* ============================================ */
-        .main-content {
-            flex: 1;
-            margin-left: 280px;
-            padding: 30px;
-            min-height: 100vh;
-        }
-
-        /* ============================================ */
-        /* TOP BAR */
-        /* ============================================ */
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .page-title {
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--gray-900);
-        }
-
-        .page-subtitle {
-            color: var(--gray-500);
-            font-size: 14px;
-            margin-top: 4px;
-        }
-
-        .top-actions {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .btn-refresh {
-            padding: 10px 20px;
-            background: white;
-            border: 2px solid var(--gray-200);
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-refresh:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .date-time {
-            color: var(--gray-500);
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        /* ============================================ */
-        /* STATS GRID */
-        /* ============================================ */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: white;
-            border-radius: var(--radius);
-            padding: 24px;
-            box-shadow: var(--shadow-sm);
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            transition: all 0.3s;
-            cursor: pointer;
-            border: 2px solid transparent;
-        }
-
-        .stat-card:hover {
-            box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
-            border-color: var(--primary-light);
-        }
-
-        .stat-card.selected {
-            border-color: var(--primary);
-            background: var(--primary-light);
-        }
-
-        .stat-icon-box {
-            width: 56px;
-            height: 56px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
-            flex-shrink: 0;
-        }
-
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 16px; }
+        .stat-icon-box { width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
         .stat-icon-box.primary { background: var(--primary-light); color: var(--primary); }
         .stat-icon-box.success { background: var(--success-light); color: var(--success); }
-        .stat-icon-box.warning { background: var(--warning-light); color: var(--warning); }
-        .stat-icon-box.danger { background: var(--danger-light); color: var(--danger); }
         .stat-icon-box.info { background: var(--info-light); color: var(--info); }
-        .stat-icon-box.purple { background: var(--purple-light); color: var(--purple); }
+        .stat-icon-box.warning { background: var(--warning-light); color: var(--warning); }
+        .stat-value { font-size: 30px; font-weight: 800; color: var(--gray-900); }
+        .stat-label { color: var(--gray-500); font-size: 13px; }
 
-        .stat-value {
-            font-size: 30px;
-            font-weight: 800;
-            color: var(--gray-900);
-            line-height: 1;
-        }
+        .content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .panel { background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 24px; }
+        .panel-header { padding: 20px 24px; border-bottom: 1px solid var(--gray-100); display: flex; justify-content: space-between; align-items: center; }
+        .panel-title { font-size: 18px; font-weight: 700; color: var(--gray-900); display: flex; align-items: center; gap: 10px; }
+        .panel-body { padding: 20px 24px; }
 
-        .stat-label {
-            color: var(--gray-500);
-            font-size: 13px;
-            font-weight: 500;
-            margin-top: 4px;
-        }
-
-        .stat-change {
-            font-size: 12px;
-            font-weight: 600;
-            margin-top: 2px;
-        }
-        .stat-change.up { color: var(--success); }
-        .stat-change.down { color: var(--danger); }
-
-        /* ============================================ */
-        /* CONTENT GRID */
-        /* ============================================ */
-        .content-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-bottom: 24px;
-        }
-
-        .content-grid.full {
-            grid-template-columns: 1fr;
-        }
-
-        /* ============================================ */
-        /* PANELS */
-        /* ============================================ */
-        .panel {
-            background: white;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-sm);
-            overflow: hidden;
-        }
-
-        .panel-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--gray-100);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .panel-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--gray-900);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .panel-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-sm {
-            padding: 6px 14px;
-            border-radius: var(--radius-xs);
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: all 0.2s;
-        }
-
-        .btn-sm-outline {
-            background: white;
-            border: 1px solid var(--gray-200);
-            color: var(--gray-600);
-        }
-
-        .btn-sm-outline:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .btn-sm-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-sm-danger {
-            background: var(--danger-light);
-            color: var(--danger);
-        }
-
-        .btn-sm-success {
-            background: var(--success-light);
-            color: var(--success);
-        }
-
-        .panel-body {
-            padding: 20px 24px;
-            max-height: 500px;
-            overflow-y: auto;
-        }
-
-        /* ============================================ */
-        /* TABLES */
-        /* ============================================ */
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .table th {
-            text-align: left;
-            padding: 12px 16px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--gray-500);
-            border-bottom: 2px solid var(--gray-100);
-            background: var(--gray-50);
-            position: sticky;
-            top: 0;
-        }
-
-        .table td {
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--gray-50);
-            font-size: 14px;
-            vertical-align: middle;
-        }
-
-        .table tr:hover td {
-            background: var(--gray-50);
-        }
-
-        /* ============================================ */
-        /* BADGES */
-        /* ============================================ */
-        .badge {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            display: inline-block;
-        }
-
+        .table { width: 100%; border-collapse: collapse; }
+        .table th { text-align: left; padding: 12px 16px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--gray-500); border-bottom: 2px solid var(--gray-100); }
+        .table td { padding: 14px 16px; border-bottom: 1px solid var(--gray-50); font-size: 14px; vertical-align: middle; }
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
         .badge-success { background: var(--success-light); color: var(--success); }
-        .badge-warning { background: var(--warning-light); color: var(--warning); }
         .badge-danger { background: var(--danger-light); color: var(--danger); }
         .badge-info { background: var(--info-light); color: var(--info); }
-        .badge-purple { background: var(--purple-light); color: var(--purple); }
-        .badge-gray { background: var(--gray-200); color: var(--gray-600); }
+        .badge-warning { background: var(--warning-light); color: var(--warning); }
 
-        /* ============================================ */
-        /* USER ROW */
-        /* ============================================ */
-        .user-cell {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .user-cell { display: flex; align-items: center; gap: 12px; }
+        .user-avatar-sm { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+        .btn-sm { padding: 6px 14px; border-radius: var(--radius-xs); font-size: 12px; font-weight: 600; border: none; cursor: pointer; }
+        .btn-sm-danger { background: var(--danger-light); color: var(--danger); }
+        .btn-sm-success { background: var(--success-light); color: var(--success); }
 
-        .user-avatar-sm {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 13px;
-            flex-shrink: 0;
-        }
-
-        .bg-gradient { background: var(--gradient); color: white; }
-        .bg-primary-light { background: var(--primary-light); color: var(--primary); }
-        .bg-success-light { background: var(--success-light); color: var(--success); }
-
-        /* ============================================ */
-        /* ACTIONS */
-        /* ============================================ */
-        .actions-group {
-            display: flex;
-            gap: 6px;
-        }
-
-        .btn-icon {
-            width: 34px;
-            height: 34px;
-            border-radius: var(--radius-xs);
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            font-size: 14px;
-        }
-
-        .btn-icon-view { background: var(--info-light); color: var(--info); }
-        .btn-icon-edit { background: var(--warning-light); color: var(--warning); }
-        .btn-icon-validate { background: var(--success-light); color: var(--success); }
-        .btn-icon-reject { background: var(--danger-light); color: var(--danger); }
-        .btn-icon-delete { background: var(--danger-light); color: var(--danger); }
-
-        .btn-icon:hover { transform: scale(1.1); }
-
-        /* ============================================ */
-        /* MODAL */
-        /* ============================================ */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.6);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal {
-            background: white;
-            border-radius: 20px;
-            width: 100%;
-            max-width: 700px;
-            max-height: 85vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow-lg);
-            animation: modalIn 0.3s ease-out;
-        }
-
-        @keyframes modalIn {
-            from { opacity: 0; transform: translateY(20px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .modal-header {
-            padding: 20px 28px;
-            border-bottom: 1px solid var(--gray-100);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            background: white;
-            z-index: 1;
-            border-radius: 20px 20px 0 0;
-        }
-
-        .modal-header h2 {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--gray-900);
-        }
-
-        .btn-close {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: none;
-            background: var(--gray-100);
-            cursor: pointer;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-close:hover {
-            background: var(--danger);
-            color: white;
-        }
-
-        .modal-body {
-            padding: 24px 28px;
-        }
-
-        /* ============================================ */
-        /* DETAIL ROW */
-        /* ============================================ */
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--gray-50);
-        }
-
-        .detail-label {
-            font-weight: 600;
-            color: var(--gray-600);
-            font-size: 14px;
-        }
-
-        .detail-value {
-            color: var(--gray-900);
-            font-size: 14px;
-            text-align: right;
-            max-width: 60%;
-        }
-
-        /* ============================================ */
-        /* CHARTS (simplifiés en CSS) */
-        /* ============================================ */
-        .bar-chart {
-            display: flex;
-            align-items: flex-end;
-            gap: 12px;
-            height: 200px;
-            padding: 10px 0;
-        }
-
-        .bar-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .bar {
-            width: 100%;
-            max-width: 60px;
-            border-radius: 8px 8px 0 0;
-            transition: all 0.3s;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .bar:hover {
-            opacity: 0.8;
-            transform: scaleY(1.05);
-            transform-origin: bottom;
-        }
-
-        .bar-value {
-            font-weight: 700;
-            font-size: 13px;
-            color: var(--gray-700);
-        }
-
-        .bar-label {
-            font-size: 11px;
-            color: var(--gray-500);
-            text-align: center;
-        }
-
-        /* ============================================ */
-        /* LOADER */
-        /* ============================================ */
-        .loader {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 60px;
-        }
-
-        .spinner {
-            width: 44px;
-            height: 44px;
-            border: 4px solid var(--gray-200);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* ============================================ */
-        /* NOTIFICATION */
-        /* ============================================ */
-        .notification {
-            position: fixed;
-            top: 24px;
-            right: 24px;
-            padding: 16px 24px;
-            border-radius: var(--radius-sm);
-            color: white;
-            font-weight: 600;
-            z-index: 3000;
-            animation: slideIn 0.3s ease-out;
-            box-shadow: var(--shadow-lg);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .notification.success { background: var(--success); }
-        .notification.error { background: var(--danger); }
-        .notification.info { background: var(--info); }
-
-        @keyframes slideIn {
-            from { transform: translateX(120%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        /* ============================================ */
-        /* RESPONSIVE */
-        /* ============================================ */
-        @media (max-width: 1400px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .content-grid { grid-template-columns: 1fr; }
-        }
-
-        @media (max-width: 1024px) {
-            .sidebar { width: 80px; }
-            .sidebar .sidebar-link span:not(.badge-count),
-            .sidebar-brand p,
-            .sidebar-user-info,
-            .sidebar-section { display: none; }
-            .sidebar-link { justify-content: center; padding: 12px; }
-            .sidebar-brand { padding: 16px; text-align: center; }
-            .main-content { margin-left: 80px; }
-        }
-
-        @media (max-width: 768px) {
-            .stats-grid { grid-template-columns: 1fr; }
-            .main-content { padding: 15px; }
-            .sidebar { display: none; }
-            .main-content { margin-left: 0; }
-        }
+        .bar-chart { display: flex; align-items: flex-end; gap: 12px; height: 160px; padding: 10px 0; }
+        .bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .bar { width: 100%; max-width: 50px; border-radius: 6px 6px 0 0; }
     </style>
 </head>
 <body>
-<!-- ============================================ -->
-<!-- SIDEBAR -->
-<!-- ============================================ -->
+
 <aside class="sidebar">
     <div class="sidebar-brand">
         <h1><i class="bi bi-shield-lock-fill"></i> SkillMatch</h1>
         <p>Panneau d'administration</p>
     </div>
-
     <nav class="sidebar-nav">
         <div class="sidebar-section">Principal</div>
-        <button class="sidebar-link active" onclick="switchSection('dashboard')">
+        <a th:href="@{/admin}" class="sidebar-link" th:classappend="${activeTab == 'dashboard' ? 'active' : ''}">
             <i class="bi bi-speedometer2"></i> <span>Tableau de bord</span>
-        </button>
-
+        </a>
         <div class="sidebar-section">Gestion</div>
-        <button class="sidebar-link" onclick="switchSection('candidats')">
+        <a th:href="@{/admin/candidats}" class="sidebar-link" th:classappend="${activeTab == 'candidats' ? 'active' : ''}">
             <i class="bi bi-people-fill"></i> <span>Candidats</span>
-            <span class="badge-count" id="pendingCandidatsCount">0</span>
-        </button>
-        <button class="sidebar-link" onclick="switchSection('entreprises')">
+        </a>
+        <a th:href="@{/admin/entreprises}" class="sidebar-link" th:classappend="${activeTab == 'entreprises' ? 'active' : ''}">
             <i class="bi bi-building-fill"></i> <span>Entreprises</span>
-        </button>
-        <button class="sidebar-link" onclick="switchSection('offres')">
-            <i class="bi bi-briefcase-fill"></i> <span>Offres</span>
-        </button>
-        <button class="sidebar-link" onclick="switchSection('candidatures')">
-            <i class="bi bi-send-fill"></i> <span>Candidatures</span>
-        </button>
-
-        <div class="sidebar-section">Système</div>
-        <button class="sidebar-link" onclick="switchSection('utilisateurs')">
-            <i class="bi bi-person-badge-fill"></i> <span>Utilisateurs</span>
-        </button>
-        <button class="sidebar-link" onclick="switchSection('statistiques')">
-            <i class="bi bi-graph-up-arrow"></i> <span>Statistiques</span>
-        </button>
-        <div class="sidebar-section">Vérification</div>
-        <button class="sidebar-link" onclick="switchSection('verification')">
+        </a>
+        <div class="sidebar-section">Vérification AI</div>
+        <a th:href="@{/admin/verification}" class="sidebar-link" th:classappend="${activeTab == 'verification' ? 'active' : ''}">
             <i class="bi bi-shield-check"></i> <span>Vérifier fichiers</span>
-            <span class="badge-count" id="pendingFilesCount" style="display:none;">0</span>
-        </button>
+        </a>
     </nav>
-
-    <div class="sidebar-user">
-        <div class="sidebar-avatar">A</div>
-        <div class="sidebar-user-info">
-            <div class="sidebar-user-name" id="adminName">Admin</div>
-            <div class="sidebar-user-role">Administrateur</div>
-        </div>
-        <button style="background:none;border:none;color:var(--gray-400);cursor:pointer;"
-                onclick="logout()" title="Déconnexion">
-            <i class="bi bi-box-arrow-right"></i>
-        </button>
-    </div>
 </aside>
 
-<!-- ============================================ -->
-<!-- MAIN CONTENT -->
-<!-- ============================================ -->
 <main class="main-content">
-    <!-- ============================================ -->
-    <!-- SECTION : DASHBOARD -->
-    <!-- ============================================ -->
-    <div id="section-dashboard">
+
+    <div th:if="${activeTab == 'dashboard'}">
         <div class="top-bar">
             <div>
                 <h1 class="page-title">Tableau de bord</h1>
-                <p class="page-subtitle">Vue d'ensemble de la plateforme</p>
+                <p class="page-subtitle">Vue d'ensemble du système</p>
             </div>
-            <div class="top-actions">
-                <span class="date-time" id="currentDateTime"></span>
-                <button class="btn-refresh" onclick="loadAllDashboardData()">
-                    <i class="bi bi-arrow-clockwise"></i> Actualiser
-                </button>
-            </div>
+            <span class="date-time" id="currentDateTime"></span>
         </div>
 
-        <!-- Stats Principales -->
-        <div class="stats-grid" id="mainStats">
+        <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon-box primary"><i class="bi bi-people-fill"></i></div>
                 <div>
-                    <div class="stat-value" id="totalUsers">-</div>
-                    <div class="stat-label">Utilisateurs totaux</div>
+                    <div class="stat-value" th:text="${stats != null ? stats['totalUsers'] : 0}">0</div>
+                    <div class="stat-label">Utilisateurs</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon-box success"><i class="bi bi-person-check-fill"></i></div>
+                <div class="stat-icon-box success"><i class="bi bi-person-badge"></i></div>
                 <div>
-                    <div class="stat-value" id="totalCandidats">-</div>
-                    <div class="stat-label">Candidats inscrits</div>
-                    <div class="stat-change up" id="validatedCandidats">-</div>
+                    <div class="stat-value" th:text="${stats != null ? stats['totalCandidats'] : 0}">0</div>
+                    <div class="stat-label">Candidats</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon-box info"><i class="bi bi-building-fill"></i></div>
+                <div class="stat-icon-box info"><i class="bi bi-building"></i></div>
                 <div>
-                    <div class="stat-value" id="totalEntreprises">-</div>
-                    <div class="stat-label">Entreprises inscrites</div>
+                    <div class="stat-value" th:text="${stats != null ? stats['totalEntreprises'] : 0}">0</div>
+                    <div class="stat-label">Entreprises</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon-box warning"><i class="bi bi-briefcase-fill"></i></div>
+                <div class="stat-icon-box warning"><i class="bi bi-briefcase"></i></div>
                 <div>
-                    <div class="stat-value" id="totalOffres">-</div>
-                    <div class="stat-label">Offres publiées</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon-box purple"><i class="bi bi-send-fill"></i></div>
-                <div>
-                    <div class="stat-value" id="totalCandidatures">-</div>
-                    <div class="stat-label">Candidatures totales</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon-box danger"><i class="bi bi-hourglass-split"></i></div>
-                <div>
-                    <div class="stat-value" id="pendingValidations">-</div>
-                    <div class="stat-label">En attente de validation</div>
+                    <div class="stat-value" th:text="${stats != null ? stats['totalOffres'] : 0}">0</div>
+                    <div class="stat-label">Offres</div>
                 </div>
             </div>
         </div>
 
-        <!-- Graphiques et Activité récente -->
         <div class="content-grid">
-            <!-- Répartition par rôle -->
             <div class="panel">
-                <div class="panel-header">
-                    <h3 class="panel-title"><i class="bi bi-pie-chart-fill"></i> Répartition des utilisateurs</h3>
-                </div>
+                <div class="panel-header"><h3 class="panel-title"><i class="bi bi-bar-chart"></i> Répartition</h3></div>
                 <div class="panel-body">
-                    <div class="bar-chart" id="roleChart">
+                    <div class="bar-chart">
                         <div class="bar-item">
-                            <div class="bar-value" id="candidatCount">-</div>
-                            <div class="bar" style="height: 0px; background: var(--primary);" id="barCandidats"></div>
-                            <div class="bar-label">Candidats</div>
+                            <div th:text="${stats != null ? stats['totalCandidats'] : 0}">0</div>
+                            <div class="bar" style="background: var(--success); height: 70px;"></div>
+                            <div class="small">Candidats</div>
                         </div>
                         <div class="bar-item">
-                            <div class="bar-value" id="entrepriseCount">-</div>
-                            <div class="bar" style="height: 0px; background: var(--info);" id="barEntreprises"></div>
-                            <div class="bar-label">Entreprises</div>
-                        </div>
-                        <div class="bar-item">
-                            <div class="bar-value" id="adminCount">-</div>
-                            <div class="bar" style="height: 0px; background: var(--purple);" id="barAdmins"></div>
-                            <div class="bar-label">Admins</div>
+                            <div th:text="${stats != null ? stats['totalEntreprises'] : 0}">0</div>
+                            <div class="bar" style="background: var(--info); height: 50px;"></div>
+                            <div class="small">Entreprises</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Derniers inscrits -->
             <div class="panel">
-                <div class="panel-header">
-                    <h3 class="panel-title"><i class="bi bi-clock-history"></i> Derniers inscrits</h3>
-                </div>
+                <div class="panel-header"><h3 class="panel-title"><i class="bi bi-list-stars"></i> Comptes Utilisateurs</h3></div>
                 <div class="panel-body">
-                    <table class="table" id="latestUsersTable">
-                        <thead>
-                        <tr>
-                            <th>Utilisateur</th>
-                            <th>Rôle</th>
-                            <th>Date</th>
-                            <th>Statut</th>
-                        </tr>
-                        </thead>
+                    <table class="table">
+                        <thead><tr><th>Utilisateur</th><th>Rôle</th><th>Action</th></tr></thead>
                         <tbody>
-                        <tr><td colspan="4" class="text-center">Chargement...</td></tr>
+                        <tr th:each="u : ${users}">
+                            <td th:text="${u['username']}">Username</td>
+                            <td><span class="badge badge-info" th:text="${u['role']}">Role</span></td>
+                            <td>
+                                <form th:action="@{/admin/users/toggle}" method="POST">
+                                    <input type="hidden" name="id" th:value="${u['id']}">
+                                    <button type="submit" class="btn-sm btn-sm-danger">Basculer</button>
+                                </form>
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
@@ -921,1089 +255,108 @@
         </div>
     </div>
 
-    <!-- ============================================ -->
-    <!-- SECTION : CANDIDATS -->
-    <!-- ============================================ -->
-    <div id="section-candidats" style="display:none;">
+    <div th:if="${activeTab == 'candidats'}">
         <div class="top-bar">
             <div>
-                <h1 class="page-title">Gestion des candidats</h1>
-                <p class="page-subtitle">Valider et gérer les profils candidats</p>
-            </div>
-            <div class="top-actions">
-                <select class="btn-refresh" id="candidatFilter" onchange="loadCandidats()">
-                    <option value="all">Tous les candidats</option>
-                    <option value="EN_ATTENTE">En attente de validation</option>
-                    <option value="VALIDE">Validés</option>
-                    <option value="REJETE">Rejetés</option>
-                </select>
-                <button class="btn-refresh" onclick="loadCandidats()">
-                    <i class="bi bi-arrow-clockwise"></i> Actualiser
-                </button>
+                <h1 class="page-title">Gestion des Candidats</h1>
+                <p class="page-subtitle">Liste complète des profils candidats enregistrés</p>
             </div>
         </div>
-
         <div class="panel">
             <div class="panel-body">
-                <table class="table" id="candidatsTable">
-                    <thead>
-                    <tr>
-                        <th>Candidat</th>
-                        <th>Email</th>
-                        <th>Compétences</th>
-                        <th>Niveau</th>
-                        <th>Statut</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
+                <table class="table">
+                    <thead><tr><th>Candidat</th><th>Rôle</th><th>Statut Système</th></tr></thead>
                     <tbody>
-                    <tr><td colspan="6" class="text-center">Chargement...</td></tr>
+                    <tr th:each="u : ${users}">
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar-sm bg-success-light text-success" th:text="${#strings.substring(u['username'],0,1).toUpperCase()}">U</div>
+                                <span class="fw-bold" th:text="${u['username']}">Nom</span>
+                            </div>
+                        </td>
+                        <td><span class="badge badge-success" th:text="${u['role']}">CANDIDAT</span></td>
+                        <td><span class="badge badge-info">Compte Actif</span></td>
+                    </tr>
+                    <tr th:if="${users.isEmpty()}"><td colspan="3" class="text-center text-muted">Aucun candidat.</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- ============================================ -->
-    <!-- SECTION : ENTREPRISES -->
-    <!-- ============================================ -->
-    <div id="section-entreprises" style="display:none;">
+    <div th:if="${activeTab == 'entreprises'}">
         <div class="top-bar">
             <div>
-                <h1 class="page-title">Gestion des entreprises</h1>
-                <p class="page-subtitle">Consulter les profils entreprises</p>
+                <h1 class="page-title">Gestion des Entreprises</h1>
+                <p class="page-subtitle">Suivi des comptes entreprises de la plateforme</p>
             </div>
-            <button class="btn-refresh" onclick="loadEntreprises()">
-                <i class="bi bi-arrow-clockwise"></i> Actualiser
-            </button>
         </div>
-
         <div class="panel">
             <div class="panel-body">
-                <table class="table" id="entreprisesTable">
-                    <thead>
-                    <tr>
-                        <th>Entreprise</th>
-                        <th>Email</th>
-                        <th>Secteur</th>
-                        <th>Offres</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
+                <table class="table">
+                    <thead><tr><th>Entreprise</th><th>Rôle</th><th>Statut Système</th></tr></thead>
                     <tbody>
-                    <tr><td colspan="5" class="text-center">Chargement...</td></tr>
+                    <tr th:each="u : ${users}">
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar-sm bg-info-light text-info"><i class="bi bi-building"></i></div>
+                                <span class="fw-bold" th:text="${u['username']}">Nom</span>
+                            </div>
+                        </td>
+                        <td><span class="badge badge-warning" th:text="${u['role']}">ENTREPRISE</span></td>
+                        <td><span class="badge badge-success">Vérifié</span></td>
+                    </tr>
+                    <tr th:if="${users.isEmpty()}"><td colspan="3" class="text-center text-muted">Aucune entreprise.</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- ============================================ -->
-    <!-- SECTION : OFFRES -->
-    <!-- ============================================ -->
-    <div id="section-offres" style="display:none;">
+    <div th:if="${activeTab == 'verification'}">
         <div class="top-bar">
             <div>
-                <h1 class="page-title">Gestion des offres</h1>
-                <p class="page-subtitle">Superviser toutes les offres publiées</p>
+                <h1 class="page-title">Vérification IA des documents</h1>
+                <p class="page-subtitle">Valider les CV candidats ou Logos d'entreprises</p>
             </div>
-            <button class="btn-refresh" onclick="loadOffres()">
-                <i class="bi bi-arrow-clockwise"></i> Actualiser
-            </button>
         </div>
-
         <div class="panel">
             <div class="panel-body">
-                <table class="table" id="offresTable">
-                    <thead>
-                    <tr>
-                        <th>Offre</th>
-                        <th>Entreprise</th>
-                        <th>Compétences</th>
-                        <th>Candidatures</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
+                <table class="table">
+                    <thead><tr><th>ID Objet</th><th>Type Fichier</th><th>Analyse IA/Description</th><th>Actions</th></tr></thead>
                     <tbody>
-                    <tr><td colspan="5" class="text-center">Chargement...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================ -->
-    <!-- SECTION : CANDIDATURES -->
-    <!-- ============================================ -->
-    <div id="section-candidatures" style="display:none;">
-        <div class="top-bar">
-            <div>
-                <h1 class="page-title">Candidatures</h1>
-                <p class="page-subtitle">Vue d'ensemble des candidatures</p>
-            </div>
-            <button class="btn-refresh" onclick="loadCandidatures()">
-                <i class="bi bi-arrow-clockwise"></i> Actualiser
-            </button>
-        </div>
-
-        <div class="panel">
-            <div class="panel-body">
-                <table class="table" id="candidaturesTable">
-                    <thead>
-                    <tr>
-                        <th>Candidat</th>
-                        <th>Offre</th>
-                        <th>Score</th>
-                        <th>Statut</th>
-                        <th>Date</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr><td colspan="5" class="text-center">Chargement...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================ -->
-    <!-- SECTION : STATISTIQUES -->
-    <!-- ============================================ -->
-    <div id="section-statistiques" style="display:none;">
-        <div class="top-bar">
-            <div>
-                <h1 class="page-title">Statistiques</h1>
-                <p class="page-subtitle">Analyse détaillée de la plateforme</p>
-            </div>
-        </div>
-
-        <div class="content-grid">
-            <div class="panel">
-                <div class="panel-header">
-                    <h3 class="panel-title"><i class="bi bi-bar-chart-fill"></i> Top compétences recherchées</h3>
-                </div>
-                <div class="panel-body" id="topCompetences">
-                    <p>Chargement...</p>
-                </div>
-            </div>
-            <div class="panel">
-                <div class="panel-header">
-                    <h3 class="panel-title"><i class="bi bi-building-fill"></i> Top entreprises</h3>
-                </div>
-                <div class="panel-body" id="topEntreprises">
-                    <p>Chargement...</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</main>
-
-<!-- ============================================ -->
-<!-- MODAL DÉTAIL -->
-<!-- ============================================ -->
-<div class="modal-overlay" id="detailModal">
-    <div class="modal">
-        <div class="modal-header">
-            <h2 id="modalTitle">Détails</h2>
-            <button class="btn-close" onclick="closeModal()">✕</button>
-        </div>
-        <div class="modal-body" id="modalBody">
-            Chargement...
-        </div>
-    </div>
-</div>
-
-<!-- ============================================ -->
-<!-- NOTIFICATION -->
-<!-- ============================================ -->
-<div id="notification" class="notification" style="display:none;"></div>
-
-<!-- ============================================ -->
-<!-- SCRIPTS -->
-<!-- ============================================ -->
-<script>
-    const API_BASE_URL = 'http://localhost:8080';
-    const token = localStorage.getItem('token');
-    const userRole = localStorage.getItem('userRole');
-
-    let currentSection = 'dashboard';
-    let allUsers = [];
-    let allCandidats = [];
-    let allEntreprises = [];
-    let allOffres = [];
-    let allCandidatures = [];
-
-    // ============================================
-    // INITIALISATION
-    // ============================================
-    document.addEventListener('DOMContentLoaded', () => {
-        if (!token || userRole !== 'ADMIN') {
-            window.location.href = '/login';
-            return;
-        }
-
-        updateDateTime();
-        setInterval(updateDateTime, 60000);
-        loadAllDashboardData();
-    });
-
-    function updateDateTime() {
-        const now = new Date();
-        document.getElementById('currentDateTime').textContent =
-            now.toLocaleDateString('fr-FR', {
-                weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-            }) + ' • ' +
-            now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-    }
-
-    // ============================================
-    // API CALL
-    // ============================================
-    async function apiCall(method, path) {
-        const response = await fetch(`${API_BASE_URL}${path}`, {
-            method,
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        if (response.status === 401) { logout(); return null; }
-        if (!response.ok) throw new Error(`Erreur ${response.status}`);
-
-        const text = await response.text();
-        return text ? JSON.parse(text) : null;
-    }
-
-    // ============================================
-    // NAVIGATION
-    // ============================================
-    function switchSection(section) {
-        currentSection = section;
-
-        // Cacher toutes les sections
-        document.querySelectorAll('[id^="section-"]').forEach(s => s.style.display = 'none');
-        document.getElementById(`section-${section}`).style.display = 'block';
-
-        // Mettre à jour les liens actifs
-        document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-        document.querySelector(`.sidebar-link[onclick*="${section}"]`)?.classList.add('active');
-
-        // Charger les données selon la section
-        switch(section) {
-            case 'dashboard': loadAllDashboardData(); break;
-            case 'candidats': loadCandidats(); break;
-            case 'entreprises': loadEntreprises(); break;
-            case 'offres': loadOffres(); break;
-            case 'candidatures': loadCandidatures(); break;
-            case 'statistiques': loadStatistiques(); break;
-            case 'utilisateurs': loadUtilisateurs(); break;
-        }
-    }
-
-    // ============================================
-    // DASHBOARD DATA
-    // ============================================
-    async function loadAllDashboardData() {
-        try {
-            // Charger toutes les données en parallèle
-            const [users, candidats, entreprises, offres, candidatures] = await Promise.all([
-                apiCall('GET', '/api/admin/users').catch(() => []),
-                apiCall('GET', '/api/candidats').catch(() => []),
-                apiCall('GET', '/api/entreprises').catch(() => []),
-                apiCall('GET', '/api/offres').catch(() => []),
-                apiCall('GET', '/api/admin/candidatures').catch(() => [])
-            ]);
-
-            allUsers = users || [];
-            allCandidats = candidats || [];
-            allEntreprises = entreprises || [];
-            allOffres = offres || [];
-            allCandidatures = candidatures || [];
-
-            updateDashboardStats();
-            updateRoleChart();
-            updateLatestUsers();
-
-        } catch (error) {
-            console.error('Erreur chargement dashboard:', error);
-        }
-    }
-
-    function updateDashboardStats() {
-        document.getElementById('totalUsers').textContent = allUsers.length;
-        document.getElementById('totalCandidats').textContent = allCandidats.length;
-        document.getElementById('totalEntreprises').textContent = allEntreprises.length;
-        document.getElementById('totalOffres').textContent = allOffres.length;
-        document.getElementById('totalCandidatures').textContent = allCandidatures.length;
-
-        const pendingCandidats = allCandidats.filter(c => c.validationStatut === 'EN_ATTENTE').length;
-        const validatedCandidats = allCandidats.filter(c => c.validationStatut === 'VALIDE').length;
-
-        document.getElementById('pendingValidations').textContent = pendingCandidats;
-        document.getElementById('validatedCandidats').textContent = `✅ ${validatedCandidats} validés`;
-        document.getElementById('pendingCandidatsCount').textContent = pendingCandidats;
-        document.getElementById('pendingCandidatsCount').style.display = pendingCandidats > 0 ? 'inline' : 'none';
-    }
-
-    function updateRoleChart() {
-        const candidats = allUsers.filter(u => u.role === 'CANDIDAT').length;
-        const entreprises = allUsers.filter(u => u.role === 'ENTREPRISE').length;
-        const admins = allUsers.filter(u => u.role === 'ADMIN').length;
-        const max = Math.max(candidats, entreprises, admins, 1);
-
-        document.getElementById('candidatCount').textContent = candidats;
-        document.getElementById('entrepriseCount').textContent = entreprises;
-        document.getElementById('adminCount').textContent = admins;
-
-        document.getElementById('barCandidats').style.height = (candidats / max * 150) + 'px';
-        document.getElementById('barEntreprises').style.height = (entreprises / max * 150) + 'px';
-        document.getElementById('barAdmins').style.height = (admins / max * 150) + 'px';
-    }
-
-    function updateLatestUsers() {
-        const tbody = document.querySelector('#latestUsersTable tbody');
-        const latest = [...allUsers].sort((a, b) =>
-            new Date(b.dateCreation) - new Date(a.dateCreation)
-        ).slice(0, 5);
-
-        if (latest.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4">Aucun utilisateur</td></tr>';
-            return;
-        }
-
-        tbody.innerHTML = latest.map(u => `
-                <tr>
-                    <td>
-                        <div class="user-cell">
-                            <div class="user-avatar-sm bg-gradient">${u.email?.charAt(0)?.toUpperCase() || '?'}</div>
-                            <span>${u.email}</span>
-                        </div>
-                    </td>
-                    <td><span class="badge badge-${u.role === 'ADMIN' ? 'purple' : u.role === 'ENTREPRISE' ? 'info' : 'success'}">${u.role}</span></td>
-                    <td>${new Date(u.dateCreation).toLocaleDateString('fr-FR')}</td>
-                    <td><span class="badge ${u.enabled ? 'badge-success' : 'badge-danger'}">${u.enabled ? 'Actif' : 'Bloqué'}</span></td>
-                </tr>
-            `).join('');
-    }
-
-    // ============================================
-    // CANDIDATS
-    // ============================================
-    async function loadCandidats() {
-        const filter = document.getElementById('candidatFilter')?.value || 'all';
-        const tbody = document.querySelector('#candidatsTable tbody');
-        tbody.innerHTML = '<tr><td colspan="6"><div class="loader"><div class="spinner"></div></div></td></tr>';
-
-        try {
-            const candidats = await apiCall('GET', '/api/candidats');
-            allCandidats = candidats || [];
-
-            const filtered = filter === 'all' ? allCandidats :
-                allCandidats.filter(c => c.validationStatut === filter);
-
-            tbody.innerHTML = filtered.length === 0 ?
-                '<tr><td colspan="6" class="text-center">Aucun candidat trouvé</td></tr>' :
-                filtered.map(c => `
-                        <tr>
-                            <td>
-                                <div class="user-cell">
-                                    <div class="user-avatar-sm bg-primary-light">
-                                        ${(c.prenom?.[0] || '') + (c.nom?.[0] || '')}
-                                    </div>
-                                    <div>
-                                        <strong>${c.prenom || ''} ${c.nom || ''}</strong>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>${c.email || getUserEmail(c.userId)}</td>
-                            <td>${c.competences ? c.competences.split(',').slice(0, 3).map(s => `<span class="badge badge-info" style="margin:2px;">${s.trim()}</span>`).join('') : '-'}</td>
-                            <td>${c.niveauScolaire || '-'}</td>
-                            <td>
-                                <span class="badge ${c.validationStatut === 'VALIDE' ? 'badge-success' : c.validationStatut === 'REJETE' ? 'badge-danger' : 'badge-warning'}">
-                                    ${c.validationStatut === 'EN_ATTENTE' ? '⏳ En attente' : c.validationStatut === 'VALIDE' ? '✅ Validé' : '❌ Rejeté'}
-                                </span>
-                            </td>
-                            <td>
-                                <div class="actions-group">
-                                    <button class="btn-icon btn-icon-view" onclick="voirDetailCandidat(${c.id})" title="Voir">
-                                        <i class="bi bi-eye-fill"></i>
-                                    </button>
-                                    ${c.validationStatut === 'EN_ATTENTE' ? `
-                                        <button class="btn-icon btn-icon-validate" onclick="validerCandidat(${c.id})" title="Valider">
-                                            <i class="bi bi-check-lg"></i>
-                                        </button>
-                                        <button class="btn-icon btn-icon-reject" onclick="rejeterCandidat(${c.id})" title="Rejeter">
-                                            <i class="bi bi-x-lg"></i>
-                                        </button>
-                                    ` : ''}
-                                </div>
-                            </td>
-                        </tr>
-                    `).join('');
-
-        } catch (error) {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center" style="color:red;">Erreur de chargement</td></tr>';
-        }
-    }
-
-    async function validerCandidat(id) {
-        try {
-            await apiCall('PUT', `/api/candidats/${id}/validation?statut=VALIDE`);
-            showNotification('✅ Candidat validé avec succès', 'success');
-            loadCandidats();
-            loadAllDashboardData();
-        } catch (e) {
-            showNotification('❌ Erreur lors de la validation', 'error');
-        }
-    }
-
-    async function rejeterCandidat(id) {
-        if (!confirm('Rejeter ce candidat ?')) return;
-        try {
-            await apiCall('PUT', `/api/candidats/${id}/validation?statut=REJETE`);
-            showNotification('❌ Candidat rejeté', 'info');
-            loadCandidats();
-            loadAllDashboardData();
-        } catch (e) {
-            showNotification('❌ Erreur', 'error');
-        }
-    }
-
-    async function voirDetailCandidat(id) {
-        try {
-            const candidat = await apiCall('GET', `/api/candidats/${id}`);
-            const experiences = await apiCall('GET', `/api/candidats/experiences/candidat/${id}`);
-
-            document.getElementById('modalTitle').textContent =
-                `👤 ${candidat.prenom} ${candidat.nom}`;
-            document.getElementById('modalBody').innerHTML = `
-                    <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value">${getUserEmail(candidat.userId) || 'N/A'}</span></div>
-                    <div class="detail-row"><span class="detail-label">Téléphone</span><span class="detail-value">${candidat.telephone || 'N/A'}</span></div>
-                    <div class="detail-row"><span class="detail-label">Adresse</span><span class="detail-value">${candidat.adresse || 'N/A'}</span></div>
-                    <div class="detail-row"><span class="detail-label">Bio</span><span class="detail-value">${candidat.bio || 'Aucune'}</span></div>
-                    <div class="detail-row"><span class="detail-label">Compétences</span><span class="detail-value">${candidat.competences || 'Aucune'}</span></div>
-                    <div class="detail-row"><span class="detail-label">Niveau scolaire</span><span class="detail-value">${candidat.niveauScolaire || 'N/A'}</span></div>
-                    <div class="detail-row"><span class="detail-label">Statut</span><span class="detail-value"><span class="badge ${candidat.validationStatut === 'VALIDE' ? 'badge-success' : 'badge-warning'}">${candidat.validationStatut}</span></span></div>
-                    <div class="detail-row"><span class="detail-label">CV</span><span class="detail-value">${candidat.cvPath ? '<a href="#">📄 Télécharger</a>' : 'Non fourni'}</span></div>
-                    <hr>
-                    <h4>Expériences (${experiences?.length || 0})</h4>
-                    ${experiences?.map(e => `
-                        <div class="detail-row">
-                            <span class="detail-label">${e.poste} chez ${e.entrepriseNom}</span>
-                            <span class="detail-value">${e.dateDebut ? new Date(e.dateDebut).toLocaleDateString('fr-FR') : ''} - ${e.dateFin ? new Date(e.dateFin).toLocaleDateString('fr-FR') : 'Présent'}</span>
-                        </div>
-                    `).join('') || '<p>Aucune expérience</p>'}
-                `;
-
-            document.getElementById('detailModal').classList.add('active');
-        } catch (e) {
-            showNotification('❌ Erreur chargement détails', 'error');
-        }
-    }
-
-    // ============================================
-    // ENTREPRISES
-    // ============================================
-    async function loadEntreprises() {
-        const tbody = document.querySelector('#entreprisesTable tbody');
-        tbody.innerHTML = '<tr><td colspan="5"><div class="loader"><div class="spinner"></div></div></td></tr>';
-
-        try {
-            const entreprises = await apiCall('GET', '/api/entreprises');
-            allEntreprises = entreprises || [];
-
-            tbody.innerHTML = allEntreprises.length === 0 ?
-                '<tr><td colspan="5">Aucune entreprise</td></tr>' :
-                allEntreprises.map(e => `
-                        <tr>
-                            <td>
-                                <div class="user-cell">
-                                    <div class="user-avatar-sm bg-gradient">${e.nomEntreprise?.charAt(0) || '?'}</div>
-                                    <strong>${e.nomEntreprise}</strong>
-                                </div>
-                            </td>
-                            <td>${e.contactEmail || getUserEmail(e.userId) || '-'}</td>
-                            <td>${e.secteur || '-'}</td>
-                            <td><span class="badge badge-info">${countOffresByEntreprise(e.id)} offres</span></td>
-                            <td>
-                                <button class="btn-icon btn-icon-view" onclick="voirDetailEntreprise(${e.id})">
-                                    <i class="bi bi-eye-fill"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `).join('');
-        } catch (e) {
-            tbody.innerHTML = '<tr><td colspan="5" style="color:red;">Erreur</td></tr>';
-        }
-    }
-
-    function countOffresByEntreprise(entrepriseId) {
-        return allOffres.filter(o => o.entrepriseId === entrepriseId).length;
-    }
-
-    // ============================================
-    // OFFRES
-    // ============================================
-    async function loadOffres() {
-        const tbody = document.querySelector('#offresTable tbody');
-        tbody.innerHTML = '<tr><td colspan="5"><div class="loader"><div class="spinner"></div></div></td></tr>';
-
-        try {
-            const offres = await apiCall('GET', '/api/offres');
-            allOffres = offres || [];
-
-            tbody.innerHTML = allOffres.length === 0 ?
-                '<tr><td colspan="5">Aucune offre</td></tr>' :
-                allOffres.map(o => `
-                        <tr>
-                            <td><strong>${o.titre}</strong></td>
-                            <td>${o.entrepriseNom || 'N/A'}</td>
-                            <td>${o.competencesRequises ? o.competencesRequises.split(',').slice(0,3).map(c => `<span class="badge badge-purple" style="margin:2px;">${c.trim()}</span>`).join('') : '-'}</td>
-                            <td><span class="badge badge-info">${o.nombreCandidatures || 0}</span></td>
-                            <td>
-                                <button class="btn-icon btn-icon-view" onclick="voirDetailOffre(${o.id})">
-                                    <i class="bi bi-eye-fill"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `).join('');
-        } catch (e) {
-            tbody.innerHTML = '<tr><td colspan="5" style="color:red;">Erreur</td></tr>';
-        }
-    }
-
-    // ============================================
-    // CANDIDATURES
-    // ============================================
-    async function loadCandidatures() {
-        const tbody = document.querySelector('#candidaturesTable tbody');
-        tbody.innerHTML = '<tr><td colspan="5"><div class="loader"><div class="spinner"></div></div></td></tr>';
-
-        try {
-            const candidatures = await apiCall('GET', '/api/admin/candidatures');
-            allCandidatures = candidatures || [];
-
-            tbody.innerHTML = allCandidatures.length === 0 ?
-                '<tr><td colspan="5">Aucune candidature</td></tr>' :
-                allCandidatures.map(c => `
-                        <tr>
-                            <td>${c.candidatNom || 'Candidat'} ${c.candidatPrenom || ''}</td>
-                            <td>${c.offreTitre || 'Offre'}</td>
-                            <td><span class="badge badge-${c.scoreMatching >= 80 ? 'success' : c.scoreMatching >= 60 ? 'warning' : 'danger'}">🎯 ${c.scoreMatching}%</span></td>
-                            <td><span class="badge ${c.statut === 'ACCEPTE' ? 'badge-success' : c.statut === 'REFUSE' ? 'badge-danger' : 'badge-warning'}">${c.statut}</span></td>
-                            <td>${new Date(c.datePostulation).toLocaleDateString('fr-FR')}</td>
-                        </tr>
-                    `).join('');
-        } catch (e) {
-            tbody.innerHTML = '<tr><td colspan="5" style="color:red;">Erreur</td></tr>';
-        }
-    }
-
-    // ============================================
-    // STATISTIQUES
-    // ============================================
-    async function loadStatistiques() {
-        try {
-            const offres = await apiCall('GET', '/api/offres');
-
-            // Top compétences
-            const competences = {};
-            offres?.forEach(o => {
-                if (o.competencesRequises) {
-                    o.competencesRequises.split(',').forEach(c => {
-                        const comp = c.trim();
-                        competences[comp] = (competences[comp] || 0) + 1;
-                    });
-                }
-            });
-
-            const sorted = Object.entries(competences)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 10);
-
-            document.getElementById('topCompetences').innerHTML = sorted.length === 0 ?
-                '<p>Aucune donnée</p>' :
-                sorted.map(([comp, count], i) => `
-                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0;">
-                            <span>${i+1}. ${comp}</span>
-                            <span class="badge badge-info">${count} offre(s)</span>
-                        </div>
-                    `).join('');
-
-        } catch (e) {
-            console.error('Erreur stats:', e);
-        }
-    }
-    <!-- ============================================ -->
-    <!-- SECTION : VÉRIFICATION FICHIERS -->
-    <!-- ============================================ -->
-    <div id="section-verification" style="display:none;">
-        <div class="top-bar">
-            <div>
-                <h1 class="page-title">🔍 Vérification des fichiers</h1>
-                <p class="page-subtitle">Analyser et approuver les CV, photos et logos</p>
-            </div>
-            <div class="top-actions">
-                <select class="btn-refresh" id="fichierFilter" onchange="filtrerFichiers()">
-                    <option value="all">Tous les types</option>
-                    <option value="CV">📄 CV uniquement</option>
-                    <option value="PHOTO">📷 Photos uniquement</option>
-                    <option value="LOGO">🏢 Logos uniquement</option>
-                </select>
-                <button class="btn-refresh" onclick="chargerFichiers()">
-                    <i class="bi bi-arrow-clockwise"></i> Actualiser
-                </button>
-            </div>
-        </div>
-
-        <!-- Stats vérification -->
-        <div class="stats-grid" style="margin-bottom:24px;">
-            <div class="stat-card">
-                <div class="stat-icon-box warning"><i class="bi bi-hourglass-split"></i></div>
-                <div>
-                    <div class="stat-value" id="nbEnAttente">-</div>
-                    <div class="stat-label">En attente</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon-box success"><i class="bi bi-check-circle-fill"></i></div>
-                <div>
-                    <div class="stat-value" id="nbApprouves">-</div>
-                    <div class="stat-label">Approuvés</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon-box danger"><i class="bi bi-x-circle-fill"></i></div>
-                <div>
-                    <div class="stat-value" id="nbRejetes">-</div>
-                    <div class="stat-label">Rejetés</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Liste des fichiers -->
-        <div class="panel">
-            <div class="panel-header">
-                <h3 class="panel-title"><i class="bi bi-file-earmark-check-fill"></i> Fichiers à vérifier</h3>
-                <button class="btn-sm btn-sm-primary" onclick="analyserTous()">
-                    🤖 Analyser tout avec l'IA
-                </button>
-            </div>
-            <div class="panel-body" id="fichiersContainer">
-                <div class="loader"><div class="spinner"></div></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================ -->
-    <!-- MODAL ANALYSE IA -->
-    <!-- ============================================ -->
-    <div class="modal-overlay" id="analyseModal">
-        <div class="modal" style="max-width: 800px;">
-            <div class="modal-header">
-                <h2>🤖 Analyse IA du fichier</h2>
-                <button class="btn-close" onclick="closeAnalyseModal()">✕</button>
-            </div>
-            <div class="modal-body">
-                <!-- Aperçu du fichier -->
-                <div id="apercuFichier" style="text-align:center; margin-bottom:20px; padding:20px; background:#f9fafb; border-radius:12px;">
-                    <div class="loader"><div class="spinner"></div></div>
-                </div>
-
-                <!-- Résultats de l'analyse -->
-                <div id="resultatsAnalyse">
-                    <div class="loader"><div class="spinner"></div></div>
-                </div>
-
-                <!-- Actions -->
-                <div id="actionsAnalyse" style="display:none; margin-top:20px; display:flex; gap:12px; justify-content:flex-end;">
-                    <button class="btn-sm btn-sm-danger" onclick="rejeterFichier()">
-                        ❌ Rejeter
-                    </button>
-                    <button class="btn-sm btn-sm-success" onclick="approuverFichier()">
-                        ✅ Approuver
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    // ============================================
-    // MODAL
-    // ============================================
-    function closeModal() {
-        document.getElementById('detailModal').classList.remove('active');
-    }
-
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('modal-overlay')) {
-            e.target.classList.remove('active');
-        }
-    });
-
-    // ============================================
-    // UTILITAIRES
-    // ============================================
-    function getUserEmail(userId) {
-        const user = allUsers.find(u => u.id === userId);
-        return user?.email || '';
-    }
-
-    function showNotification(message, type) {
-        const notification = document.getElementById('notification');
-        notification.innerHTML = message;
-        notification.className = `notification ${type}`;
-        notification.style.display = 'flex';
-
-        clearTimeout(notification._timeout);
-        notification._timeout = setTimeout(() => {
-            notification.style.display = 'none';
-        }, 4000);
-    }
-
-    function logout() {
-        localStorage.clear();
-        window.location.href = '/login';
-    }
-    // ============================================
-    // VARIABLES POUR LA VÉRIFICATION
-    // ============================================
-    let tousLesFichiers = [];
-    let fichierCourant = null;
-    let analyseCourante = null;
-
-    // ============================================
-    // CHARGER LES FICHIERS À VÉRIFIER
-    // ============================================
-    async function chargerFichiers() {
-        const container = document.getElementById('fichiersContainer');
-        container.innerHTML = '<div class="loader"><div class="spinner"></div></div>';
-
-        try {
-            const fichiers = await apiCall('GET', '/api/admin/fichiers-a-verifier');
-            tousLesFichiers = fichiers || [];
-
-            mettreAJourStatsFichiers();
-            afficherFichiers(tousLesFichiers);
-
-        } catch (error) {
-            container.innerHTML = `
-            <div class="empty-state">
-                <i class="bi bi-exclamation-triangle"></i>
-                <p>Erreur lors du chargement des fichiers</p>
-            </div>`;
-        }
-    }
-
-    function mettreAJourStatsFichiers() {
-        document.getElementById('nbEnAttente').textContent = tousLesFichiers.length;
-        document.getElementById('nbApprouves').textContent =
-            tousLesFichiers.filter(f => f.statut === 'APPROUVE').length;
-        document.getElementById('nbRejetes').textContent =
-            tousLesFichiers.filter(f => f.statut === 'REJETE').length;
-    }
-
-    function filtrerFichiers() {
-        const filtre = document.getElementById('fichierFilter').value;
-        const filtres = filtre === 'all' ? tousLesFichiers :
-            tousLesFichiers.filter(f => f.type === filtre);
-        afficherFichiers(filtres);
-    }
-
-    function afficherFichiers(fichiers) {
-        const container = document.getElementById('fichiersContainer');
-
-        if (!fichiers || fichiers.length === 0) {
-            container.innerHTML = `
-            <div class="empty-state">
-                <i class="bi bi-check-circle"></i>
-                <h3>Tous les fichiers sont vérifiés</h3>
-                <p>Aucun fichier en attente de vérification.</p>
-            </div>`;
-            return;
-        }
-
-        container.innerHTML = `
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Type</th>
-                    <th>Fichier</th>
-                    <th>Propriétaire</th>
-                    <th>Date</th>
-                    <th>Score IA</th>
-                    <th>Statut</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${fichiers.map(f => `
-                    <tr>
+                    <tr th:each="f : ${fichiers}">
+                        <td class="fw-bold" th:text="${f['id']}">1</td>
+                        <td><span class="badge badge-warning" th:text="${f['type'] ?: 'DOCUMENT'}">CV</span></td>
+                        <td th:text="${f['description'] ?: 'En attente de relecture humaine'}">Analyse du document...</td>
                         <td>
-                            <span class="badge badge-${f.type === 'CV' ? 'info' : f.type === 'PHOTO' ? 'purple' : 'warning'}">
-                                ${f.type === 'CV' ? '📄 CV' : f.type === 'PHOTO' ? '📷 Photo' : '🏢 Logo'}
-                            </span>
-                        </td>
-                        <td>
-                            <a href="#" onclick="ouvrirFichier('${f.url}', '${f.type}'); return false;"
-                               style="color:var(--primary); text-decoration:none; font-weight:500;">
-                                <i class="bi bi-file-earmark"></i> ${f.nom.split('/').pop().substring(0, 30)}...
-                            </a>
-                        </td>
-                        <td>${f.candidatNom || f.entrepriseNom || 'N/A'}</td>
-                        <td>${formatDate(f.dateUpload)}</td>
-                        <td>
-                            <span class="badge badge-${f.scoreIA >= 80 ? 'success' : f.scoreIA >= 50 ? 'warning' : 'danger'}">
-                                ${f.scoreIA ? f.scoreIA + '%' : 'Non analysé'}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="badge badge-${f.statut === 'APPROUVE' ? 'success' : f.statut === 'REJETE' ? 'danger' : 'warning'}">
-                                ${f.statut === 'APPROUVE' ? '✅ Approuvé' : f.statut === 'REJETE' ? '❌ Rejeté' : '⏳ En attente'}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="actions-group">
-                                <button class="btn-icon btn-icon-view"
-                                        onclick="analyserFichier('${f.id}', '${f.url}', '${f.type}')"
-                                        title="Analyser avec IA">
-                                    🤖
-                                </button>
-                                <button class="btn-icon btn-icon-validate"
-                                        onclick="approuverFichierDirect('${f.id}')"
-                                        title="Approuver">
-                                    ✅
-                                </button>
-                                <button class="btn-icon btn-icon-reject"
-                                        onclick="demanderMotifRejet('${f.id}')"
-                                        title="Rejeter">
-                                    ❌
-                                </button>
+                            <div class="d-flex gap-2">
+                                <form th:action="@{/admin/candidat/valider}" method="POST" class="d-inline">
+                                    <input type="hidden" name="id" th:value="${f['id']}">
+                                    <input type="hidden" name="statut" value="VALIDE">
+                                    <button type="submit" class="btn-sm btn-sm-success"><i class="bi bi-check-lg"></i> Approuver</button>
+                                </form>
+                                <form th:action="@{/admin/candidat/valider}" method="POST" class="d-inline">
+                                    <input type="hidden" name="id" th:value="${f['id']}">
+                                    <input type="hidden" name="statut" value="REJETE">
+                                    <button type="submit" class="btn-sm btn-sm-danger"><i class="bi bi-x-lg"></i> Rejeter</button>
+                                </form>
                             </div>
                         </td>
                     </tr>
-                `).join('')}
-            </tbody>
-        </table>`;
-    }
-
-    // ============================================
-    // ANALYSE IA
-    // ============================================
-    async function analyserFichier(id, url, type) {
-        fichierCourant = { id, url, type };
-
-        document.getElementById('analyseModal').classList.add('active');
-        document.getElementById('resultatsAnalyse').innerHTML =
-            '<div class="loader"><div class="spinner"></div></div>';
-        document.getElementById('actionsAnalyse').style.display = 'none';
-
-        // Aperçu du fichier
-        const apercu = document.getElementById('apercuFichier');
-        if (type === 'PHOTO' || type === 'LOGO') {
-            apercu.innerHTML = `<img src="${url}" style="max-width:300px; max-height:300px; border-radius:8px;" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22><rect fill=%22%23ddd%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22>📄</text></svg>'">`;
-        } else {
-            apercu.innerHTML = `
-            <div style="padding:40px; background:white; border-radius:8px; text-align:center;">
-                <i class="bi bi-file-pdf" style="font-size:48px; color:#ef4444;"></i>
-                <p style="margin-top:10px; font-weight:600;">Document PDF</p>
-                <a href="${url}" target="_blank" class="btn-sm btn-sm-primary" style="display:inline-block; margin-top:10px;">
-                    📥 Ouvrir le fichier
-                </a>
-            </div>`;
-        }
-
-        // Appeler l'API d'analyse
-        try {
-            const resultat = await apiCall('POST', '/api/admin/analyser-contenu', {
-                url: url,
-                type: type
-            });
-
-            analyseCourante = resultat;
-            afficherResultatsAnalyse(resultat);
-
-        } catch (error) {
-            document.getElementById('resultatsAnalyse').innerHTML = `
-            <div class="alert alert-danger">
-                Erreur lors de l'analyse : ${error.message}
-            </div>`;
-        }
-    }
-
-    function afficherResultatsAnalyse(resultat) {
-        const score = resultat.scoreConformite || 0;
-        const couleurScore = score >= 80 ? '#10b981' : score >= 50 ? '#f59e0b' : '#ef4444';
-
-        document.getElementById('resultatsAnalyse').innerHTML = `
-        <h4 style="margin-bottom:16px;">📊 Résultats de l'analyse IA</h4>
-
-        <!-- Score global -->
-        <div style="text-align:center; margin-bottom:24px;">
-            <div style="width:120px; height:120px; border-radius:50%;
-                        background:conic-gradient(${couleurScore} ${score}%, #e5e7eb ${score}%);
-                        display:inline-flex; align-items:center; justify-content:center;
-                        position:relative;">
-                <div style="width:90px; height:90px; border-radius:50%; background:white;
-                            display:flex; align-items:center; justify-content:center;">
-                    <span style="font-size:28px; font-weight:800; color:${couleurScore};">${score}%</span>
-                </div>
+                    <tr th:if="${fichiers == null or fichiers.isEmpty()}"><td colspan="4" class="text-center text-muted py-4">Aucun fichier en attente de vérification.</td></tr>
+                    </tbody>
+                </table>
             </div>
-            <p style="margin-top:8px; font-weight:600; color:${couleurScore};">
-                ${resultat.recommendation === 'APPROUVER' ? '✅ Conforme' : '⚠️ Problèmes détectés'}
-            </p>
         </div>
+    </div>
 
-        <!-- Détails -->
-        <div style="background:#f9fafb; border-radius:12px; padding:20px;">
-            ${Object.entries(resultat)
-            .filter(([key]) => !['type', 'scoreConformite', 'recommendation', 'dateAnalyse', 'problemes'].includes(key))
-            .map(([key, value]) => `
-                    <div class="detail-row">
-                        <span class="detail-label">${formaterCle(key)}</span>
-                        <span class="detail-value">${typeof value === 'boolean' ? (value ? '✅ Oui' : '❌ Non') : value}</span>
-                    </div>
-                `).join('')}
-        </div>
+</main>
 
-        <!-- Problèmes détectés -->
-        ${resultat.problemes && resultat.problemes.length > 0 ? `
-            <div style="margin-top:16px; padding:16px; background:#fef2f2; border-radius:12px; border-left:4px solid #ef4444;">
-                <h5 style="color:#dc2626; margin-bottom:8px;">⚠️ Problèmes détectés :</h5>
-                <ul style="margin:0; padding-left:20px;">
-                    ${resultat.problemes.map(p => `<li style="color:#dc2626;">${p}</li>`).join('')}
-                </ul>
-            </div>
-        ` : ''}
-
-        <p style="margin-top:16px; color:#9ca3af; font-size:12px;">
-            📅 Analyse effectuée le ${new Date(resultat.dateAnalyse).toLocaleString('fr-FR')}
-        </p>
-    `;
-
-        document.getElementById('actionsAnalyse').style.display = 'flex';
-    }
-
-    function formaterCle(cle) {
-        const formatages = {
-            'contientNom': 'Contient un nom',
-            'contientEmail': 'Contient un email',
-            'contientTelephone': 'Contient un téléphone',
-            'formatValide': 'Format valide',
-            'tailleKo': 'Taille du fichier',
-            'visageDetecte': 'Visage détecté',
-            'qualiteImage': 'Qualité de l\'image',
-            'fondApproprie': 'Fond approprié',
-            'texteLisible': 'Texte lisible',
-            'pasDeContenuOffensant': 'Pas de contenu offensant'
-        };
-        return formatages[cle] || cle.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
-    }
-
-    // ============================================
-    // APPROUVER / REJETER
-    // ============================================
-    async function approuverFichier() {
-        if (!fichierCourant) return;
-
-        try {
-            await apiCall('PUT', `/api/admin/approuver-fichier/${fichierCourant.id}`);
-            showNotification('✅ Fichier approuvé avec succès', 'success');
-            closeAnalyseModal();
-            chargerFichiers();
-        } catch (error) {
-            showNotification('❌ Erreur lors de l\'approbation', 'error');
-        }
-    }
-
-    async function approuverFichierDirect(id) {
-        if (!confirm('Approuver ce fichier ?')) return;
-
-        try {
-            await apiCall('PUT', `/api/admin/approuver-fichier/${id}`);
-            showNotification('✅ Fichier approuvé', 'success');
-            chargerFichiers();
-        } catch (error) {
-            showNotification('❌ Erreur', 'error');
-        }
-    }
-
-    function demanderMotifRejet(id) {
-        fichierCourant = { id };
-        const motif = prompt('Motif du rejet :');
-        if (motif) {
-            rejeterFichierAvecMotif(id, motif);
-        }
-    }
-
-    async function rejeterFichier() {
-        if (!fichierCourant) return;
-        const motif = prompt('Motif du rejet :', 'Contenu non conforme');
-        if (!motif) return;
-
-        await rejeterFichierAvecMotif(fichierCourant.id, motif);
-        closeAnalyseModal();
-    }
-
-    async function rejeterFichierAvecMotif(id, motif) {
-        try {
-            await apiCall('PUT', `/api/admin/rejeter-fichier/${id}`, { motif });
-            showNotification('❌ Fichier rejeté : ' + motif, 'info');
-            chargerFichiers();
-        } catch (error) {
-            showNotification('❌ Erreur lors du rejet', 'error');
-        }
-    }
-
-    // ============================================
-    // ANALYSER TOUS LES FICHIERS
-    // ============================================
-    async function analyserTous() {
-        if (!confirm('🤖 Lancer l\'analyse IA sur tous les fichiers en attente ?')) return;
-
-        const enAttente = tousLesFichiers.filter(f => f.statut === 'EN_ATTENTE' || !f.scoreIA);
-
-        if (enAttente.length === 0) {
-            showNotification('Aucun fichier à analyser', 'info');
-            return;
-        }
-
-        showNotification(`🤖 Analyse de ${enAttente.length} fichiers en cours...`, 'info');
-
-        for (const fichier of enAttente) {
-            try {
-                const resultat = await apiCall('POST', '/api/admin/analyser-contenu', {
-                    url: fichier.url,
-                    type: fichier.type
-                });
-
-                fichier.scoreIA = resultat.scoreConformite;
-                fichier.statut = resultat.scoreConformite >= 70 ? 'APPROUVE' : 'REJETE';
-
-                // Approuver automatiquement si score >= 80
-                if (resultat.scoreConformite >= 80) {
-                    await apiCall('PUT', `/api/admin/approuver-fichier/${fichier.id}`);
-                }
-
-            } catch (e) {
-                console.error('Erreur analyse:', fichier.nom, e);
-            }
-        }
-
-        showNotification('✅ Analyse terminée !', 'success');
-        chargerFichiers();
-    }
-
-    function ouvrirFichier(url, type) {
-        window.open(url, '_blank');
-    }
-
-    function closeAnalyseModal() {
-        document.getElementById('analyseModal').classList.remove('active');
-        fichierCourant = null;
-        analyseCourante = null;
-    }
+<script>
+    document.getElementById('currentDateTime').textContent = new Date().toLocaleString('fr-FR', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit'
+    });
 </script>
 </body>
 </html>

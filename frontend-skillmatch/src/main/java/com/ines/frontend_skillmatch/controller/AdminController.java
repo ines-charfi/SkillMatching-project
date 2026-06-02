@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,16 +17,16 @@ import java.util.Map;
 public class AdminController {
 
     private final SessionService sessionService;
-    private final AuthClient authClient; // Injecte le client Feign
+    private final AuthClient authClient;
     private final CandidatClient candidatClient;
 
-    public AdminController(SessionService sessionService, AuthClient authClient,CandidatClient candidatClient) {
+    public AdminController(SessionService sessionService, AuthClient authClient, CandidatClient candidatClient) {
         this.sessionService = sessionService;
         this.authClient = authClient;
         this.candidatClient = candidatClient;
     }
 
-    // PAGE PRINCIPALE : DASHBOARD AVEC STATS (Maquette 6)
+    // PAGE PRINCIPALE : DASHBOARD AVEC STATS
     @GetMapping("/admin")
     public String adminDashboard(Model model) {
         if (!sessionService.isAuthenticated() || !sessionService.isAdmin()) {
@@ -33,11 +34,9 @@ public class AdminController {
         }
 
         try {
-            // Récupération des stats (Candidats Totaux, Entreprises Totales, Offres Publiées)
             Map<String, Object> stats = authClient.getAdminStats();
             model.addAttribute("stats", stats);
 
-            // Récupération de tous les utilisateurs pour le tableau
             List<Map<String, Object>> users = authClient.getAllUsers();
             model.addAttribute("users", users);
 
@@ -52,13 +51,16 @@ public class AdminController {
     // GESTION DES CANDIDATS
     @GetMapping("/admin/candidats")
     public String adminCandidats(Model model) {
-        if (!sessionService.isAdmin()) return "redirect:/login";
+        if (!sessionService.isAuthenticated() || !sessionService.isAdmin()) return "redirect:/login";
 
-        List<Map<String, Object>> users = authClient.getAllUsers();
-        // On ne garde que les candidats
-        model.addAttribute("users", users.stream()
-                .filter(u -> "CANDIDAT".equals(u.get("role")))
-                .toList());
+        try {
+            List<Map<String, Object>> users = authClient.getAllUsers();
+            model.addAttribute("users", users.stream()
+                    .filter(u -> u != null && "CANDIDAT".equals(u.get("role")))
+                    .toList());
+        } catch (Exception e) {
+            model.addAttribute("users", new ArrayList<>());
+        }
 
         model.addAttribute("activeTab", "candidats");
         return "dashboard-admin";
@@ -67,25 +69,30 @@ public class AdminController {
     // GESTION DES ENTREPRISES
     @GetMapping("/admin/entreprises")
     public String adminEntreprises(Model model) {
-        if (!sessionService.isAdmin()) return "redirect:/login";
+        if (!sessionService.isAuthenticated() || !sessionService.isAdmin()) return "redirect:/login";
 
-        List<Map<String, Object>> users = authClient.getAllUsers();
-        model.addAttribute("users", users.stream()
-                .filter(u -> "ENTREPRISE".equals(u.get("role")))
-                .toList());
+        try {
+            List<Map<String, Object>> users = authClient.getAllUsers();
+            model.addAttribute("users", users.stream()
+                    .filter(u -> u != null && "ENTREPRISE".equals(u.get("role")))
+                    .toList());
+        } catch (Exception e) {
+            model.addAttribute("users", new ArrayList<>());
+        }
 
         model.addAttribute("activeTab", "entreprises");
         return "dashboard-admin";
     }
 
-    // VÉRIFICATION DES FICHIERS (CV / LOGOS) via IA
+    // VÉRIFICATION DES FICHIERS (CV / LOGOS) VIA IA
     @GetMapping("/admin/verification")
     public String adminVerification(Model model) {
-        if (!sessionService.isAdmin()) return "redirect:/login";
+        if (!sessionService.isAuthenticated() || !sessionService.isAdmin()) return "redirect:/login";
 
         try {
             model.addAttribute("fichiers", authClient.getFichiersAVerifier());
         } catch (Exception e) {
+            model.addAttribute("fichiers", new ArrayList<>());
             model.addAttribute("error", "Service de vérification indisponible");
         }
 
@@ -101,7 +108,6 @@ public class AdminController {
 
     @PostMapping("/admin/candidat/valider")
     public String validerCandidat(@RequestParam Long id, @RequestParam String statut) {
-
         candidatClient.updateValidation(id, statut);
         return "redirect:/admin/verification";
     }

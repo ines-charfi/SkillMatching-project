@@ -5,28 +5,32 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-// CORRECTION : Changement de 'name' pour matcher Consul et suppression de l'URL en dur
 @FeignClient(name = "skillmatch-auth-service")
 public interface AuthClient {
 
+    // --- Routes publiques d'authentification ---
     @PostMapping("/api/auth/login")
     Map<String, Object> login(@RequestBody Map<String, String> credentials);
 
     @PostMapping("/api/auth/register")
     Map<String, Object> register(@RequestBody Map<String, Object> registrationData);
 
-    @GetMapping("/api/auth/stats")
+    // Attention, dans ton AuthController backend c'est "/api/auth/stats/public" !
+    @GetMapping("/api/auth/stats/public")
     Map<String, Object> getPublicStats();
 
-    @GetMapping("/api/auth/admin/stats")
+
+    // --- Routes d'administration (Pointent vers l'AdminController du Backend) ---
+    @GetMapping("/api/admin/stats")
     Map<String, Object> getAdminStats();
 
-    @GetMapping("/api/auth/admin/users")
+    @GetMapping("/api/admin/users")
     List<Map<String, Object>> getAllUsers();
 
-    @GetMapping("/api/auth/admin/fichiers-verification")
+
+    @GetMapping("/api/admin/fichiers-a-verifier")
     List<Map<String, Object>> getFichiersAVerifier();
 
-    @PostMapping("/api/auth/admin/users/{id}/toggle-status")
-    Map<String, Object> toggleUserStatus(@PathVariable("id") Long id);
+    @PutMapping("/api/admin/users/{id}/toggle")
+    Void toggleUserStatus(@PathVariable("id") Long id);
 }

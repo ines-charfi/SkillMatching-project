@@ -35,7 +35,7 @@ public class SecurityConfig {
                                 "/offre/supprimer/**",
                                 "/offre/modifier/**",          // 🎯 AJOUT : Autorise l'affichage du formulaire de modification
                                 "/offre/update/**",            // 🎯 AJOUT : Autorise la soumission des modifications (POST)// 💡 Débloque la suppression d'offres
-                                "/candidatures/statut",// 💡 Débloque les boutons Accepter/Refuser
+                                "/candidatures/statut",        // 💡 Débloque les boutons Accepter/Refuser
                                 "/candidature/statut",
                                 "/entreprise/entretiens/planifier",
                                 "/candidat/profil/**",
@@ -46,7 +46,12 @@ public class SecurityConfig {
 
                                 // 6. Uploader cv et avatar
                                 "/api/candidats/download/cv/**",
-                                "/api/entreprises/**", "/api/candidats/avatar/**"
+                                "/api/entreprises/**", "/api/candidats/avatar/**",
+
+                                // 🎯 7. PAGES ADMINISTRATION (AJOUT)
+                                // On autorise Spring Security à laisser passer ces routes.
+                                // La sécurité réelle est gérée par ton SessionService dans l'AdminController !
+                                "/admin", "/admin/**"
 
                         ).permitAll()
                         .anyRequest().authenticated()
