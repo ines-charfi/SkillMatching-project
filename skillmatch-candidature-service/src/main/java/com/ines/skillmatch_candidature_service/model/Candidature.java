@@ -35,6 +35,6 @@ public class Candidature {
     private LocalDateTime datePostulation = LocalDateTime.now();
 
     public enum Statut {
-        EN_ATTENTE, ACCEPTE, REFUSE
+        EN_ATTENTE, ACCEPTE, REFUSE, ENTRETIEN
     }
 }

@@ -500,4 +500,24 @@ public class DashboardController {
             return ResponseEntity.internalServerError().build();
         }
     }
+    @PostMapping("/entreprise/entretiens/planifier")
+    public String planifierEntretien(
+            @RequestParam("candidatureId") Long candidatureId,
+            @RequestParam("date") String dateStr,
+            @RequestParam("lieu") String lieu,
+            @RequestParam("notes") String notes,
+            RedirectAttributes redirectAttributes) {
+
+        if (!sessionService.isAuthenticated() || !sessionService.isEntreprise()) return "redirect:/login";
+
+        try {
+            // Appel au client Feign vers le microservice candidature
+            candidatureClient.planifierEntretien(candidatureId, dateStr, lieu, notes);
+            redirectAttributes.addFlashAttribute("message", "L'entretien a été planifié avec succès !");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Échec de la planification de l'entretien : " + e.getMessage());
+        }
+
+        return "redirect:/dashboard-entreprise";
+    }
 }
