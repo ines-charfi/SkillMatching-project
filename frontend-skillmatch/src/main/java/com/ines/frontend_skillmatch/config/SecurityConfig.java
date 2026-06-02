@@ -35,7 +35,9 @@ public class SecurityConfig {
                                 "/offre/supprimer/**",
                                 "/offre/modifier/**",          // 🎯 AJOUT : Autorise l'affichage du formulaire de modification
                                 "/offre/update/**",            // 🎯 AJOUT : Autorise la soumission des modifications (POST)// 💡 Débloque la suppression d'offres
-                                "/candidatures/statut",        // 💡 Débloque les boutons Accepter/Refuser
+                                "/candidatures/statut",// 💡 Débloque les boutons Accepter/Refuser
+                                "/candidature/statut",
+                                "/candidat/profil/**",
                                 "/candidats",
 
                                 // 5. Technique & Erreurs globales

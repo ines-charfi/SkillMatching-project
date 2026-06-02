@@ -274,6 +274,48 @@ public class DashboardController {
     }
 
     /**
+     * Permet à une entreprise de consulter le profil détaillé d'un candidat ayant postulé.
+     */
+    /**
+     * Permet à une entreprise de consulter le profil détaillé d'un candidat ayant postulé.
+     * Accès sécurisé via l'ID de la candidature pour parer aux données de Map nulles.
+     */
+    @GetMapping("/candidat/profil/{candidatureId}")
+    public String voirProfilCandidat(@PathVariable("candidatureId") Long candidatureId, Model model, RedirectAttributes ra) {
+        if (!sessionService.isAuthenticated() || !sessionService.isEntreprise()) return "redirect:/login";
+        try {
+            // 1. Récupère la liste des candidatures de l'entreprise pour retrouver la bonne
+            Map<String, Object> profilEntreprise = entrepriseClient.getByUserId(sessionService.getUserId());
+            Long entId = Long.valueOf(profilEntreprise.get("id").toString());
+            List<Map<String, Object>> candidatures = candidatureClient.getByEntreprise(entId);
+
+            // 2. Extrait le candidatId associé à cette candidature spécifique
+            Long candidatId = null;
+            for (Map<String, Object> c : candidatures) {
+                if (c.get("id") != null && Long.valueOf(c.get("id").toString()).equals(candidatureId)) {
+                    candidatId = Long.valueOf(c.get("candidatId").toString());
+                    break;
+                }
+            }
+
+            if (candidatId == null) {
+                ra.addFlashAttribute("error", "Impossible de retrouver le candidat associé à cette candidature.");
+                return "redirect:/dashboard-entreprise";
+            }
+
+            // 3. Récupère et injecte le profil du candidat trouvé
+            Map<String, Object> candidatProfil = candidatClient.getProfil(candidatId);
+            model.addAttribute("candidat", candidatProfil != null ? candidatProfil : new HashMap<>());
+            model.addAttribute("profil", profilEntreprise != null ? profilEntreprise : new HashMap<>());
+
+            return "voir-candidat";
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", "Erreur lors du chargement du profil candidat.");
+            return "redirect:/dashboard-entreprise";
+        }
+    }
+
+    /**
      * Affiche le tableau de bord principal de l'Espace Candidat.
      */
     @GetMapping("/dashboard-candidat")
@@ -423,7 +465,7 @@ public class DashboardController {
 
     /**
      * Proxy HTTP récupérant le logo d'une entreprise depuis son microservice.
-     * 🎯 FIX : URL corrigée de /api/entreprises/logo/{id} vers /api/entreprises/{id}/logo
+     *  FIX : URL corrigée de /api/entreprises/logo/{id} vers /api/entreprises/{id}/logo
      * pour correspondre au chemin exact utilisé par le template Thymeleaf.
      */
     @GetMapping("/api/entreprises/{id}/logo")

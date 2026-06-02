@@ -72,6 +72,7 @@ public class CandidatureService {
 
                     results.add(CandidatureDTO.builder()
                             .id(c.getId())
+                            .candidatId(c.getCandidatId())
                             .candidatNom(nomComplet)
                             .offreTitre(titre)
                             .scoreMatching(c.getScoreMatching())
