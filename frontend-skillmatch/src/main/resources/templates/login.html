@@ -132,6 +132,7 @@
     <div class="role-selector">
         <button type="button" class="role-btn active" id="btnCandidat" onclick="selectRole('CANDIDAT')">Candidat</button>
         <button type="button" class="role-btn" id="btnEntreprise" onclick="selectRole('ENTREPRISE')">Entreprise</button>
+        <button type="button" class="role-btn" id="btnAdmin" onclick="selectRole('ADMIN')">Admin</button>
     </div>
 
     <form th:action="@{/login}" method="post" id="formLogin" onsubmit="startLoading()">
@@ -187,6 +188,7 @@
         document.getElementById('roleInput').value = role;
         document.getElementById('btnCandidat').classList.toggle('active', role === 'CANDIDAT');
         document.getElementById('btnEntreprise').classList.toggle('active', role === 'ENTREPRISE');
+        document.getElementById('btnAdmin').classList.toggle('active', role === 'ADMIN'); // 💡 Ajouté !
     }
 
     function togglePassword() {

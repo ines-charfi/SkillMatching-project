@@ -13,11 +13,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable()) // Désactivé pour laisser passer les formulaires Thymeleaf librement
+                .cors(cors -> cors.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                // 1. Accueil et Statiques
+                                // 1. Accueil, Ressources Statiques et Dépendances
                                 "/", "/home", "/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico",
+                                "/static/**", "/resources/**",
 
                                 // 2. Authentification et gestion des erreurs
                                 "/login", "/register", "/logout-user", "/oauth2/**", "/login-error",
@@ -25,17 +27,17 @@ public class SecurityConfig {
                                 // 3. Pages Candidat
                                 "/dashboard-candidat", "/profil", "/profil/update", "/mes-candidatures", "/postuler",
 
-                                // 4. Pages Entreprise (CORRIGÉ & COMPLET)
+                                // 4. Pages Entreprise
                                 "/dashboard-entreprise",
-                                "/profil-entreprise",          // 💡 Débloque l'affichage du profil entreprise
-                                "/profil-entreprise/update",   // 💡 Débloque la modification du profil
-                                "/offre",                      // Liste générale des offres
-                                "/offre/nouveau",              // 💡 Débloque le formulaire de création
-                                "/offre/creer",                // 💡 Débloque la soumission de l'offre
+                                "/profil-entreprise",
+                                "/profil-entreprise/update",
+                                "/offre",
+                                "/offre/nouveau",
+                                "/offre/creer",
                                 "/offre/supprimer/**",
-                                "/offre/modifier/**",          // 🎯 AJOUT : Autorise l'affichage du formulaire de modification
-                                "/offre/update/**",            // 🎯 AJOUT : Autorise la soumission des modifications (POST)// 💡 Débloque la suppression d'offres
-                                "/candidatures/statut",        // 💡 Débloque les boutons Accepter/Refuser
+                                "/offre/modifier/**",
+                                "/offre/update/**",
+                                "/candidatures/statut",
                                 "/candidature/statut",
                                 "/entreprise/entretiens/planifier",
                                 "/candidat/profil/**",
@@ -44,18 +46,21 @@ public class SecurityConfig {
                                 // 5. Technique & Erreurs globales
                                 "/actuator/health", "/error",
 
-                                // 6. Uploader cv et avatar
+                                // 6. Uploader de fichiers (CV, avatars, dossiers entreprises)
                                 "/api/candidats/download/cv/**",
-                                "/api/entreprises/**", "/api/candidats/avatar/**",
+                                "/api/entreprises/**",
+                                "/api/candidats/avatar/**",
 
-                                // 🎯 7. PAGES ADMINISTRATION (AJOUT)
-                                // On autorise Spring Security à laisser passer ces routes.
-                                // La sécurité réelle est gérée par ton SessionService dans l'AdminController !
+                                // 7. Pages d'Administration (Aiguillage sécurisé par ton SessionService)
                                 "/admin", "/admin/**"
 
                         ).permitAll()
+
+                        // Tout le reste de l'application (s'il y a des routes oubliées) requiert une authentification
                         .anyRequest().authenticated()
                 )
+                // On désactive les formulaires et fenêtres pop-up natifs de Spring Security
+                // pour que ton LoginController personnalisé garde la main à 100%
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
                 .logout(logout -> logout.disable());

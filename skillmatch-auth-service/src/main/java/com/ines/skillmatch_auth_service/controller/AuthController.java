@@ -60,6 +60,7 @@ public class AuthController {
         return ResponseEntity.ok(Map.of(
                 "message", "Vous êtes connecté",
                 "timestamp", System.currentTimeMillis()
+                // Signé Ines
         ));
     }
 
@@ -68,7 +69,8 @@ public class AuthController {
     // ============================================
 
     @GetMapping("/users")
-    @PreAuthorize("hasRole('ADMIN')")
+    // 🎯 CORRECTION : hasRole -> hasAuthority pour matcher la chaîne brute "ADMIN" de ta DB
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<UserDto>> getAllUsers() {
         List<User> users = userRepository.findAll();
         List<UserDto> dtos = users.stream()
@@ -78,7 +80,8 @@ public class AuthController {
     }
 
     @GetMapping("/users/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    // 🎯 CORRECTION : hasRole -> hasAuthority
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
@@ -86,7 +89,8 @@ public class AuthController {
     }
 
     @PutMapping("/users/{id}/toggle-status")
-    @PreAuthorize("hasRole('ADMIN')")
+    // 🎯 CORRECTION : hasRole -> hasAuthority
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<UserDto> toggleUserStatus(@PathVariable Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
@@ -96,7 +100,8 @@ public class AuthController {
     }
 
     @PutMapping("/users/{id}/role")
-    @PreAuthorize("hasRole('ADMIN')")
+    // 🎯 CORRECTION : hasRole -> hasAuthority
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<UserDto> changeUserRole(@PathVariable Long id,
                                                   @RequestParam String role) {
         User user = userRepository.findById(id)
@@ -105,6 +110,7 @@ public class AuthController {
         user = userRepository.save(user);
         return ResponseEntity.ok(toDto(user));
     }
+
     // ============================================
     // NOUVELLE MÉTHODE POUR LA PAGE D'ACCUEIL
     // ============================================
@@ -112,10 +118,8 @@ public class AuthController {
     public ResponseEntity<Map<String, Object>> getPublicStats() {
         Map<String, Object> stats = new HashMap<>();
 
-        // 1. Compter les utilisateurs dans la base Auth
         stats.put("totalUsers", userRepository.count());
 
-        // 2. Compter les offres en demandant au microservice Offre via Feign
         try {
             stats.put("totalOffres", offreClient.countAllOffres());
             stats.put("totalEntreprises", userRepository.countByRole(User.Role.ENTREPRISE));

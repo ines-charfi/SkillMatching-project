@@ -71,7 +71,12 @@ public class LoginController {
                 return "login";
             }
         } catch (Exception e) {
-            model.addAttribute("error", "Service d'authentification indisponible.");
+            // 🔥 LE LOG CHIRURGICAL : On affiche l'erreur réelle dans le terminal
+            System.err.println("[🔴 FRONTEND DEBUG] L'appel d'authentification a échoué ! Cause réelle :");
+            e.printStackTrace();
+
+            // On affiche le vrai message d'erreur de la cause sur l'interface pour t'aider
+            model.addAttribute("error", "Erreur technique : " + e.getMessage());
             return "login";
         }
     }

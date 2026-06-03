@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@FeignClient(name = "skillmatch-auth-service")
+@FeignClient(name = "skillmatch-auth-service", url = "http://auth-service:8081")
 public interface AuthClient {
 
     // --- Routes publiques d'authentification ---
