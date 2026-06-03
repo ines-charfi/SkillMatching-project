@@ -67,6 +67,14 @@ public class OffreController {
         return ResponseEntity.ok(offreService.countByEntreprise(entrepriseId));
     }
 
+
+    // 10. COMPTAGE GLOBAL (Ajouté pour le Dashboard Admin)
+    @GetMapping("/count")
+    public ResponseEntity<Long> countAllOffres() {
+        // Appelle la méthode de ton service qui compte toutes les offres.
+        // Si elle n'existe pas, tu peux utiliser ton repository (ex: offreRepository.count())
+        return ResponseEntity.ok(offreService.countAllOffres());
+    }
     // 9. DERNIÈRES OFFRES (Pour la page d'accueil ou sidebar)
     @GetMapping("/latest")
     public ResponseEntity<List<Offre>> getLatest() {

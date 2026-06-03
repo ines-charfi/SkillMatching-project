@@ -113,4 +113,9 @@ public class OffreService {
     public List<Offre> getLatest() {
         return offreRepository.findLatestOffres();
     }
+
+    public Long countAllOffres() {
+        // Si tu as injecté ton repository sous le nom 'offreRepository' :
+        return offreRepository.count();
+    }
 }

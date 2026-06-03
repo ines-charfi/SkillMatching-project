@@ -9,8 +9,13 @@ import com.ines.skillmatch_auth_service.service.client.OffreClient;
 import com.ines.skillmatch_auth_service.service.client.CandidatureClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource; // CORRIGÉ : Bon import pour le flux de fichier
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -28,20 +33,18 @@ public class AdminController {
     private final CandidatureClient candidatureClient;
 
     // ============================================
-    // 1. STATISTIQUES GLOBALES (Pour les 4 cartes du haut)
+    // 1. STATISTIQUES GLOBALES
     // ============================================
     @GetMapping("/stats")
     public ResponseEntity<Map<String, Object>> getGlobalStats() {
         Map<String, Object> stats = new HashMap<>();
 
-        // Stats locales (Auth DB)
         List<User> allUsers = userRepository.findAll();
         stats.put("totalUsers", allUsers.size());
-        stats.put("candidats", allUsers.stream().filter(u -> u.getRole() == User.Role.CANDIDAT).count());
-        stats.put("entreprises", allUsers.stream().filter(u -> u.getRole() == User.Role.ENTREPRISE).count());
+        stats.put("totalCandidats", allUsers.stream().filter(u -> u.getRole() == User.Role.CANDIDAT).count());
+        stats.put("totalEntreprises", allUsers.stream().filter(u -> u.getRole() == User.Role.ENTREPRISE).count());
         stats.put("admins", allUsers.stream().filter(u -> u.getRole() == User.Role.ADMIN).count());
 
-        // Stats distantes (via OpenFeign)
         try {
             stats.put("totalOffres", offreClient.countAllOffres());
             stats.put("totalCandidatures", candidatureClient.countAllCandidatures());
@@ -64,7 +67,6 @@ public class AdminController {
 
     @GetMapping("/latest-users")
     public ResponseEntity<List<UserDto>> getLatestUsers() {
-        // Retourne les 5 derniers inscrits pour le tableau de droite
         return ResponseEntity.ok(userRepository.findTop5ByOrderByDateCreationDesc().stream().map(this::toDto).toList());
     }
 
@@ -77,13 +79,13 @@ public class AdminController {
     }
 
     // ============================================
-    // 3. VÉRIFICATION IA DES FICHIERS
+    // 3. VÉRIFICATION IA DES FICHIERS & AGGRÉGATION
     // ============================================
     @GetMapping("/fichiers-a-verifier")
     public ResponseEntity<List<Map<String, Object>>> getFichiersAVerifier() {
         List<Map<String, Object>> fichiers = new ArrayList<>();
 
-        // On parcourt les candidats pour trouver les CV
+        // 1. Extraction des CV Candidats
         userRepository.findAll().stream()
                 .filter(u -> u.getRole() == User.Role.CANDIDAT)
                 .forEach(user -> {
@@ -101,22 +103,121 @@ public class AdminController {
                     } catch (Exception ignored) {}
                 });
 
+        // 2. Extraction des Logos Entreprises (Ajouté pour dynamiser ton tableau)
+        userRepository.findAll().stream()
+                .filter(u -> u.getRole() == User.Role.ENTREPRISE)
+                .forEach(user -> {
+                    try {
+                        Map<String, Object> entreprise = entrepriseClient.getEntrepriseByUserId(user.getId());
+                        if (entreprise != null && entreprise.get("logoPath") != null) {
+                            Map<String, Object> f = new HashMap<>();
+                            f.put("id", user.getId());
+                            f.put("type", "LOGO");
+                            f.put("nom", entreprise.get("logoPath"));
+                            f.put("proprietaire", entreprise.get("nomEntreprise"));
+                            f.put("date", entreprise.get("dateCreation"));
+                            fichiers.add(f);
+                        }
+                    } catch (Exception ignored) {}
+                });
+
         return ResponseEntity.ok(fichiers);
     }
 
     @PostMapping("/analyser-contenu")
     public ResponseEntity<Map<String, Object>> analyser(@RequestBody Map<String, String> req) {
-        // Appelle la simulation IA que tu as déjà écrite
         return ResponseEntity.ok(analyserAvecIA(req.get("type")));
+    }
+
+    // ============================================
+    // 4. MODÉRATION DES OFFRES
+    // ============================================
+    @GetMapping("/offres")
+    public ResponseEntity<List<Map<String, Object>>> getAllOffres() {
+        try {
+            return ResponseEntity.ok(offreClient.getAllOffres());
+        } catch (Exception e) {
+            log.error("Erreur récupération des offres: {}", e.getMessage());
+            return ResponseEntity.ok(new ArrayList<>());
+        }
+    }
+
+    @DeleteMapping("/offres/{id}")
+    public ResponseEntity<Void> supprimerOffre(@PathVariable Long id) {
+        try {
+            offreClient.deleteOffre(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            log.error("Erreur suppression offre: {}", e.getMessage());
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    // ============================================
+    // 5. TUNNEL DE TÉLÉCHARGEMENT SECURISE
+    // ============================================
+    @GetMapping("/fichiers/download-cv/{candidatId}")
+    public ResponseEntity<Resource> downloadCv(@PathVariable Long candidatId) {
+        try {
+            Map<String, Object> candidat = candidatClient.getCandidatByUserId(candidatId);
+            String fileName = (String) candidat.get("cvPath");
+
+            if (fileName == null || fileName.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            RestTemplate restTemplate = new RestTemplate();
+            String fileUrl = "http://candidat-service:8082/api/candidats/files/" + fileName;
+            byte[] fileBytes = restTemplate.getForObject(fileUrl, byte[].class);
+
+            ByteArrayResource resource = new ByteArrayResource(fileBytes);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .body(resource);
+        } catch (Exception e) {
+            log.error("Erreur lors du téléchargement du CV: {}", e.getMessage());
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    @GetMapping("/fichiers/download-logo/{entrepriseId}")
+    public ResponseEntity<Resource> downloadLogo(@PathVariable Long entrepriseId) {
+        try {
+            Map<String, Object> entreprise = entrepriseClient.getEntrepriseByUserId(entrepriseId);
+            String fileName = (String) entreprise.get("logoPath");
+
+            if (fileName == null || fileName.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            RestTemplate restTemplate = new RestTemplate();
+            String fileUrl = "http://entreprise-service:8083/api/entreprises/files/" + fileName;
+            byte[] fileBytes = restTemplate.getForObject(fileUrl, byte[].class);
+
+            ByteArrayResource resource = new ByteArrayResource(fileBytes);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                    .contentType(MediaType.IMAGE_PNG)
+                    .body(resource);
+        } catch (Exception e) {
+            log.error("Erreur lors du téléchargement du logo: {}", e.getMessage());
+            return ResponseEntity.status(500).build();
+        }
     }
 
     // --- UTILS ---
     private UserDto toDto(User user) {
         return UserDto.builder()
-                .id(user.getId()).email(user.getEmail()).role(user.getRole().name())
-                .enabled(user.getEnabled()).dateCreation(user.getDateCreation()).build();
+                .id(user.getId())
+                .email(user.getEmail())
+                .role(user.getRole().name())
+                .enabled(user.getEnabled())
+                .dateCreation(user.getDateCreation())
+                .build();
     }
-
 
     /**
      * Simulation d'analyse IA
