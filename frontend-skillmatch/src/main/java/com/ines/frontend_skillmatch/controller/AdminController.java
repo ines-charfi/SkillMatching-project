@@ -138,6 +138,7 @@ public class AdminController {
         return authClient.downloadCv(id);
     }
 
+    // CORRIGÉ : On utilise authClient à la place du mystérieux fichierClient + type Resource explicite !
     @GetMapping("/admin/fichiers/download-logo")
     public ResponseEntity<Resource> downloadLogo(@RequestParam("id") Long id) {
         if (!sessionService.isAuthenticated() || !sessionService.isAdmin()) {

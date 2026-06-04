@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher; //Import requis pour le logout en GET
 
 @Configuration
 @EnableWebSecurity
@@ -22,7 +23,7 @@ public class SecurityConfig {
                                 "/static/**", "/resources/**",
 
                                 // 2. Authentification et gestion des erreurs
-                                "/login", "/register", "/logout-user", "/oauth2/**", "/login-error",
+                                "/login", "/register", "/logout", "/logout-user", "/oauth2/**", "/login-error",
 
                                 // 3. Pages Candidat
                                 "/dashboard-candidat", "/profil", "/profil/update", "/mes-candidatures", "/postuler",
@@ -63,7 +64,18 @@ public class SecurityConfig {
                 // pour que ton LoginController personnalisé garde la main à 100%
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
-                .logout(logout -> logout.disable());
+
+                // MODIFIÉ : Réactivation et configuration propre du Logout
+                .logout(logout -> logout
+                        // Permet de se déconnecter simplement en cliquant sur un lien (requête GET sur /logout)
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))
+                        // Où rediriger l'utilisateur après qu'il se soit déconnecté
+                        .logoutSuccessUrl("/login?logout")
+                        // Supprime proprement la session HTTP pour des raisons de sécurité
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .permitAll()
+                );
 
         return http.build();
     }
