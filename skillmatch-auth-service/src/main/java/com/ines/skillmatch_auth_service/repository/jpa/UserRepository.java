@@ -1,4 +1,4 @@
-package com.ines.skillmatch_auth_service.repository;
+package com.ines.skillmatch_auth_service.repository.repository.jpa;
 import com.ines.skillmatch_auth_service.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
