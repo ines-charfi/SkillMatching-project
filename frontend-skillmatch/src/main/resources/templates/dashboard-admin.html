@@ -111,17 +111,44 @@
 </aside>
 
 <main class="main-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="page-title" th:text="${activeTab == 'dashboard' ? 'Tableau de bord' : (activeTab == 'candidats' ? 'Modération Candidats' : (activeTab == 'entreprises' ? 'Modération Entreprises' : (activeTab == 'offres' ? 'Gestion des Offres' : 'Validation des Pièces')))}">Page</h1>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+            <div class="dropdown">
+                <button class="btn btn-white border position-relative shadow-sm" type="button" id="notifBell" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: var(--radius-sm);">
+                    <i class="bi bi-bell-fill text-dark fs-5"></i>
+                    <span th:if="${notifCount != null and notifCount > 0}" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" th:text="${notifCount}">0</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-0" aria-labelledby="notifBell" style="width: 320px; max-height: 400px; overflow-y: auto; border-radius: var(--radius-sm);">
+                    <li class="bg-light p-3 border-bottom"><h6 class="mb-0 fw-bold"><i class="bi bi-lightning-fill text-warning me-2"></i>Notifications d'Administration</h6></li>
+
+                    <th:block th:each="n : ${notifications}">
+                        <li class="p-3 border-bottom">
+                            <div class="d-flex flex-column">
+                                <span class="fw-bold text-indigo small mb-1" th:text="${n['titreNotif']}">Titre</span>
+                                <p class="text-muted small mb-0 lh-sm" th:text="${n['message']}">Message</p>
+                            </div>
+                        </li>
+                    </th:block>
+
+                    <li th:if="${notifications == null or notifications.isEmpty()}" class="text-center p-4 text-muted small">
+                        <i class="bi bi-bell-slash d-block fs-4 mb-2"></i> Aucune notification récente
+                    </li>
+                </ul>
+            </div>
+            <span class="badge bg-dark text-white p-2 fs-7" id="currentDateTime"></span>
+        </div>
+    </div>
+
     <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
         <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${error}"></span>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 
     <div th:if="${activeTab == 'dashboard'}">
-        <div class="top-bar">
-            <div><h1 class="page-title">Tableau de bord</h1><p class="text-muted">Statistiques en temps réel de votre écosystème</p></div>
-            <span class="badge bg-dark text-white p-2 fs-7" id="currentDateTime"></span>
-        </div>
-
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon-box primary"><i class="bi bi-people-fill"></i></div>
@@ -157,7 +184,7 @@
                         <td>
                             <form th:action="@{/admin/users/toggle}" method="POST">
                                 <input type="hidden" name="id" th:value="${u['id']}">
-                                <input type="hidden" name="fromTab" value="">
+                                <input type="hidden" name="fromTab" value="dashboard">
                                 <button type="submit" class="btn-sm" th:classappend="${u['enabled'] ? 'btn-toggle-block' : 'btn-toggle-activate'}" th:text="${u['enabled'] ? 'Bloquer' : 'Activer'}"></button>
                             </form>
                         </td>
@@ -169,7 +196,6 @@
     </div>
 
     <div th:if="${activeTab == 'candidats'}">
-        <div class="top-bar"><div><h1 class="page-title">Modération Candidats</h1><p class="text-muted">Activer ou suspendre les profils talents</p></div></div>
         <div class="panel"><div class="panel-body p-0">
             <table class="table table-hover mb-0">
                 <thead><tr><th>Identifiant Email</th><th>Statut de Connexion</th><th>Changer l'état</th></tr></thead>
@@ -194,7 +220,6 @@
     </div>
 
     <div th:if="${activeTab == 'entreprises'}">
-        <div class="top-bar"><div><h1 class="page-title">Modération Entreprises</h1><p class="text-muted">Gérer les droits d'accès des recruteurs</p></div></div>
         <div class="panel"><div class="panel-body p-0">
             <table class="table table-hover mb-0">
                 <thead><tr><th>Compte Recruteur</th><th>Autorisation de publication</th><th>Changer l'état</th></tr></thead>
@@ -219,7 +244,6 @@
     </div>
 
     <div th:if="${activeTab == 'offres'}">
-        <div class="top-bar"><div><h1 class="page-title">Gestion des Offres d'Emploi</h1><p class="text-muted">Supprimer ou modérer les annonces frauduleuses/périmées</p></div></div>
         <div class="panel"><div class="panel-body p-0">
             <table class="table table-hover mb-0">
                 <thead><tr><th>Intitulé du Poste</th><th>ID Entreprise Dépositaire</th><th>Action Immédiate</th></tr></thead>
@@ -232,7 +256,7 @@
                             <input type="hidden" name="id" th:value="${o['id']}">
                             <button type="submit" class="btn-sm btn-danger text-white"><i class="bi bi-trash3"></i> Supprimer l'annonce</button>
                         </form>
-                    </td>
+$                    </td>
                 </tr>
                 <tr th:if="${offres == null or offres.isEmpty()}">
                     <td colspan="3" class="text-center text-muted p-4">Aucune offre d'emploi n'est actuellement en ligne sur la plateforme.</td>
@@ -243,8 +267,6 @@
     </div>
 
     <div th:if="${activeTab == 'verification'}">
-        <div class="top-bar"><div><h1 class="page-title">Validation des Pièces et Analyse Virtuelle IA</h1><p class="text-muted">Vérifiez la conformité des CV et Logos de la plateforme</p></div></div>
-
         <div th:if="${resultatIa}" class="card border-primary mb-4 shadow-sm" style="border-radius: var(--radius)">
             <div class="card-header bg-primary text-white d-flex align-items-center gap-2" style="border-radius: 14px 14px 0 0">
                 <i class="bi bi-cpu-fill fs-5"></i> <h5 class="mb-0 fw-bold">Rapport Virtuel Généré par l'Intelligence Artificielle</h5>
@@ -286,16 +308,15 @@
                     </td>
                     <td>
                         <div class="d-flex gap-2">
-                            <form th:action="@{/admin/candidat/valider}" method="POST">
-                                <input type="hidden" name="id" th:value="${f['id']}">
-                                <input type="hidden" name="statut" value="VALIDE">
-                                <button type="submit" class="btn-sm btn-success text-white">Valider</button>
-                            </form>
-                            <form th:action="@{/admin/candidat/valider}" method="POST">
-                                <input type="hidden" name="id" th:value="${f['id']}">
-                                <input type="hidden" name="statut" value="REJETE">
-                                <button type="submit" class="btn-sm btn-danger text-white">Rejeter</button>
-                            </form>
+                            <a th:href="@{/admin/arbitrage(id=${f['id']}, statut='VALIDE', typeFichier=${f['nature'] != null ? f['nature'] : (f['type'] != null ? f['type'] : 'CV')}, userId=${f['userId'] != null ? f['userId'] : f['id']})}"
+                               class="btn btn-sm btn-success text-white px-3">
+                                Valider
+                            </a>
+
+                            <a th:href="@{/admin/arbitrage(id=${f['id']}, statut='REJETE', typeFichier=${f['nature'] != null ? f['nature'] : (f['type'] != null ? f['type'] : 'CV')}, userId=${f['userId'] != null ? f['userId'] : f['id']})}"
+                               class="btn btn-sm btn-danger text-white px-3">
+                                Rejeter
+                            </a>
                         </div>
                     </td>
                 </tr>
@@ -309,7 +330,6 @@
 </main>
 
 <script>
-    // On vérifie d'abord si l'élément existe dans la page actuelle
     const dateTimeElement = document.getElementById('currentDateTime');
     if (dateTimeElement) {
         dateTimeElement.textContent = new Date().toLocaleString('fr-FR', {

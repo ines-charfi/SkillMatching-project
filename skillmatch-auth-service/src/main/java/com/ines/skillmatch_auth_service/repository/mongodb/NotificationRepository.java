@@ -1,5 +1,4 @@
-package com.ines.skillmatch_auth_service.repository.repository.mongodb;
-
+package com.ines.skillmatch_auth_service.repository.mongodb;
 
 import com.ines.skillmatch_auth_service.model.Notification;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -8,6 +7,7 @@ import java.util.List;
 
 @Repository
 public interface NotificationRepository extends MongoRepository<Notification, String> {
-    List<Notification> findByUserIdTargetOrderByDateCreationDesc(Long userIdTarget);
-    long countByUserIdTargetAndLuFalse(Long userIdTarget);
+    // FIX : Filtrage croisé avec l'ID et le rôle du destinataire
+    List<Notification> findByUserIdTargetAndRecipientRoleOrderByDateCreationDesc(Long userIdTarget, String recipientRole);
+    long countByUserIdTargetAndRecipientRoleAndLuFalse(Long userIdTarget, String recipientRole);
 }

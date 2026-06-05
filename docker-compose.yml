@@ -2,16 +2,16 @@ version: '3.8'
 
 services:
   # ============================================
-  # DATABASE SYSTEM (MySQL)
+  # DATABASE SYSTEMS (MySQL & MongoDB)
   # ============================================
   mysql:
     image: mysql:8.0.46
     container_name: mysql-skillmatch
     ports:
-      - "3307:3306"
+      - "${MYSQL_PORT_EXTERNAL}:3306"
     environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=skillmatchingApp
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
     volumes:
       - mysql-data:/var/lib/mysql
     healthcheck:
@@ -23,6 +23,23 @@ services:
     networks:
       - skillmatch-network
 
+  mongodb:
+    image: mongo:latest
+    container_name: skillmatch-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db # 🔥 CORRIGÉ ICI : Remplacement de l'underscore par un tiret
+    networks:
+      - skillmatch-network
+    healthcheck:
+      # Utilisation de mongosh disponible nativement en v7.0 avec la syntaxe exacte attendue
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
   # ============================================
   # SERVICE DISCOVERY (Consul)
   # ============================================
@@ -30,7 +47,7 @@ services:
     image: hashicorp/consul:1.15.0
     container_name: consul-server-skillmatchpfe
     ports:
-      - "8500:8500"
+      - "${CONSUL_PORT}:${CONSUL_PORT}"
     command: "agent -server -bootstrap-expect=1 -ui -client=0.0.0.0"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8500/v1/status/leader"]
@@ -50,9 +67,9 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_CLOUD_CONSUL_HOST=consul
-      - SPRING_CLOUD_CONSUL_PORT=8500
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILE}
+      - SPRING_CLOUD_CONSUL_HOST=${CONSUL_HOST}
+      - SPRING_CLOUD_CONSUL_PORT=${CONSUL_PORT}
     depends_on:
       consul:
         condition: service_healthy
@@ -69,15 +86,18 @@ services:
     ports:
       - "8081:8081"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILE}
       - SPRING_DATASOURCE_HOST=mysql
-      - SPRING_DATASOURCE_DB=skillmatchingApp
+      - SPRING_DATASOURCE_DB=${MYSQL_DATABASE}
       - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_CLOUD_CONSUL_HOST=consul
-      - SPRING_CLOUD_CONSUL_PORT=8500
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/${MONGO_DATABASE}
+      - SPRING_CLOUD_CONSUL_HOST=${CONSUL_HOST}
+      - SPRING_CLOUD_CONSUL_PORT=${CONSUL_PORT}
     depends_on:
       mysql:
+        condition: service_healthy
+      mongodb:
         condition: service_healthy
       consul:
         condition: service_healthy
@@ -91,13 +111,13 @@ services:
     ports:
       - "8082:8082"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILE}
       - SPRING_DATASOURCE_HOST=mysql
-      - SPRING_DATASOURCE_DB=skillmatchingApp
+      - SPRING_DATASOURCE_DB=${MYSQL_DATABASE}
       - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_CLOUD_CONSUL_HOST=consul
-      - SPRING_CLOUD_CONSUL_PORT=8500
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - SPRING_CLOUD_CONSUL_HOST=${CONSUL_HOST}
+      - SPRING_CLOUD_CONSUL_PORT=${CONSUL_PORT}
     depends_on:
       mysql:
         condition: service_healthy
@@ -105,6 +125,8 @@ services:
         condition: service_healthy
     networks:
       - skillmatch-network
+    volumes:
+      - ./uploads:/app/uploads
 
   entreprise-service:
     build:
@@ -113,13 +135,13 @@ services:
     ports:
       - "8083:8083"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILE}
       - SPRING_DATASOURCE_HOST=mysql
-      - SPRING_DATASOURCE_DB=skillmatchingApp
+      - SPRING_DATASOURCE_DB=${MYSQL_DATABASE}
       - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_CLOUD_CONSUL_HOST=consul
-      - SPRING_CLOUD_CONSUL_PORT=8500
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - SPRING_CLOUD_CONSUL_HOST=${CONSUL_HOST}
+      - SPRING_CLOUD_CONSUL_PORT=${CONSUL_PORT}
     depends_on:
       mysql:
         condition: service_healthy
@@ -135,13 +157,13 @@ services:
     ports:
       - "8084:8084"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILE}
       - SPRING_DATASOURCE_HOST=mysql
-      - SPRING_DATASOURCE_DB=skillmatchingApp
+      - SPRING_DATASOURCE_DB=${MYSQL_DATABASE}
       - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_CLOUD_CONSUL_HOST=consul
-      - SPRING_CLOUD_CONSUL_PORT=8500
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - SPRING_CLOUD_CONSUL_HOST=${CONSUL_HOST}
+      - SPRING_CLOUD_CONSUL_PORT=${CONSUL_PORT}
     depends_on:
       mysql:
         condition: service_healthy
@@ -157,13 +179,13 @@ services:
     ports:
       - "8085:8085"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILE}
       - SPRING_DATASOURCE_HOST=mysql
-      - SPRING_DATASOURCE_DB=skillmatchingApp
+      - SPRING_DATASOURCE_DB=${MYSQL_DATABASE}
       - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_CLOUD_CONSUL_HOST=consul
-      - SPRING_CLOUD_CONSUL_PORT=8500
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - SPRING_CLOUD_CONSUL_HOST=${CONSUL_HOST}
+      - SPRING_CLOUD_CONSUL_PORT=${CONSUL_PORT}
     depends_on:
       mysql:
         condition: service_healthy
@@ -183,10 +205,10 @@ services:
     ports:
       - "8086:8086"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILE}
       - API_GATEWAY_URL=http://api-gateway:8080
-      - SPRING_CLOUD_CONSUL_HOST=consul
-      - SPRING_CLOUD_CONSUL_PORT=8500
+      - SPRING_CLOUD_CONSUL_HOST=${CONSUL_HOST}
+      - SPRING_CLOUD_CONSUL_PORT=${CONSUL_PORT}
       - SPRING_CLOUD_CONSUL_DISCOVERY_PREFER_IP_ADDRESS=true
     depends_on:
       mysql:
@@ -205,4 +227,6 @@ networks:
 
 volumes:
   mysql-data:
+    driver: local
+  mongo-data:
     driver: local

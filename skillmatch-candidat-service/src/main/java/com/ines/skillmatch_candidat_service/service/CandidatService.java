@@ -29,10 +29,22 @@ public class CandidatService {
                 .orElseThrow(() -> new RuntimeException("Candidat non trouvé avec l'ID: " + id));
     }
 
-    // 2. RÉCUPÉRATION PAR USER_ID (Sécurisé pour le Dashboard)
+    // 2. RÉCUPÉRATION PAR USER_ID (Corrigé : Crée et sauvegarde si absent)
+    @Transactional
     public Candidat getByUserId(Long userId) {
         return candidatRepository.findByUserId(userId)
-                .orElseGet(() -> Candidat.builder().userId(userId).nom("Utilisateur").prenom("Nouveau").build());
+                .orElseGet(() -> {
+                    System.out.println("⚠️ Aucun candidat trouvé pour userId " + userId + ". Création d'un profil par défaut...");
+                    Candidat nouveauCandidat = Candidat.builder()
+                            .userId(userId)
+                            .nom("Candidat")
+                            .prenom("Nouveau")
+                            .bio("Complétez votre bio pour attirer les recruteurs.")
+                            .validationStatut(Candidat.ValidationStatut.EN_ATTENTE)
+                            .build();
+                    // 🎯 TRÈS IMPORTANT : On le persiste en BDD pour qu'il existe physiquement !
+                    return candidatRepository.save(nouveauCandidat);
+                });
     }
 
     // 3. INITIALISATION (Feign)

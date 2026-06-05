@@ -35,18 +35,19 @@ public class CandidatController {
         return ResponseEntity.ok(candidatService.getByUserId(userId));
     }
 
+    // 🎯 CORRECTION : Tout passer en @RequestPart pour s'aligner sur Feign Client et éviter le 400 Bad Request
     @PostMapping(value = "/user/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Candidat> updateProfil(
             @PathVariable Long userId,
-            @RequestParam("prenom") String prenom,
-            @RequestParam("nom") String nom,
-            @RequestParam(required = false) String telephone,
-            @RequestParam(required = false) String adresse,
-            @RequestParam(required = false) String bio,
-            @RequestParam(required = false) String competences,
-            @RequestParam(required = false) String linkedinUrl,
-            @RequestParam(required = false) String portfolioUrl,
-            @RequestParam(required = false) String niveauScolaire,
+            @RequestPart("prenom") String prenom,
+            @RequestPart("nom") String nom,
+            @RequestPart(value = "telephone", required = false) String telephone,
+            @RequestPart(value = "adresse", required = false) String adresse,
+            @RequestPart(value = "bio", required = false) String bio,
+            @RequestPart(value = "competences", required = false) String competences,
+            @RequestPart(value = "linkedinUrl", required = false) String linkedinUrl,
+            @RequestPart(value = "portfolioUrl", required = false) String portfolioUrl,
+            @RequestPart(value = "niveauScolaire", required = false) String niveauScolaire,
             @RequestPart(value = "cv", required = false) MultipartFile cv,
             @RequestPart(value = "photo", required = false) MultipartFile photo
     ) throws IOException {
@@ -82,19 +83,14 @@ public class CandidatController {
         return ResponseEntity.ok(candidatService.searchByCompetence(competence));
     }
 
-    // ============================================
-    // ENDPOINT : TÉLÉCHARGER LE CV
-    // ============================================
     @GetMapping("/download/cv/{userId}")
     public ResponseEntity<Resource> downloadCV(@PathVariable Long userId) {
         try {
             Candidat candidat = candidatService.getByUserId(userId);
-
             if (candidat == null || candidat.getCvPath() == null) {
                 return ResponseEntity.notFound().build();
             }
 
-            // 💡 CORRECTION : Pointer vers le bon sous-dossier "uploads/cvs"
             Path filePath = Paths.get("uploads", "cvs", candidat.getCvPath());
             Resource resource = new UrlResource(filePath.toUri());
 
@@ -112,22 +108,15 @@ public class CandidatController {
         }
     }
 
-    // ============================================
-    // ENDPOINT : AFFICHER LA PHOTO DE PROFIL
-    // ============================================
     @GetMapping("/avatar/{userId}")
     public ResponseEntity<byte[]> getAvatar(@PathVariable Long userId) {
         try {
             Candidat candidat = candidatService.getByUserId(userId);
-
             if (candidat != null && candidat.getPhotoPath() != null) {
-                // 💡 CORRECTION : Pointer vers le bon sous-dossier "uploads/photos"
                 Path path = Paths.get("uploads", "photos", candidat.getPhotoPath());
-
                 if (Files.exists(path)) {
                     byte[] image = Files.readAllBytes(path);
                     String contentType = Files.probeContentType(path);
-
                     return ResponseEntity.ok()
                             .contentType(MediaType.parseMediaType(contentType != null ? contentType : "image/jpeg"))
                             .body(image);

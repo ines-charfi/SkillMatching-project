@@ -2,6 +2,7 @@ package com.ines.frontend_skillmatch.controller;
 
 import com.ines.frontend_skillmatch.service.client.AuthClient;
 import com.ines.frontend_skillmatch.service.SessionService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -126,5 +127,14 @@ public class LoginController {
     public String logout() {
         sessionService.destroySession();
         return "redirect:/login?logout=true";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        // 1. On détruit la session personnalisée (ton SessionService)
+        session.invalidate();
+
+        // 2. On redirige vers la page de login avec le paramètre de succès
+        return "redirect:/login?logout";
     }
 }

@@ -2,7 +2,7 @@ package com.ines.skillmatch_auth_service.service;
 
 import com.ines.skillmatch_auth_service.dto.*;
 import com.ines.skillmatch_auth_service.model.User;
-import com.ines.skillmatch_auth_service.repository.UserRepository;
+import com.ines.skillmatch_auth_service.repository.jpa.UserRepository;
 import com.ines.skillmatch_auth_service.security.JwtService;
 import com.ines.skillmatch_auth_service.security.UserDetailsImpl;
 import com.ines.skillmatch_auth_service.service.client.CandidatClient;

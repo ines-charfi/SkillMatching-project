@@ -1,7 +1,7 @@
 package com.ines.skillmatch_auth_service.security;
 
 import com.ines.skillmatch_auth_service.model.User;
-import com.ines.skillmatch_auth_service.repository.UserRepository;
+import com.ines.skillmatch_auth_service.repository.jpa.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.*;

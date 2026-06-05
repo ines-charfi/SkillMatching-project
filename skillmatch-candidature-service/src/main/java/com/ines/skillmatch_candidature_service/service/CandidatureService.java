@@ -2,6 +2,7 @@ package com.ines.skillmatch_candidature_service.service;
 
 import com.ines.skillmatch_candidature_service.service.client.CandidatClient;
 import com.ines.skillmatch_candidature_service.service.client.OffreClient;
+import com.ines.skillmatch_candidature_service.service.client.NotificationClient;
 import com.ines.skillmatch_candidature_service.dto.CandidatureDTO;
 import com.ines.skillmatch_candidature_service.model.Candidature;
 import com.ines.skillmatch_candidature_service.repository.CandidatureRepository;
@@ -22,6 +23,7 @@ public class CandidatureService {
     private final MatchingService matchingService;
     private final CandidatClient candidatClient;
     private final OffreClient offreClient;
+    private final NotificationClient notificationClient;
     private final com.ines.skillmatch_candidature_service.repository.EntretienRepository entretienRepository;
 
     @Transactional
@@ -47,31 +49,104 @@ public class CandidatureService {
                     .statut(Candidature.Statut.EN_ATTENTE)
                     .build();
 
-            return candidatureRepository.save(candidature);
+            Candidature savedCandidature = candidatureRepository.save(candidature);
+
+            try {
+                if (offre != null && offre.get("entrepriseId") != null) {
+                    Long entId = Long.valueOf(offre.get("entrepriseId").toString());
+                    Long recruteurUserId = (offre.get("userId") != null)
+                            ? Long.valueOf(offre.get("userId").toString())
+                            : entId;
+
+                    String prenomCand = candidat.get("prenom") != null ? candidat.get("prenom").toString() : "";
+                    String nomCand = candidat.get("nom") != null ? candidat.get("nom").toString() : "Un candidat";
+                    String titreOffre = offre.get("titre") != null ? offre.get("titre").toString() : "votre offre";
+
+                    Map<String, Object> notifData = new HashMap<>();
+                    notifData.put("userIdTarget", recruteurUserId);
+                    notifData.put("recipientRole", "recruiter"); // 🎯 FIX : Identifié pour l'espace Entreprise uniquement
+                    notifData.put("type", "new_application");
+                    notifData.put("titreNotif", "Nouvelle candidature reçue ! 📩");
+                    notifData.put("message", prenomCand + " " + nomCand + " a postulé pour le poste : " + titreOffre + " (Score Matching : " + score + "%)");
+                    notifData.put("lu", false);
+
+                    notificationClient.envoyerNotification(notifData);
+                    log.info("🚀 Notification de postulation envoyée avec succès au Recruteur User ID {}", recruteurUserId);
+                } else {
+                    log.warn("⚠️ Impossible d'envoyer la notification : entrepriseId introuvable dans l'offre.");
+                }
+            } catch (Exception ex) {
+                log.error("❌ Échec lors de l'envoi de la notification au recruteur : {}", ex.getMessage());
+            }
+
+            return savedCandidature;
         } catch (Exception e) {
-            throw new RuntimeException("Erreur de communication inter-services");
+            throw new RuntimeException("Erreur de communication inter-services : " + e.getMessage());
         }
     }
 
-    // MÉTHODE POUR LA MAQUETTE 4 (Tableau Entreprise)
+    @Transactional
+    public Candidature updateStatut(Long id, String statut) {
+        Candidature candidature = candidatureRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Candidature non trouvée"));
+
+        candidature.setStatut(Candidature.Statut.valueOf(statut.toUpperCase()));
+        Candidature updatedCandidature = candidatureRepository.save(candidature);
+
+        try {
+            Long candidatUserId = updatedCandidature.getCandidatId();
+            Map<String, Object> offre = offreClient.getOffre(updatedCandidature.getOffreId());
+            String titreOffre = offre.get("titre") != null ? offre.get("titre").toString() : "votre candidature";
+
+            String titreNotif = "Mise à jour de votre candidature 📋";
+            String message = "";
+
+            switch (statut.toUpperCase()) {
+                case "ACCEPTE":
+                    titreNotif = "Candidature Acceptée ! 🎉";
+                    message = "Excellente nouvelle ! Votre candidature pour le poste de \"" + titreOffre + "\" a été acceptée par le recruteur.";
+                    break;
+                case "REFUSE":
+                    titreNotif = "Retour sur votre candidature 📨";
+                    message = "Malheureusement, votre profil n'a pas été retenu pour le poste de \"" + titreOffre + "\". Ne découragez pas, d'autres opportunités vous attendent !";
+                    break;
+                case "ENTRETIEN":
+                    titreNotif = "Invitation à un entretien ! 🗓️";
+                    message = "Bonne nouvelle ! Le recruteur souhaite planifier un entretien avec vous pour le poste de \"" + titreOffre + "\".";
+                    break;
+                default:
+                    message = "Le statut de votre candidature pour le poste de \"" + titreOffre + "\" a été mis à jour : " + statut;
+                    break;
+            }
+
+            Map<String, Object> notifData = new HashMap<>();
+            notifData.put("userIdTarget", candidatUserId);
+            notifData.put("recipientRole", "candidate"); // 🎯 FIX : Identifié pour l'espace Candidat uniquement
+            notifData.put("titreNotif", titreNotif);
+            notifData.put("message", message);
+            notifData.put("lu", false);
+
+            notificationClient.envoyerNotification(notifData);
+            log.info("🚀 Notification de suivi envoyée avec succès au candidat ID {}", candidatUserId);
+
+        } catch (Exception ex) {
+            log.error("⚠️ Impossible d'envoyer la notification de statut au candidat : {}", ex.getMessage());
+        }
+
+        return updatedCandidature;
+    }
+
     public List<CandidatureDTO> findAllByEntrepriseId(Long entrepriseId) {
         List<CandidatureDTO> results = new ArrayList<>();
         try {
-            // 1. Récupérer les offres de l'entreprise
             List<Map<String, Object>> offres = offreClient.getOffresByEntreprise(entrepriseId);
-
             for (Map<String, Object> offre : offres) {
                 Long oId = Long.valueOf(offre.get("id").toString());
                 String titre = (String) offre.get("titre");
-
-                // 2. Trouver les candidatures pour chaque offre
                 List<Candidature> candList = candidatureRepository.findByOffreId(oId);
-
                 for (Candidature c : candList) {
-                    // 3. Récupérer le nom du candidat via Feign
                     Map<String, Object> candidat = candidatClient.getProfil(c.getCandidatId());
                     String nomComplet = candidat.get("prenom") + " " + candidat.get("nom");
-
                     results.add(CandidatureDTO.builder()
                             .id(c.getId())
                             .candidatId(c.getCandidatId())
@@ -83,67 +158,32 @@ public class CandidatureService {
                             .build());
                 }
             }
-        } catch (Exception e) {
-            log.error("Erreur enrichissement candidatures: {}", e.getMessage());
-        }
+        } catch (Exception e) { log.error("Erreur enrichissement candidatures: {}", e.getMessage()); }
         return results;
     }
 
-    public List<Candidature> getByCandidat(Long userId) {
-        return candidatureRepository.findByCandidatId(userId);
-    }
-
-    public List<Candidature> getByOffre(Long offreId) {
-        return candidatureRepository.findByOffreId(offreId);
-    }
-
-    public long countByOffre(Long offreId) {
-        return candidatureRepository.countByOffreId(offreId);
-    }
-
-    public long countByCandidat(Long candidatId) {
-        return candidatureRepository.countByCandidatId(candidatId);
-    }
-
-    @Transactional
-    public Candidature updateStatut(Long id, String statut) {
-        Candidature candidature = candidatureRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Candidature non trouvée"));
-        candidature.setStatut(Candidature.Statut.valueOf(statut.toUpperCase()));
-        return candidatureRepository.save(candidature);
-    }
+    public List<Candidature> getByCandidat(Long userId) { return candidatureRepository.findByCandidatId(userId); }
+    public List<Candidature> getByOffre(Long offreId) { return candidatureRepository.findByOffreId(offreId); }
+    public long countByOffre(Long offreId) { return candidatureRepository.countByOffreId(offreId); }
+    public long countByCandidat(Long candidatId) { return candidatureRepository.countByCandidatId(candidatId); }
 
     public Map<String, Object> getStatsEntreprise(Long entrepriseId) {
         Map<String, Object> stats = new HashMap<>();
         List<Map<String, Object>> offres = offreClient.getOffresByEntreprise(entrepriseId);
-
-        long totalCandidatures = 0;
-        long totalEntretiens = 0; // 🎯 Compteur d'entretiens
-
+        long totalCandidatures = 0; long totalEntretiens = 0;
         if (offres != null) {
             for (Map<String, Object> o : offres) {
                 Long oId = Long.valueOf(o.get("id").toString());
-
-                // 1. On compte les candidatures liées à cette offre
                 totalCandidatures += countByOffre(oId);
-
-                // 2. On compte les entretiens liés aux candidatures de cette offre
                 totalEntretiens += entretienRepository.countByCandidatureIdIn(
                         candidatureRepository.findByOffreId(oId).stream().map(Candidature::getId).toList()
                 );
             }
         }
-
         stats.put("totalCandidatures", totalCandidatures);
         stats.put("offresActives", offres != null ? offres.size() : 0);
-
-        // 🎯 IMPORTANT : Ajoute l'envoi de la statistique pour Thymeleaf
-        // (Vérifie dans ton fichier HTML si la variable s'appelle 'entretiensCount' ou 'totalEntretiens')
         stats.put("entretiensCount", totalEntretiens);
-        stats.put("totalEntretiens", totalEntretiens); // On met les deux par sécurité !
-
+        stats.put("totalEntretiens", totalEntretiens);
         return stats;
     }
-
-
 }

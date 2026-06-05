@@ -9,41 +9,51 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Map;
 
-// CORRECTION : Changement de 'name' pour matcher Consul et suppression de l'URL en dur
 @FeignClient(name = "skillmatch-candidat-service", configuration = FeignConfig.class)
 public interface CandidatClient {
 
-    @GetMapping("/api/candidats/user/{userId}")
-    Map<String, Object> getProfil(@PathVariable("userId") Long userId);
-
+    // Mise à jour du profil (multipart)
     @PostMapping(value = "/api/candidats/user/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     Map<String, Object> updateProfil(
             @PathVariable("userId") Long userId,
-            @RequestParam("prenom") String prenom,
-            @RequestParam("nom") String nom,
-            @RequestParam(value = "telephone", required = false) String telephone,
-            @RequestParam(value = "adresse", required = false) String adresse,
-            @RequestParam(value = "bio", required = false) String bio,
-            @RequestParam(value = "competences", required = false) String competences,
-            @RequestParam(value = "linkedinUrl", required = false) String linkedinUrl,
-            @RequestParam(value = "portfolioUrl", required = false) String portfolioUrl,
-            @RequestParam(value = "niveauScolaire", required = false) String niveauScolaire,
+            @RequestPart("prenom") String prenom,
+            @RequestPart("nom") String nom,
+            @RequestPart(value = "telephone", required = false) String telephone,
+            @RequestPart(value = "adresse", required = false) String adresse,
+            @RequestPart(value = "bio", required = false) String bio,
+            @RequestPart(value = "competences", required = false) String competences,
+            @RequestPart(value = "linkedinUrl", required = false) String linkedinUrl,
+            @RequestPart(value = "portfolioUrl", required = false) String portfolioUrl,
+            @RequestPart(value = "niveauScolaire", required = false) String niveauScolaire,
             @RequestPart(value = "cv", required = false) MultipartFile cv,
             @RequestPart(value = "photo", required = false) MultipartFile photo
     );
 
+    // Récupération du profil (correction du chemin)
+    @GetMapping("/api/candidats/user/{userId}")
+    Map<String, Object> getProfil(@PathVariable("userId") Long userId);
+
+    // Expériences
     @GetMapping("/api/candidats/experiences/user/{userId}")
     List<Map<String, Object>> getExperiences(@PathVariable("userId") Long userId);
 
-    @PutMapping("/api/candidats/{id}/validation")
-    void updateValidation(@PathVariable("id") Long id, @RequestParam("statut") String statut);
-
-    // Pour récupérer les octets de la photo de profil
+    // Avatar
     @GetMapping("/api/candidats/avatar/{userId}")
-    org.springframework.http.ResponseEntity<byte[]> getAvatar(@PathVariable("userId") Long userId);
+    ResponseEntity<byte[]> getAvatar(@PathVariable("userId") Long userId);
 
-    // Pour récupérer le flux du fichier CV
+    // Téléchargement du CV
     @GetMapping("/api/candidats/download/cv/{userId}")
     ResponseEntity<byte[]> downloadCV(@PathVariable("userId") Long userId);
 
+    // Liste de tous les candidats
+    @GetMapping("/api/candidats")
+    List<Map<String, Object>> getAllCandidats();
+
+    // Changement de statut (validation)
+    @PutMapping("/api/candidats/{id}/statut")
+    void validerStatutCandidat(@PathVariable("id") Long id, @RequestParam("statut") String statut);
+
+    // Validation (pour admin)
+    @PutMapping("/api/candidats/{id}/validation")
+    void updateValidation(@PathVariable("id") Long id, @RequestParam("statut") String statut);
 }

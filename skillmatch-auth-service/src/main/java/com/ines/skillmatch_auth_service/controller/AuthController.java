@@ -2,7 +2,7 @@ package com.ines.skillmatch_auth_service.controller;
 
 import com.ines.skillmatch_auth_service.dto.*;
 import com.ines.skillmatch_auth_service.model.User;
-import com.ines.skillmatch_auth_service.repository.UserRepository;
+import com.ines.skillmatch_auth_service.repository.jpa.UserRepository;
 import com.ines.skillmatch_auth_service.service.AuthService;
 import com.ines.skillmatch_auth_service.service.client.OffreClient;
 import jakarta.validation.Valid;
@@ -29,7 +29,7 @@ public class AuthController {
     }
 
     // ============================================
-    // AUTH
+    // AUTHENTICATION (Endpoints totalement Publics)
     // ============================================
 
     @PostMapping("/register")
@@ -60,7 +60,6 @@ public class AuthController {
         return ResponseEntity.ok(Map.of(
                 "message", "Vous êtes connecté",
                 "timestamp", System.currentTimeMillis()
-                // Signé Ines
         ));
     }
 
@@ -69,7 +68,6 @@ public class AuthController {
     // ============================================
 
     @GetMapping("/users")
-    // 🎯 CORRECTION : hasRole -> hasAuthority pour matcher la chaîne brute "ADMIN" de ta DB
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<UserDto>> getAllUsers() {
         List<User> users = userRepository.findAll();
@@ -80,7 +78,6 @@ public class AuthController {
     }
 
     @GetMapping("/users/{id}")
-    // 🎯 CORRECTION : hasRole -> hasAuthority
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         User user = userRepository.findById(id)
@@ -89,7 +86,6 @@ public class AuthController {
     }
 
     @PutMapping("/users/{id}/toggle-status")
-    // 🎯 CORRECTION : hasRole -> hasAuthority
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<UserDto> toggleUserStatus(@PathVariable Long id) {
         User user = userRepository.findById(id)
@@ -100,10 +96,8 @@ public class AuthController {
     }
 
     @PutMapping("/users/{id}/role")
-    // 🎯 CORRECTION : hasRole -> hasAuthority
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<UserDto> changeUserRole(@PathVariable Long id,
-                                                  @RequestParam String role) {
+    public ResponseEntity<UserDto> changeUserRole(@PathVariable Long id, @RequestParam String role) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
         user.setRole(User.Role.valueOf(role.toUpperCase()));
@@ -112,14 +106,12 @@ public class AuthController {
     }
 
     // ============================================
-    // NOUVELLE MÉTHODE POUR LA PAGE D'ACCUEIL
+    // STATISTIQUES PUBLIQUES
     // ============================================
     @GetMapping("/stats/public")
     public ResponseEntity<Map<String, Object>> getPublicStats() {
         Map<String, Object> stats = new HashMap<>();
-
         stats.put("totalUsers", userRepository.count());
-
         try {
             stats.put("totalOffres", offreClient.countAllOffres());
             stats.put("totalEntreprises", userRepository.countByRole(User.Role.ENTREPRISE));
@@ -127,13 +119,8 @@ public class AuthController {
             stats.put("totalOffres", 0);
             stats.put("totalEntreprises", 0);
         }
-
         return ResponseEntity.ok(stats);
     }
-
-    // ============================================
-    // PRIVATE
-    // ============================================
 
     private UserDto toDto(User user) {
         return UserDto.builder()

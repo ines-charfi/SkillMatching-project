@@ -1,7 +1,7 @@
 package com.ines.skillmatch_auth_service.security;
 
 import com.ines.skillmatch_auth_service.model.User;
-import com.ines.skillmatch_auth_service.repository.UserRepository;
+import com.ines.skillmatch_auth_service.repository.jpa.UserRepository;
 import com.ines.skillmatch_auth_service.service.client.CandidatClient; // AJOUT
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.*;
@@ -9,8 +9,6 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor

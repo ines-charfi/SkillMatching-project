@@ -141,10 +141,41 @@
             <i class="bi bi-lightning-charge-fill text-warning me-2"></i>SkillMatch <span class="badge bg-light text-dark fs-6 ms-2">Recruteur</span>
         </a>
         <div class="d-flex align-items-center gap-3">
+
+            <div class="dropdown">
+                <button class="btn btn-link position-relative text-white p-2" type="button" id="entrepriseNotifBell" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-bell-fill fs-4"></i>
+                    <span th:if="${notifCount != null and notifCount > 0}"
+                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                          th:text="${notifCount}" style="font-size: 0.65rem;">0</span>
+                </button>
+
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-0" aria-labelledby="entrepriseNotifBell" style="width: 340px; max-height: 400px; overflow-y: auto; border-radius: 12px;">
+                    <li class="bg-light p-3 border-bottom">
+                        <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-briefcase-fill text-primary me-2"></i>Alertes Recruteur</h6>
+                    </li>
+
+                    <th:block th:unless="${notifications == null or notifications.isEmpty()}" th:each="n : ${notifications}">
+                        <li class="p-3 border-bottom dropdown-item-text">
+                            <div class="d-flex flex-column">
+                                <span class="fw-bold text-dark small mb-1"
+                                      th:text="${n.titreNotif != null ? n.titreNotif : n['titreNotif']}">Notification</span>
+                                <p class="text-muted small mb-0 lh-sm"
+                                   th:text="${n.message != null ? n.message : n['message']}">Détails du message</p>
+                            </div>
+                        </li>
+                    </th:block>
+
+                    <li th:if="${notifications == null or notifications.isEmpty()}" class="text-center p-4 text-muted small">
+                        <i class="bi bi-bell-slash d-block fs-4 mb-2 text-secondary"></i> Aucune nouvelle alerte.
+                    </li>
+                </ul>
+            </div>
+
             <a href="/profil-entreprise" class="btn btn-outline-light btn-pill px-3 py-1 btn-sm">
                 <i class="bi bi-building me-1"></i> Mon Profil Entreprise
             </a>
-            <a href="/logout-user" class="btn btn-light rounded-circle text-danger p-2" style="width:38px; height:38px; display:flex; align-items:center; justify-content:center;">
+            <a href="/logout" class="btn btn-light rounded-circle text-danger p-2" style="width:38px; height:38px; display:flex; align-items:center; justify-content:center;" title="Se déconnecter">
                 <i class="bi bi-box-arrow-right"></i>
             </a>
         </div>
@@ -154,11 +185,11 @@
 <div class="container pb-5">
 
     <div th:if="${message}" class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${message}">Message de succès</span>
+        <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${message}">Succès</span>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     <div th:if="${error}" class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${error}">Message d'erreur</span>
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${error}">Erreur</span>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 
@@ -196,7 +227,7 @@
                     <i class="bi bi-file-earmark-text-fill fs-4"></i>
                 </div>
                 <p class="text-muted small fw-bold mb-1">OFFRES ACTIVES</p>
-                <h2 class="fw-black text-dark mb-0" th:text="${offres != null ? offres.size() : 0}">0</h2>
+                <h2 class="fw-black text-dark mb-0" th:text="${stats != null and stats['totalOffres'] != null ? stats['totalOffres'] : (offres != null ? offres.size() : 0)}">0</h2>
             </div>
         </div>
         <div class="col-md-4">
@@ -205,80 +236,63 @@
                     <i class="bi bi-people-fill fs-4"></i>
                 </div>
                 <p class="text-muted small fw-bold mb-1">CANDIDATURES REÇUES</p>
-                <h2 class="fw-black text-dark mb-0" th:text="${stats != null ? stats['totalCandidatures'] : 0}">0</h2>
+                <h2 class="fw-black text-dark mb-0" th:text="${stats != null and stats['totalCandidatures'] != null ? stats['totalCandidatures'] : (candidaturesRecues != null ? candidaturesRecues.size() : 0)}">0</h2>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card stat-card p-4 text-center">
                 <div class="icon-circle bg-warning bg-opacity-10 text-warning">
-                    <i class="bi bi-calendar-event-fill fs-4"></i>
+                    <i class="bi bi-calendar-check-fill fs-4"></i>
                 </div>
-                <p class="text-muted small fw-bold mb-1">ENTRETIENS PRÉVUS</p>
-                <h2 class="fw-black text-dark mb-0" th:text="${stats != null ? stats['entretiensCount'] : 0}">0</h2>
+                <p class="text-muted small fw-bold mb-1">ENTRETIENS PROGRAMMÉS</p>
+                <h2 class="fw-black text-dark mb-0" th:text="${stats != null and stats['totalEntretiens'] != null ? stats['totalEntretiens'] : 0}">0</h2>
             </div>
         </div>
     </div>
 
     <div class="table-container mb-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="fw-bold text-dark mb-0"><i class="bi bi-briefcase-fill me-2 text-primary"></i>Vos offres d'emploi actives</h4>
+        <h4 class="fw-bold text-dark mb-4"><i class="bi bi-list-task text-primary me-2"></i>Vos offres d'emploi publiées</h4>
+        <div th:if="${offres == null or offres.isEmpty()}" class="text-center py-4 text-muted">
+            <p class="mb-0">Vous n'avez pas encore publié d'offres.</p>
         </div>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+        <div th:unless="${offres == null or offres.isEmpty()}" class="table-responsive">
+            <table class="table align-middle">
                 <thead>
                 <tr>
-                    <th>Intitulé du poste</th>
-                    <th>Ville</th>
-                    <th>Type de contrat</th>
-                    <th>Rémunération</th>
-                    <th>Compétences requises</th>
+                    <th>Titre du poste</th>
+                    <th>Niveau Requis</th>
+                    <th>Salaire</th>
+                    <th>Date de publication</th>
                     <th class="text-end">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="o : ${offres}" th:if="${o != null and o['id'] != null}">
+                <tr th:each="o : ${offres}">
+                    <td><strong class="text-dark" th:text="${o['titre']}">Titre</strong></td>
+                    <td><span class="badge bg-light text-dark" th:text="${o['niveauRequis']}">Niveau</span></td>
+                    <td th:text="${o['salaire']}">Salaire</td>
                     <td>
-                        <span class="fw-bold text-dark" th:text="${o['titre']}">Développeur Java</span>
-                    </td>
-
-                    <td th:text="${profil != null and profil['ville'] != null and profil['ville'] != ''} ? ${profil['ville']} : 'Non spécifiée'">Casablanca</td>
-
-                    <td>
-                        <span th:if="${#strings.containsIgnoreCase(o['titre'], 'stage') or #strings.containsIgnoreCase(o['titre'], 'internship')}"
-                              class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-2.5 py-1 small">Stage</span>
-
-                        <span th:if="${#strings.containsIgnoreCase(o['titre'], 'alternance') or #strings.containsIgnoreCase(o['titre'], 'apprenti') or #strings.containsIgnoreCase(o['titre'], 'cfa')}"
-                              class="badge bg-info bg-opacity-10 text-info rounded-pill px-2.5 py-1 small">Alternance</span>
-
-                        <span th:if="${#strings.containsIgnoreCase(o['titre'], 'cdd')}"
-                              class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-2.5 py-1 small">CDD</span>
-
-                        <span th:if="${#strings.containsIgnoreCase(o['titre'], 'freelance') or #strings.containsIgnoreCase(o['titre'], 'indépendant')}"
-                              class="badge bg-dark bg-opacity-10 text-dark rounded-pill px-2.5 py-1 small">Freelance</span>
-
-                        <span th:if="${!#strings.containsIgnoreCase(o['titre'], 'stage') and !#strings.containsIgnoreCase(o['titre'], 'internship') and !#strings.containsIgnoreCase(o['titre'], 'alternance') and !#strings.containsIgnoreCase(o['titre'], 'apprenti') and !#strings.containsIgnoreCase(o['titre'], 'cfa') and !#strings.containsIgnoreCase(o['titre'], 'cdd') and !#strings.containsIgnoreCase(o['titre'], 'freelance') and !#strings.containsIgnoreCase(o['titre'], 'indépendant')}"
-                              class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-2.5 py-1 small">CDI</span>
-                    </td>
-
-                    <td class="fw-medium text-secondary" th:text="${o['salaire']}">45k - 50k €</td>
-                    <td>
-                        <small class="text-muted" th:text="${o['competencesRequises']}">Java, Spring Boot, MySQL</small>
+                        <span class="text-muted small"><i class="bi bi-calendar3 me-1"></i></span>
+                        <span th:text="${o['datePublication'] != null} ?
+                                       ${#strings.concat(
+                                           #strings.substring(o['datePublication'], 8, 10), '/',
+                                           #strings.substring(o['datePublication'], 5, 7), '/',
+                                           #strings.substring(o['datePublication'], 0, 4), ' ',
+                                           #strings.substring(o['datePublication'], 11, 19)
+                                       )} : 'Non spécifiée'">01/01/2026 00:00:00</span>
                     </td>
                     <td class="text-end">
                         <div class="d-flex justify-content-end gap-2">
-                            <a th:href="@{'/offre/modifier/' + ${o['id']}}" class="btn btn-sm btn-light btn-pill border px-3 text-primary">
-                                <i class="bi bi-pencil-square me-1"></i> Modifier
+                            <a th:href="@{'/offre/modifier/' + ${o['id']}}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                <i class="bi bi-pencil-fill"></i> Modifier
                             </a>
-                            <form th:action="@{/offre/supprimer/{id}(id=${o['id']})}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette offre définitivement ?');" class="d-inline">
-                                <button type="submit" class="btn btn-sm btn-outline-danger btn-pill px-3">
-                                    <i class="bi bi-trash3 me-1"></i> Supprimer
+                            <form th:action="@{'/offre/supprimer/' + ${o['id']}}" method="post" onsubmit="return confirm('Supprimer définitivement cette offre ?');" class="m-0">
+                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3" title="Supprimer l'offre">
+                                    <i class="bi bi-trash-fill"></i>
                                 </button>
                             </form>
                         </div>
                     </td>
-                </tr>
-                <tr th:if="${offres == null or offres.isEmpty()}">
-                    <td colspan="6" class="text-center py-4 text-muted small">Vous n'avez publié aucune offre d'emploi pour le moment.</td>
                 </tr>
                 </tbody>
             </table>
@@ -286,144 +300,117 @@
     </div>
 
     <div class="table-container">
-        <h4 class="fw-bold text-dark mb-4"><i class="bi bi-mailbox me-2 text-primary"></i>Flux des candidatures reçues</h4>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+        <h4 class="fw-bold text-dark mb-4"><i class="bi bi-envelope-open-fill text-success me-2"></i>Suivi des candidatures reçues</h4>
+        <div th:if="${candidaturesRecues == null or candidaturesRecues.isEmpty()}" class="text-center py-4 text-muted">
+            <p class="mb-0">Aucune candidature reçue pour le moment.</p>
+        </div>
+        <div th:unless="${candidaturesRecues == null or candidaturesRecues.isEmpty()}" class="table-responsive">
+            <table class="table align-middle">
                 <thead>
                 <tr>
                     <th>Candidat</th>
-                    <th>Poste Visé</th>
-                    <th>Score de Matching</th>
+                    <th>Poste ciblé</th>
+                    <th>Score de Match</th>
                     <th>Statut actuel</th>
-                    <th class="text-end">Actions</th>
+                    <th>Changer le Statut / Planifier</th>
+                    <th class="text-end">Profil</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="c : ${candidaturesRecues}">
                     <td>
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="avatar-initial" th:text="${c['candidatNom'] != null and !#strings.isEmpty(c['candidatNom'])} ? ${#strings.toUpperCase(#strings.substring(c['candidatNom'],0,1))} : 'C'">C</div>
-                            <span class="fw-semibold text-dark" th:text="${c['candidatNom']}">Nom</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="avatar-initial">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                            <div>
+                                <span class="fw-bold text-dark" th:text="${c['candidatNomComplet']}">Nom du Candidat</span>
+                            </div>
                         </div>
                     </td>
-                    <td class="fw-medium" th:text="${c['offreTitre']}">Titre</td>
-                    <td style="min-width: 160px;">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="progress flex-grow-1">
-                                <div class="progress-bar bg-success" th:style="'width:' + ${c['scoreMatching'] ?: 0} + '%'"></div>
+                    <td><span th:text="${c['offreTitre'] ?: 'ID Offre: ' + c['offreId']}">Poste</span></td>
+
+                    <td>
+                        <div class="d-flex align-items-center gap-2" style="width: 140px;">
+                            <div class="progress flex-grow-1" style="height: 6px;">
+                                <div class="progress-bar" role="progressbar"
+                                     th:style="'width: ' + ${c['scoreMatching'] != null ? c['scoreMatching'] : 0} + '%; background-color: var(--primary);'"
+                                     th:aria-valuenow="${c['scoreMatching'] != null ? c['scoreMatching'] : 0}" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
-                            <span class="fw-bold text-success small" th:text="${c['scoreMatching'] ?: 0} + '%'">0%</span>
+                            <span class="small fw-bold text-dark" th:text="${(c['scoreMatching'] != null ? c['scoreMatching'] : 0) + '%'}">0%</span>
                         </div>
+                    </td>
+
+                    <td>
+                            <span th:class="'badge rounded-pill p-2 ' +
+                                (${c['statut'] == 'ACCEPTE' or c['statut'] == 'VALIDE'} ? 'bg-success bg-opacity-10 text-success' :
+                                (${c['statut'] == 'REFUSE'} ? 'bg-danger bg-opacity-10 text-danger' :
+                                (${c['statut'] == 'ENTRETIEN_PLANIFIE'} ? 'bg-warning bg-opacity-10 text-warning' : 'bg-primary bg-opacity-10 text-primary')))"
+                                  th:text="${c['statut']}">EN_COURS</span>
                     </td>
                     <td>
-                        <span th:class="${c['statut'] == 'ACCEPTE' ? 'badge bg-success bg-opacity-10 text-success' : (c['statut'] == 'REFUSE' ? 'badge bg-danger bg-opacity-10 text-danger' : 'badge bg-warning bg-opacity-10 text-warning')} + ' px-3 py-2 rounded-pill small fw-bold'" th:text="${c['statut']}">Statut</span>
-                    </td>
-                    <td class="text-end">
-                        <div class="d-flex justify-content-end gap-2 align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <form th:action="@{/candidature/statut}" method="post" class="d-inline-flex gap-1 m-0">
+                                <input type="hidden" name="id" th:value="${c['id']}">
+                                <select name="statut" class="form-select form-select-sm rounded-pill" style="width: 130px;" onchange="this.form.submit()">
+                                    <option value="" disabled selected>Modifier...</option>
+                                    <option value="EN_COURS">À l'étude</option>
+                                    <option value="ENTRETIEN_PLANIFIE">Entretien</option>
+                                    <option value="ACCEPTE">Accepter</option>
+                                    <option value="REFUSE">Refuser</option>
+                                </select>
+                            </form>
 
-                            <button type="button"
-                                    class="btn btn-sm btn-outline-primary btn-pill px-3"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#modalEntretien"
-                                    th:data-candidature-id="${c['id']}"
-                                    th:data-candidat-nom="${c['candidatNom']}">
-                                <i class="bi bi-calendar-plus me-1"></i> Planifier
+                            <button type="button" class="btn btn-sm btn-outline-warning rounded-pill px-2 py-1" data-bs-toggle="modal" th:data-bs-target="'#modalEntretien' + ${c['id']}">
+                                <i class="bi bi-calendar-plus"></i>
                             </button>
+                        </div>
 
-                            <a th:href="@{/candidat/profil/{candidatureId}(candidatureId=${c.get('id')})}"
-                               class="btn btn-sm btn-light btn-pill border px-3 text-secondary">
-                                <i class="bi bi-person"></i> Profil
-                            </a>
-
-                            <form th:action="@{/candidature/statut}" method="post" class="d-inline">
-                                <input type="hidden" name="id" th:value="${c.get('id')}">
-                                <input type="hidden" name="statut" value="ACCEPTE">
-                                <button type="submit" class="btn btn-sm btn-success rounded-circle" style="width:32px; height:32px; display: inline-flex; align-items: center; justify-content: center;">
-                                    <i class="bi bi-check-lg"></i>
-                                </button>
-                            </form>
-
-                            <form th:action="@{/candidature/statut}" method="post" class="d-inline">
-                                <input type="hidden" name="id" th:value="${c.get('id')}">
-                                <input type="hidden" name="statut" value="REFUSE">
-                                <button type="submit" class="btn btn-sm btn-danger rounded-circle" style="width:32px; height:32px; display: inline-flex; align-items: center; justify-content: center;">
-                                    <i class="bi bi-x-lg"></i>
-                                </button>
-                            </form>
-
+                        <div class="modal fade" th:id="'modalEntretien' + ${c['id']}" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content" style="border-radius: var(--radius)">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title fw-bold">Planifier un entretien</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <form th:action="@{/entreprise/entretiens/planifier}" method="post">
+                                        <div class="modal-body text-start">
+                                            <input type="hidden" name="candidatureId" th:value="${c['id']}">
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold">Date & heure de l'entretien</label>
+                                                <input type="datetime-local" name="date" class="form-control" required th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd''T''HH:mm')}">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold">Lieu ou Lien Visioconférence</label>
+                                                <input type="text" name="lieu" class="form-control" placeholder="ex: Teams, Google Meet ou Bureau 302" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold">Notes / Consignes pour le candidat</label>
+                                                <textarea name="notes" class="form-control" rows="3" placeholder="Documents à apporter, préparatifs particuliers..."></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-sm btn-secondary rounded-pill" data-bs-dismiss="modal">Annuler</button>
+                                            <button type="submit" class="btn btn-sm btn-primary rounded-pill">Confirmer la planification</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </td>
-                </tr>
-                <tr th:if="${candidaturesRecues == null or candidaturesRecues.isEmpty()}">
-                    <td colspan="5" class="text-center py-5 text-muted small">Aucune candidature n'a été déposée pour le moment.</td>
+                    <td class="text-end">
+                        <a th:href="@{'/candidat/profil/' + ${c['id']}}" class="btn btn-sm btn-pill btn-pill-primary py-1 px-3">
+                            <i class="bi bi-eye-fill"></i> Voir Profil
+                        </a>
+                    </td>
                 </tr>
                 </tbody>
             </table>
         </div>
     </div>
+
 </div>
 
-<div class="modal fade" id="modalEntretien" tabindex="-1" aria-labelledby="modalEntretienLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
-            <div class="modal-header bg-dark text-white" style="border-top-left-radius: 16px; border-top-right-radius: 16px;">
-                <h5 class="modal-title" id="modalEntretienLabel"><i class="bi bi-calendar2-event me-2 text-warning"></i>Planifier un entretien</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form th:action="@{/entreprise/entretiens/planifier}" method="POST">
-                <div class="modal-body p-4">
-                    <input type="hidden" name="candidatureId" id="modalCandidatureId">
-
-                    <div class="mb-3">
-                        <label class="form-label fw-bold text-secondary">Candidat sélectionné</label>
-                        <input type="text" id="modalCandidatNom" class="form-control bg-light" readonly style="font-weight: 600;">
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="date" class="form-label fw-bold text-secondary">Date et Heure du rendez-vous</label>
-                        <input type="datetime-local" class="form-control" id="date" name="date" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="lieu" class="form-label fw-bold text-secondary">Lieu ou Lien de rencontre</label>
-                        <input type="text" class="form-control" id="lieu" name="lieu" placeholder="Ex: Google Meet, Skype, Bureaux Paris..." required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="notes" class="form-label fw-bold text-secondary">Notes optionnelles</label>
-                        <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Ajouter des consignes, documents à préparer..."></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer bg-light" style="border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;">
-                    <button type="button" class="btn btn-secondary btn-pill px-3" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-primary btn-pill px-4" style="background: var(--gradient); border: none;">Fixer le rendez-vous</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<div th:replace="~{fragments/footer :: footer}"></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const modalEntretien = document.getElementById('modalEntretien');
-        if (modalEntretien) {
-            modalEntretien.addEventListener('show.bs.modal', function (event) {
-                // Le bouton qui a déclenché l'ouverture de la modal
-                const button = event.relatedTarget;
-
-                // Extraction des attributs th:data-*
-                const candidatureId = button.getAttribute('data-candidature-id');
-                const candidatNom = button.getAttribute('data-candidat-nom');
-
-                // Injection dans les champs de la modal
-                document.getElementById('modalCandidatureId').value = candidatureId;
-                document.getElementById('modalCandidatNom').value = candidatNom ? candidatNom : "Candidat";
-            });
-        }
-    });
-</script>
 </body>
 </html>
