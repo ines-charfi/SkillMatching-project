@@ -4,7 +4,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "skillmatch-candidature-service")
+@FeignClient(name = "skillmatch-candidature-service", fallback = CandidatureClientFallback.class)
 public interface CandidatureClient {
     @GetMapping("/api/candidatures/count")
     Long CountByOffreId(@RequestParam("offreId") Long offreId);

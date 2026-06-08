@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@FeignClient(name = "skillmatch-candidature-service", configuration = FeignConfig.class)
+@FeignClient(name = "skillmatch-candidature-service", configuration = FeignConfig.class, fallback = CandidatureClientFallback.class)
 public interface CandidatureClient {
 
     @PostMapping("/api/candidatures")

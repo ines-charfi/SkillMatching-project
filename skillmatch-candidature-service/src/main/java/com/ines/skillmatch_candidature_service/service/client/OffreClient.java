@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 // On change le name ici pour correspondre exactement au nom dans Consul
-@FeignClient(name = "skillmatch-offres-service")
+@FeignClient(name = "skillmatch-offres-service", fallback = OffreClientFallback.class)
 public interface OffreClient {
 
     @GetMapping("/api/offres/{id}")

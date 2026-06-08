@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.Map;
 
 
-@FeignClient(name = "skillmatch-entreprise-service")
+@FeignClient(name = "skillmatch-entreprise-service", fallback = EntrepriseClientFallback.class)
 public interface EntrepriseClient {
     @GetMapping("/api/entreprises/user/{userId}")
     Map<String, Object> getEntrepriseByUserId(@PathVariable("userId") Long userId);

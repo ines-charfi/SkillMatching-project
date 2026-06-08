@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Map;
 
 // CORRECTION : Changement de 'name' pour matcher Consul et suppression de l'URL en dur
-@FeignClient(name = "skillmatch-entreprise-service", configuration = FeignConfig.class)
+@FeignClient(name = "skillmatch-entreprise-service", configuration = FeignConfig.class, fallback = EntrepriseClientFallback.class)
 public interface EntrepriseClient {
 
     @GetMapping("/api/entreprises/user/{userId}")

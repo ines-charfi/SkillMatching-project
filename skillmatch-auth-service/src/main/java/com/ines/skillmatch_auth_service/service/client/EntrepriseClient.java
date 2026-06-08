@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Map;
 
-@FeignClient(name = "entreprise-service", url = "http://entreprise-service:8083")
+@FeignClient(name = "entreprise-service", url = "http://entreprise-service:8083", fallback = EntrepriseClientFallback.class)
 public interface EntrepriseClient {
     @PostMapping("/api/entreprises/init")
     void initEntreprise(@RequestParam("userId") Long userId,

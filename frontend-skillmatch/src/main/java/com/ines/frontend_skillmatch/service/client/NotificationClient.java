@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@FeignClient(name = "skillmatch-auth-service")
+@FeignClient(name = "skillmatch-auth-service", fallback = NotificationClientFallback.class)
 public interface NotificationClient {
 
     @PostMapping("/api/notifications")

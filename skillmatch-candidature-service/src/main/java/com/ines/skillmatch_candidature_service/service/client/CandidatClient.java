@@ -6,7 +6,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Map;
 
-@FeignClient(name = "skillmatch-candidat-service")
+// On lie l'interface à sa classe de secours en cas de panne
+@FeignClient(name = "skillmatch-candidat-service", fallback = CandidatClientFallback.class)
 public interface CandidatClient {
     @GetMapping("/api/candidats/user/{userId}")
     Map<String, Object> getProfil(@PathVariable("userId") Long userId);

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 // Ton annotation @FeignClient doit déjà être là, ne touche qu'aux méthodes en dessous :
-@FeignClient(name = "skillmatch-offre-service", url = "http://offre-service:8084") // ou ton URL actuelle
+@FeignClient(name = "skillmatch-offre-service", url = "http://offre-service:8084", fallback = OffreClientFallback.class) // ou ton URL actuelle
 public interface OffreClient {
 
     // Garde tes méthodes actuelles (comme countAllOffres()) et AJOUTE ces deux-là :

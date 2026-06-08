@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@FeignClient(name = "skillmatch-offres-service", configuration = FeignConfig.class)
+@FeignClient(name = "skillmatch-offres-service", configuration = FeignConfig.class, fallback = OffreClientFallback.class)
 public interface OffreClient {
 
     @GetMapping("/api/offres")

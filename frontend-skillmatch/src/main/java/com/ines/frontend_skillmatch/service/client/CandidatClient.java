@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Map;
 
-@FeignClient(name = "skillmatch-candidat-service", configuration = FeignConfig.class)
+@FeignClient(name = "skillmatch-candidat-service", configuration = FeignConfig.class, fallback = CandidatClientFallback.class)
 public interface CandidatClient {
 
     // Mise à jour du profil (multipart)

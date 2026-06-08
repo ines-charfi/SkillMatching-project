@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@FeignClient(name = "skillmatch-auth-service", url = "http://auth-service:8081")
+@FeignClient(name = "skillmatch-auth-service", url = "http://auth-service:8081", fallback = AuthClientFallback.class)
 public interface AuthClient {
 
     @PostMapping("/api/auth/login")
