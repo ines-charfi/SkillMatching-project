@@ -19,7 +19,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 // 1. Accueil, Ressources Statiques et Dépendances
-                                "/", "/home", "/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico",
+                                "/", "/home", "/css/**", "/js/**", "/img/**", "/webjars/**", "/favicon.ico",
                                 "/static/**", "/resources/**",
 
                                 // 2. Authentification et gestion des erreurs
