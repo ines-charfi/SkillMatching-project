@@ -4,120 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillMatch - Connexion</title>
+    <!-- Bootstrap + Icons + Google Fonts -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <style>
-        :root {
-            --primary: #4f46e5;
-            --primary-dark: #4338ca;
-            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        body {
-            background: var(--gradient);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            overflow: hidden;
-        }
-
-        /* Arrière-plan animé pour l'effet "PFE Wahou" */
-        .bg-circles {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            overflow: hidden; z-index: -1;
-        }
-        .circle {
-            position: absolute; background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%; animation: animate 25s linear infinite; bottom: -150px;
-        }
-        @keyframes animate {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 0; }
-            100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 50%; }
-        }
-
-        .login-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(15px);
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            width: 100%;
-            max-width: 450px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            transition: transform 0.3s ease;
-        }
-
-        .logo-icon {
-            width: 60px; height: 60px;
-            background: var(--gradient);
-            border-radius: 16px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 28px; color: white; margin: 0 auto 15px;
-        }
-
-        .role-selector {
-            background: #f1f5f9;
-            padding: 5px;
-            border-radius: 14px;
-            display: flex;
-            margin-bottom: 25px;
-        }
-
-        .role-btn {
-            flex: 1; border: none; padding: 10px; border-radius: 10px;
-            font-weight: 600; color: #64748b; background: transparent;
-            transition: 0.3s; font-size: 14px;
-        }
-
-        .role-btn.active {
-            background: white; color: var(--primary);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-control {
-            border-radius: 12px; padding: 12px 15px;
-            border: 2px solid #e2e8f0; background: #f8fafc;
-        }
-
-        .form-control:focus {
-            border-color: var(--primary); box-shadow: none; background: white;
-        }
-
-        .btn-login {
-            background: var(--gradient); border: none; border-radius: 12px;
-            padding: 14px; font-weight: 700; color: white;
-            transition: 0.3s; margin-top: 10px;
-        }
-
-        .btn-login:hover {
-            transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4);
-        }
-
-        /* Animation de chargement */
-        .loading .spinner-border { display: inline-block !important; }
-        .loading .btn-text { display: none; }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- CSS commun du site -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <!-- CSS spécifique à la page login -->
+    <link rel="stylesheet" th:href="@{/css/login.css}">
 </head>
 <body>
 
+<!-- Arrière‑plan animé (cercles) -->
 <div class="bg-circles">
     <div class="circle" style="width: 80px; height: 80px; left: 10%; animation-delay: 0s;"></div>
     <div class="circle" style="width: 120px; height: 120px; left: 70%; animation-delay: 3s;"></div>
     <div class="circle" style="width: 50px; height: 50px; left: 40%; animation-delay: 7s;"></div>
 </div>
 
+<!-- Barre de navigation simplifiée (logo + bouton Accueil) -->
+<nav class="login-navbar">
+    <div class="login-nav-container">
+        <a th:href="@{/}" class="login-logo">
+            <img th:src="@{/img/logo.png}" alt="SkillMatch Logo" class="login-logo-img">
+        </a>
+        <a th:href="@{/}" class="btn-home">
+            <i class="bi bi-house-door-fill"></i> Accueil
+        </a>
+    </div>
+</nav>
+
+<!-- Carte de connexion -->
 <div class="login-card">
     <div class="text-center mb-4">
         <div class="logo-icon"><i class="bi bi-lightning-charge-fill"></i></div>
-        <h2 class="fw-bold text-dark mb-1">SkillMatch</h2>
-        <p class="text-muted small">Connectez-vous à votre espace recrutement</p>
+        <h2 class="fw-bold text-dark mb-1">Bienvenue</h2>
+        <p class="text-muted small">Connectez-vous à votre espace</p>
     </div>
 
-    <!-- Alertes -->
+    <!-- Alertes (messages d'erreur, succès) -->
     <div th:if="${error}" class="alert alert-danger border-0 small mb-4" style="border-radius: 12px;">
         <i class="bi bi-exclamation-circle-fill me-2"></i> <span th:text="${error}"></span>
     </div>
@@ -188,7 +113,7 @@
         document.getElementById('roleInput').value = role;
         document.getElementById('btnCandidat').classList.toggle('active', role === 'CANDIDAT');
         document.getElementById('btnEntreprise').classList.toggle('active', role === 'ENTREPRISE');
-        document.getElementById('btnAdmin').classList.toggle('active', role === 'ADMIN'); // 💡 Ajouté !
+        document.getElementById('btnAdmin').classList.toggle('active', role === 'ADMIN');
     }
 
     function togglePassword() {
@@ -206,10 +131,7 @@
     function startLoading() {
         const btn = document.getElementById('submitBtn');
         btn.classList.add('loading');
-        // Laissez le bouton actif une fraction de seconde pour permettre au navigateur de soumettre la requête
-        setTimeout(() => {
-            btn.disabled = true;
-        }, 50);
+        setTimeout(() => { btn.disabled = true; }, 50);
     }
 </script>
 </body>

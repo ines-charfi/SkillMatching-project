@@ -6,80 +6,22 @@
     <title>SkillMatch - Administration</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <style>
-        :root {
-            --primary: #4f46e5; --primary-light: #eef2ff; --primary-dark: #4338ca;
-            --success: #10b981; --success-light: #d1fae5;
-            --warning: #f59e0b; --warning-light: #fef3c7;
-            --danger: #ef4444; --danger-light: #fef2f2;
-            --info: #3b82f6; --info-light: #dbeafe;
-            --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
-            --gray-500: #6b7280; --gray-700: #374151; --gray-900: #111827;
-            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1); --radius: 16px; --radius-sm: 10px; --radius-xs: 6px;
-        }
-        body { background: var(--gray-50); font-family: 'Segoe UI', sans-serif; color: var(--gray-700); display: flex; min-height: 100vh; margin: 0; }
-
-        /* Sidebar Layout */
-        .sidebar { width: 280px; background: var(--gray-900); color: white; padding: 24px 0; position: fixed; top: 0; left: 0; bottom: 0; z-index: 200; display: flex; flex-direction: column; }
-        .sidebar-brand { padding: 0 24px 24px; border-bottom: 1px solid var(--gray-700); margin-bottom: 16px; }
-        .sidebar-brand h1 { font-size: 22px; font-weight: 800; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .sidebar-nav { flex: 1; padding: 0 12px; }
-        .sidebar-section { color: var(--gray-500); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 16px 12px 8px; }
-        .sidebar-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #9ca3af; text-decoration: none; border-radius: var(--radius-sm); margin-bottom: 4px; font-size: 14px; }
-        .sidebar-link:hover { background: rgba(255,255,255,0.08); color: white; }
-        .sidebar-link.active { background: var(--primary); color: white; font-weight: 600; }
-
-        /* Zone Déconnexion */
-        .logout-box { padding: 16px; border-top: 1px solid var(--gray-700); }
-        .logout-btn { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 16px; color: #ef4444; background: transparent; border: none; text-align: left; border-radius: var(--radius-sm); font-size: 14px; cursor: pointer; transition: background 0.2s; }
-        .logout-btn:hover { background: rgba(239, 68, 68, 0.1); color: #f87171; }
-
-        /* Main Content */
-        .main-content { flex: 1; margin-left: 280px; padding: 30px; min-height: 100vh; }
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .page-title { font-size: 28px; font-weight: 800; color: var(--gray-900); }
-
-        /* Panneaux & Tableaux */
-        .panel { background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 24px; border: 1px solid var(--gray-100); }
-        .panel-header { padding: 20px 24px; border-bottom: 1px solid var(--gray-100); background: #fafafa; }
-        .panel-title { font-size: 18px; font-weight: 700; color: var(--gray-900); display: flex; align-items: center; gap: 10px; margin: 0; }
-        .panel-body { padding: 20px 24px; }
-
-        .table th { text-align: left; padding: 12px 16px; font-size: 11px; color: var(--gray-500); border-bottom: 2px solid var(--gray-100); text-transform: uppercase; letter-spacing: 0.5px; }
-        .table td { padding: 14px 16px; border-bottom: 1px solid var(--gray-100); font-size: 14px; vertical-align: middle; }
-
-        /* Badges & Boutons */
-        .badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
-        .badge-success { background: var(--success-light); color: var(--success); }
-        .badge-danger { background: var(--danger-light); color: var(--danger); }
-        .badge-info { background: var(--info-light); color: var(--info); }
-        .badge-warning { background: var(--warning-light); color: var(--warning); }
-
-        .btn-sm { padding: 6px 14px; border-radius: var(--radius-xs); font-size: 12px; font-weight: 600; border: none; cursor: pointer; }
-        .btn-toggle-block { background: var(--danger-light); color: var(--danger); }
-        .btn-toggle-block:hover { background: #fee2e2; }
-        .btn-toggle-activate { background: var(--success-light); color: var(--success); }
-        .btn-toggle-activate:hover { background: #bbf7d0; }
-
-        /* Stats Grid */
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: white; border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 16px; border: 1px solid var(--gray-100); }
-        .stat-icon-box { width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
-        .stat-icon-box.primary { background: var(--primary-light); color: var(--primary); }
-        .stat-icon-box.success { background: var(--success-light); color: var(--success); }
-        .stat-icon-box.info { background: var(--info-light); color: var(--info); }
-        .stat-icon-box.warning { background: var(--warning-light); color: var(--warning); }
-        .stat-value { font-size: 30px; font-weight: 800; color: var(--gray-900); }
-
-        .content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    </style>
+    <!-- CSS commun du site -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <!-- CSS spécifique admin (mobile‑first) -->
+    <link rel="stylesheet" th:href="@{/css/dashboard-admin.css}">
 </head>
 <body>
 
-<aside class="sidebar">
+<!-- Bouton burger pour ouvrir la sidebar sur mobile -->
+<button class="burger-btn" id="burgerBtn" aria-label="Menu">
+    <i class="bi bi-list"></i>
+</button>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
-        <h1><i class="bi bi-shield-lock-fill"></i> SkillMatch</h1>
+        <img th:src="@{/img/logo.png}" alt="SkillMatch Logo" class="sidebar-logo-img">
         <p class="text-muted small mb-0">Espace Administration</p>
     </div>
     <nav class="sidebar-nav">
@@ -102,7 +44,6 @@
             <i class="bi bi-shield-check"></i> <span>Vérifier fichiers</span>
         </a>
     </nav>
-
     <div class="logout-box">
         <a th:href="@{/logout}" class="logout-btn text-decoration-none d-flex align-items-center gap-2">
             <i class="bi bi-box-arrow-left"></i> <span>Déconnexion</span>
@@ -111,20 +52,16 @@
 </aside>
 
 <main class="main-content">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="page-title" th:text="${activeTab == 'dashboard' ? 'Tableau de bord' : (activeTab == 'candidats' ? 'Modération Candidats' : (activeTab == 'entreprises' ? 'Modération Entreprises' : (activeTab == 'offres' ? 'Gestion des Offres' : 'Validation des Pièces')))}">Page</h1>
-        </div>
-
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-4 gap-3">
+        <h1 class="page-title" th:text="${activeTab == 'dashboard' ? 'Tableau de bord' : (activeTab == 'candidats' ? 'Modération Candidats' : (activeTab == 'entreprises' ? 'Modération Entreprises' : (activeTab == 'offres' ? 'Gestion des Offres' : 'Validation des Pièces')))}">Page</h1>
         <div class="d-flex align-items-center gap-3">
             <div class="dropdown">
-                <button class="btn btn-white border position-relative shadow-sm" type="button" id="notifBell" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: var(--radius-sm);">
+                <button class="btn btn-white border position-relative shadow-sm" type="button" id="notifBell" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="bi bi-bell-fill text-dark fs-5"></i>
                     <span th:if="${notifCount != null and notifCount > 0}" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" th:text="${notifCount}">0</span>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-0" aria-labelledby="notifBell" style="width: 320px; max-height: 400px; overflow-y: auto; border-radius: var(--radius-sm);">
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-0" style="width: 320px; max-height: 400px; overflow-y: auto;">
                     <li class="bg-light p-3 border-bottom"><h6 class="mb-0 fw-bold"><i class="bi bi-lightning-fill text-warning me-2"></i>Notifications d'Administration</h6></li>
-
                     <th:block th:each="n : ${notifications}">
                         <li class="p-3 border-bottom">
                             <div class="d-flex flex-column">
@@ -133,13 +70,12 @@
                             </div>
                         </li>
                     </th:block>
-
                     <li th:if="${notifications == null or notifications.isEmpty()}" class="text-center p-4 text-muted small">
                         <i class="bi bi-bell-slash d-block fs-4 mb-2"></i> Aucune notification récente
                     </li>
                 </ul>
             </div>
-            <span class="badge bg-dark text-white p-2 fs-7" id="currentDateTime"></span>
+            <span class="badge bg-dark text-white p-2" id="currentDateTime"></span>
         </div>
     </div>
 
@@ -148,6 +84,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 
+    <!-- ========== DASHBOARD ========== -->
     <div th:if="${activeTab == 'dashboard'}">
         <div class="stats-grid">
             <div class="stat-card">
@@ -171,101 +108,113 @@
         <div class="panel">
             <div class="panel-header"><h3 class="panel-title"><i class="bi bi-list-stars"></i> Liste Globale de Modération Rapide</h3></div>
             <div class="panel-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead><tr><th>Adresse Email</th><th>Rôle Compte</th><th>État Actuel</th><th>Action Modérateur</th></tr></thead>
+                        <tbody>
+                        <tr th:each="u : ${users}">
+                            <td class="fw-semibold" th:text="${u['email']}">Email</td>
+                            <td><span class="badge badge-info" th:text="${u['role']}">Role</span></td>
+                            <td>
+                                <span th:if="${u['enabled']}" class="badge badge-success">Actif</span>
+                                <span th:if="${!u['enabled']}" class="badge badge-danger">Bloqué</span>
+                            </td>
+                            <td>
+                                <form th:action="@{/admin/users/toggle}" method="POST">
+                                    <input type="hidden" name="id" th:value="${u['id']}">
+                                    <input type="hidden" name="fromTab" value="dashboard">
+                                    <button type="submit" class="btn-sm" th:classappend="${u['enabled'] ? 'btn-toggle-block' : 'btn-toggle-activate'}" th:text="${u['enabled'] ? 'Bloquer' : 'Activer'}"></button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== CANDIDATS ========== -->
+    <div th:if="${activeTab == 'candidats'}">
+        <div class="panel"><div class="panel-body p-0">
+            <div class="table-responsive">
                 <table class="table table-hover mb-0">
-                    <thead><tr><th>Adresse Email</th><th>Rôle Compte</th><th>État Actuel</th><th>Action Modérateur</th></tr></thead>
+                    <thead><tr><th>Identifiant Email</th><th>Statut de Connexion</th><th>Changer l'état</th></tr></thead>
                     <tbody>
                     <tr th:each="u : ${users}">
-                        <td class="fw-semibold" th:text="${u['email']}">Email</td>
-                        <td><span class="badge badge-info" th:text="${u['role']}">Role</span></td>
+                        <td class="fw-bold" th:text="${u['email']}">Email</td>
                         <td>
-                            <span th:if="${u['enabled']}" class="badge badge-success">Actif</span>
-                            <span th:if="${!u['enabled']}" class="badge badge-danger">Bloqué</span>
+                            <span th:if="${u['enabled']}" class="badge badge-success"><i class="bi bi-check-circle-fill"></i> Compte Actif</span>
+                            <span th:if="${!u['enabled']}" class="badge badge-danger"><i class="bi bi-x-circle-fill"></i> Profil Bloqué</span>
                         </td>
                         <td>
                             <form th:action="@{/admin/users/toggle}" method="POST">
                                 <input type="hidden" name="id" th:value="${u['id']}">
-                                <input type="hidden" name="fromTab" value="dashboard">
-                                <button type="submit" class="btn-sm" th:classappend="${u['enabled'] ? 'btn-toggle-block' : 'btn-toggle-activate'}" th:text="${u['enabled'] ? 'Bloquer' : 'Activer'}"></button>
+                                <input type="hidden" name="fromTab" value="candidats">
+                                <button type="submit" class="btn-sm" th:classappend="${u['enabled'] ? 'btn-toggle-block' : 'btn-toggle-activate'}" th:text="${u['enabled'] ? 'Bloquer le Profil' : 'Activer le Profil'}"></button>
                             </form>
                         </td>
                     </tr>
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
-
-    <div th:if="${activeTab == 'candidats'}">
-        <div class="panel"><div class="panel-body p-0">
-            <table class="table table-hover mb-0">
-                <thead><tr><th>Identifiant Email</th><th>Statut de Connexion</th><th>Changer l'état</th></tr></thead>
-                <tbody>
-                <tr th:each="u : ${users}">
-                    <td class="fw-bold" th:text="${u['email']}">Email</td>
-                    <td>
-                        <span th:if="${u['enabled']}" class="badge badge-success"><i class="bi bi-check-circle-fill"></i> Compte Actif</span>
-                        <span th:if="${!u['enabled']}" class="badge badge-danger"><i class="bi bi-x-circle-fill"></i> Profil Bloqué</span>
-                    </td>
-                    <td>
-                        <form th:action="@{/admin/users/toggle}" method="POST">
-                            <input type="hidden" name="id" th:value="${u['id']}">
-                            <input type="hidden" name="fromTab" value="candidats">
-                            <button type="submit" class="btn-sm" th:classappend="${u['enabled'] ? 'btn-toggle-block' : 'btn-toggle-activate'}" th:text="${u['enabled'] ? 'Bloquer le Profil' : 'Activer le Profil'}"></button>
-                        </form>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
         </div></div>
     </div>
 
+    <!-- ========== ENTREPRISES ========== -->
     <div th:if="${activeTab == 'entreprises'}">
         <div class="panel"><div class="panel-body p-0">
-            <table class="table table-hover mb-0">
-                <thead><tr><th>Compte Recruteur</th><th>Autorisation de publication</th><th>Changer l'état</th></tr></thead>
-                <tbody>
-                <tr th:each="u : ${users}">
-                    <td class="fw-bold" th:text="${u['email']}">Email</td>
-                    <td>
-                        <span th:if="${u['enabled']}" class="badge badge-success">Autorisé</span>
-                        <span th:if="${!u['enabled']}" class="badge badge-danger">Suspendu</span>
-                    </td>
-                    <td>
-                        <form th:action="@{/admin/users/toggle}" method="POST">
-                            <input type="hidden" name="id" th:value="${u['id']}">
-                            <input type="hidden" name="fromTab" value="entreprises">
-                            <button type="submit" class="btn-sm" th:classappend="${u['enabled'] ? 'btn-toggle-block' : 'btn-toggle-activate'}" th:text="${u['enabled'] ? 'Suspendre la Structure' : 'Réactiver la Structure'}"></button>
-                        </form>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead><tr><th>Compte Recruteur</th><th>Autorisation de publication</th><th>Changer l'état</th></tr></thead>
+                    <tbody>
+                    <tr th:each="u : ${users}">
+                        <td class="fw-bold" th:text="${u['email']}">Email</td>
+                        <td>
+                            <span th:if="${u['enabled']}" class="badge badge-success">Autorisé</span>
+                            <span th:if="${!u['enabled']}" class="badge badge-danger">Suspendu</span>
+                        </td>
+                        <td>
+                            <form th:action="@{/admin/users/toggle}" method="POST">
+                                <input type="hidden" name="id" th:value="${u['id']}">
+                                <input type="hidden" name="fromTab" value="entreprises">
+                                <button type="submit" class="btn-sm" th:classappend="${u['enabled'] ? 'btn-toggle-block' : 'btn-toggle-activate'}" th:text="${u['enabled'] ? 'Suspendre la Structure' : 'Réactiver la Structure'}"></button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div></div>
     </div>
 
+    <!-- ========== OFFRES ========== -->
     <div th:if="${activeTab == 'offres'}">
         <div class="panel"><div class="panel-body p-0">
-            <table class="table table-hover mb-0">
-                <thead><tr><th>Intitulé du Poste</th><th>ID Entreprise Dépositaire</th><th>Action Immédiate</th></tr></thead>
-                <tbody>
-                <tr th:each="o : ${offres}">
-                    <td class="fw-bold text-primary" th:text="${o['titre']}">Poste</td>
-                    <td class="font-monospace" th:text="${o['entrepriseId']}">ID</td>
-                    <td>
-                        <form th:action="@{/admin/offres/supprimer}" method="POST" onsubmit="return confirm('Voulez-vous vraiment supprimer définitivement cette offre ?');">
-                            <input type="hidden" name="id" th:value="${o['id']}">
-                            <button type="submit" class="btn-sm btn-danger text-white"><i class="bi bi-trash3"></i> Supprimer l'annonce</button>
-                        </form>
-$                    </td>
-                </tr>
-                <tr th:if="${offres == null or offres.isEmpty()}">
-                    <td colspan="3" class="text-center text-muted p-4">Aucune offre d'emploi n'est actuellement en ligne sur la plateforme.</td>
-                </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead><tr><th>Intitulé du Poste</th><th>ID Entreprise Dépositaire</th><th>Action Immédiate</th></tr></thead>
+                    <tbody>
+                    <tr th:each="o : ${offres}">
+                        <td class="fw-bold text-primary" th:text="${o['titre']}">Poste</td>
+                        <td class="font-monospace" th:text="${o['entrepriseId']}">ID</td>
+                        <td>
+                            <form th:action="@{/admin/offres/supprimer}" method="POST" onsubmit="return confirm('Voulez-vous vraiment supprimer définitivement cette offre ?');">
+                                <input type="hidden" name="id" th:value="${o['id']}">
+                                <button type="submit" class="btn-sm btn-danger text-white"><i class="bi bi-trash3"></i> Supprimer l'annonce</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${offres == null or offres.isEmpty()}">
+                        <td colspan="3" class="text-center text-muted p-4">Aucune offre d'emploi n'est actuellement en ligne sur la plateforme.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div></div>
     </div>
 
+    <!-- ========== VÉRIFICATION (IA) ========== -->
     <div th:if="${activeTab == 'verification'}">
         <div th:if="${resultatIa}" class="card border-primary mb-4 shadow-sm" style="border-radius: var(--radius)">
             <div class="card-header bg-primary text-white d-flex align-items-center gap-2" style="border-radius: 14px 14px 0 0">
@@ -284,56 +233,67 @@ $                    </td>
         </div>
 
         <div class="panel"><div class="panel-body p-0">
-            <table class="table table-hover mb-0">
-                <thead><tr><th>Propriétaire</th><th>Nature</th><th>Fichier Source (Télécharger)</th><th>Analyse Automatique</th><th>Arbitrage Humain</th></tr></thead>
-                <tbody>
-                <tr th:each="f : ${fichiers}">
-                    <td class="fw-bold" th:text="${f['proprietaire']}">Nom</td>
-                    <td>
-                        <span class="badge" th:classappend="${f['type'] == 'CV' ? 'badge-warning' : 'badge-info'}" th:text="${f['type']}">CV</span>
-                    </td>
-                    <td>
-                        <a th:if="${f['type'] == 'CV'}" th:href="@{/admin/fichiers/download-cv(id=${f['id']})}" class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold">
-                            <i class="bi bi-download me-1 text-primary"></i> <span th:text="${f['nom']}"></span>
-                        </a>
-                        <a th:if="${f['type'] == 'LOGO'}" th:href="@{/admin/fichiers/download-logo(id=${f['id']})}" class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold text-success">
-                            <i class="bi bi-download me-1"></i> <span th:text="${f['nom']}"></span>
-                        </a>
-                    </td>
-                    <td>
-                        <form th:action="@{/admin/fichiers/analyser}" method="POST">
-                            <input type="hidden" name="type" th:value="${f['type']}">
-                            <button type="submit" class="btn-sm btn-primary text-white"><i class="bi bi-play-circle-fill"></i> Analyser avec l'IA</button>
-                        </form>
-                    </td>
-                    <td>
-                        <div class="d-flex gap-2">
-                            <a th:href="@{/admin/arbitrage(id=${f['id']}, statut='VALIDE', typeFichier=${f['nature'] != null ? f['nature'] : (f['type'] != null ? f['type'] : 'CV')}, userId=${f['userId'] != null ? f['userId'] : f['id']})}"
-                               class="btn btn-sm btn-success text-white px-3">
-                                Valider
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead><tr><th>Propriétaire</th><th>Nature</th><th>Fichier Source (Télécharger)</th><th>Analyse Automatique</th><th>Arbitrage Humain</th></tr></thead>
+                    <tbody>
+                    <tr th:each="f : ${fichiers}">
+                        <td class="fw-bold" th:text="${f['proprietaire']}">Nom</td>
+                        <td><span class="badge" th:classappend="${f['type'] == 'CV' ? 'badge-warning' : 'badge-info'}" th:text="${f['type']}">CV</span></td>
+                        <td>
+                            <a th:if="${f['type'] == 'CV'}" th:href="@{/admin/fichiers/download-cv(id=${f['id']})}" class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold">
+                                <i class="bi bi-download me-1 text-primary"></i> <span th:text="${f['nom']}"></span>
                             </a>
-
-                            <a th:href="@{/admin/arbitrage(id=${f['id']}, statut='REJETE', typeFichier=${f['nature'] != null ? f['nature'] : (f['type'] != null ? f['type'] : 'CV')}, userId=${f['userId'] != null ? f['userId'] : f['id']})}"
-                               class="btn btn-sm btn-danger text-white px-3">
-                                Rejeter
+                            <a th:if="${f['type'] == 'LOGO'}" th:href="@{/admin/fichiers/download-logo(id=${f['id']})}" class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold text-success">
+                                <i class="bi bi-download me-1"></i> <span th:text="${f['nom']}"></span>
                             </a>
-                        </div>
-                    </td>
-                </tr>
-                <tr th:if="${fichiers == null or fichiers.isEmpty()}">
-                    <td colspan="5" class="text-center text-muted p-4">Aucune pièce justificative en attente de traitement.</td>
-                </tr>
-                </tbody>
-            </table>
+                        </td>
+                        <td>
+                            <form th:action="@{/admin/fichiers/analyser}" method="POST">
+                                <input type="hidden" name="type" th:value="${f['type']}">
+                                <button type="submit" class="btn-sm btn-primary text-white"><i class="bi bi-play-circle-fill"></i> Analyser avec l'IA</button>
+                            </form>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a th:href="@{/admin/arbitrage(id=${f['id']}, statut='VALIDE', typeFichier=${f['nature'] != null ? f['nature'] : (f['type'] != null ? f['type'] : 'CV')}, userId=${f['userId'] != null ? f['userId'] : f['id']})}"
+                                   class="btn btn-sm btn-success text-white px-3">Valider</a>
+                                <a th:href="@{/admin/arbitrage(id=${f['id']}, statut='REJETE', typeFichier=${f['nature'] != null ? f['nature'] : (f['type'] != null ? f['type'] : 'CV')}, userId=${f['userId'] != null ? f['userId'] : f['id']})}"
+                                   class="btn btn-sm btn-danger text-white px-3">Rejeter</a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${fichiers == null or fichiers.isEmpty()}">
+                        <td colspan="5" class="text-center text-muted p-4">Aucune pièce justificative en attente de traitement.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div></div>
     </div>
 </main>
 
+<div th:replace="~{fragments/footer :: footer}"></div>
+
 <script>
+    // Menu burger pour mobile
+    const burger = document.getElementById('burgerBtn');
+    const sidebar = document.getElementById('sidebar');
+    if (burger && sidebar) {
+        burger.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth < 768 && !sidebar.contains(e.target) && !burger.contains(e.target)) {
+                sidebar.classList.remove('open');
+            }
+        });
+    }
+
     const dateTimeElement = document.getElementById('currentDateTime');
     if (dateTimeElement) {
         dateTimeElement.textContent = new Date().toLocaleString('fr-FR', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit'
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
         });
     }
 </script>

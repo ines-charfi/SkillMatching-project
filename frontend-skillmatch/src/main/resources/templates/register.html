@@ -6,26 +6,36 @@
     <title>SkillMatch - Inscription</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
-    <style>
-        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; font-family: 'Segoe UI', sans-serif; }
-        .register-card { background: white; border-radius: 20px; padding: 40px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); max-width: 550px; width: 100%; }
-        .role-card { border: 2px solid #f1f5f9; border-radius: 15px; padding: 20px; cursor: pointer; transition: 0.3s; }
-        .role-card:hover { border-color: #667eea; transform: translateY(-3px); }
-        .role-card.selected { border-color: #4f46e5; background: #eef2ff; }
-        .form-control { border-radius: 10px; padding: 12px; border: 2px solid #f1f5f9; }
-        .btn-register { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 10px; padding: 12px; font-weight: 700; color: white; transition: 0.3s; }
-        .btn-register:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(118, 75, 162, 0.4); }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- CSS commun du site -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <!-- CSS spécifique à la page register -->
+    <link rel="stylesheet" th:href="@{/css/register.css}">
 </head>
 <body>
-<div class="container">
+
+<!-- Barre de navigation simplifiée -->
+<nav class="register-navbar">
+    <div class="register-nav-container">
+        <a th:href="@{/}" class="register-logo">
+            <img th:src="@{/img/logo.png}" alt="SkillMatch Logo" class="register-logo-img">
+            <span class="register-logo-text">SkillMatch</span>
+        </a>
+        <a th:href="@{/}" class="btn-home">
+            <i class="bi bi-house-door-fill"></i> Accueil
+        </a>
+    </div>
+</nav>
+
+<!-- Carte d'inscription -->
+<div class="container register-wrapper">
     <div class="register-card mx-auto">
         <h2 class="text-center fw-bold mb-4" style="color: #1e1b4b;">📝 Créer un compte</h2>
 
-        <!-- MESSAGE D'ERREUR -->
+        <!-- Message d'erreur -->
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-        <!-- FORMULAIRE REDIRIGÉ VERS JAVA -->
+        <!-- Formulaire -->
         <form th:action="@{/register}" method="post">
 
             <!-- Sélection du rôle -->
@@ -47,21 +57,20 @@
                         </div>
                     </div>
                 </div>
-                <!-- Champ caché pour envoyer le rôle au contrôleur -->
                 <input type="hidden" name="role" id="selectedRole" value="CANDIDAT">
             </div>
 
+            <!-- Email et mot de passe -->
             <div class="mb-3">
                 <label class="form-label fw-bold small">Email</label>
                 <input type="email" class="form-control" name="email" placeholder="vous@exemple.com" required>
             </div>
-
             <div class="mb-3">
                 <label class="form-label fw-bold small">Mot de passe</label>
                 <input type="password" class="form-control" name="password" placeholder="Min. 6 caractères" minlength="6" required>
             </div>
 
-            <!-- Champs dynamiques selon le rôle -->
+            <!-- Champs spécifiques au candidat -->
             <div id="candidatFields">
                 <div class="row">
                     <div class="col-6 mb-3">
@@ -75,6 +84,7 @@
                 </div>
             </div>
 
+            <!-- Champs spécifiques à l'entreprise -->
             <div id="entrepriseFields" style="display: none;">
                 <div class="mb-3">
                     <label class="form-label fw-bold small">Nom de l'entreprise</label>
@@ -87,6 +97,7 @@
             </button>
         </form>
 
+        <!-- Connexion via OAuth -->
         <div class="text-center mt-4">
             <p class="small text-muted">Ou inscrivez-vous avec :</p>
             <div class="d-flex justify-content-center gap-2">
@@ -99,6 +110,7 @@
             </div>
         </div>
 
+        <!-- Lien vers connexion -->
         <p class="text-center mt-4 mb-0 small">
             Déjà inscrit ? <a th:href="@{/login}" class="fw-bold text-primary text-decoration-none">Se connecter</a>
         </p>
@@ -109,7 +121,6 @@
     function selectRole(role) {
         document.getElementById('selectedRole').value = role;
 
-        // Mise à jour visuelle des cartes
         const cardC = document.getElementById('cardCandidat');
         const cardE = document.getElementById('cardEntreprise');
 
@@ -118,7 +129,6 @@
             cardE.classList.remove('selected');
             document.getElementById('candidatFields').style.display = 'block';
             document.getElementById('entrepriseFields').style.display = 'none';
-            // On rend les champs obligatoires selon le rôle
             document.getElementById('inputPrenom').required = true;
             document.getElementById('inputNom').required = true;
             document.getElementById('inputEntreprise').required = false;
@@ -132,7 +142,6 @@
             document.getElementById('inputEntreprise').required = true;
         }
     }
-    // Initialisation
     window.onload = () => selectRole('CANDIDAT');
 </script>
 </body>

@@ -1,0 +1,272 @@
+/* ============================================ */
+/* PAGE OFFRE – MOBILE-FIRST                    */
+/* ============================================ */
+
+:root {
+    --primary: #4f46e5;
+    --primary-light: #eef2ff;
+    --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --success: #10b981;
+    --success-light: #d1fae5;
+    --gray-50: #f9fafb;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --radius: 16px;
+    --radius-sm: 10px;
+}
+
+/* ========== BASE (MOBILE) ========== */
+body {
+    background: var(--gray-50);
+    font-family: 'Segoe UI', sans-serif;
+    color: var(--gray-700);
+    margin: 0;
+    padding-top: 70px;
+}
+
+.container {
+    max-width: 100%;
+    margin: 16px auto;
+    padding: 0 16px;
+}
+
+.page-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--gray-800);
+    margin-bottom: 16px;
+}
+
+/* Barre de recherche (mobile) */
+.search-bar {
+    background: white;
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid #e5e7eb;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    box-sizing: border-box;
+}
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+/* Cartes d'offres (mobile) */
+.offre-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: all 0.3s;
+    border: 2px solid transparent;
+    margin-bottom: 16px;
+}
+.offre-card:hover {
+    border-color: var(--primary-light);
+    transform: translateY(-2px);
+}
+
+/* Header de la carte : titre et salaire */
+.offre-header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+.offre-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+}
+.offre-company {
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 13px;
+    margin: 0;
+}
+.offre-salaire {
+    align-self: flex-start;
+    padding: 4px 10px;
+    background: var(--success-light);
+    color: var(--success);
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+.offre-description {
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 12px 0;
+    color: var(--gray-700);
+}
+
+.offre-skills {
+    margin: 12px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.skill-tag {
+    padding: 4px 10px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.offre-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.btn-postuler {
+    padding: 10px 16px;
+    background: var(--gradient);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+    font-size: 14px;
+    width: 100%;
+}
+.btn-postuler:disabled {
+    background: #d1fae5;
+    color: #059669;
+    cursor: default;
+}
+
+.notification {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    left: 16px;
+    padding: 12px 20px;
+    background: #10b981;
+    color: white;
+    border-radius: 10px;
+    font-weight: 600;
+    z-index: 2000;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    display: none;
+    text-align: center;
+    font-size: 14px;
+}
+
+/* ========== TABLETTE (≥ 576px) ========== */
+@media (min-width: 576px) {
+    .container {
+        max-width: 540px;
+        margin: 24px auto;
+        padding: 0 20px;
+    }
+    .page-title {
+        font-size: 26px;
+    }
+    .search-bar {
+        flex-direction: row;
+        padding: 20px;
+    }
+    .search-input {
+        width: auto;
+        flex: 1;
+        padding: 12px 16px;
+    }
+    .offre-card {
+        padding: 20px;
+    }
+    .offre-header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    .offre-salaire {
+        align-self: auto;
+    }
+    .offre-title {
+        font-size: 20px;
+    }
+    .offre-description {
+        font-size: 14px;
+    }
+    .skill-tag {
+        font-size: 11px;
+    }
+    .offre-footer {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .btn-postuler {
+        width: auto;
+        padding: 10px 20px;
+    }
+    .notification {
+        left: auto;
+        right: 20px;
+        top: 20px;
+        min-width: 300px;
+        text-align: left;
+    }
+}
+
+/* ========== PETIT DESKTOP (≥ 768px) ========== */
+@media (min-width: 768px) {
+    .container {
+        max-width: 720px;
+    }
+    .page-title {
+        font-size: 28px;
+    }
+    .offre-card {
+        padding: 24px;
+    }
+    .offre-title {
+        font-size: 22px;
+    }
+    .offre-company {
+        font-size: 14px;
+    }
+    .offre-salaire {
+        font-size: 13px;
+        padding: 6px 14px;
+    }
+    .skill-tag {
+        font-size: 12px;
+        padding: 4px 12px;
+    }
+    .btn-postuler {
+        font-size: 15px;
+        padding: 10px 24px;
+    }
+}
+
+/* ========== DESKTOP (≥ 1024px) ========== */
+@media (min-width: 1024px) {
+    .container {
+        max-width: 1000px;
+    }
+    .offre-card {
+        padding: 24px;
+    }
+    .offre-title {
+        font-size: 24px;
+    }
+}

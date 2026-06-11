@@ -1,0 +1,124 @@
+/* ============================================ */
+/* MES CANDIDATURES - MOBILE-FIRST              */
+/* ============================================ */
+
+/* ========== MOBILE (défaut) ========== */
+body {
+    background: #f8fafc;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Cartes de candidature (mobile) */
+.cand-card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    margin: 0 16px 16px 16px;   /* marges latérales sur mobile */
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.cand-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
+}
+
+/* Badge de statut (mobile) */
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 11px;
+    display: inline-block;
+}
+
+/* Espacement sous le header (mobile) */
+.container.py-5 {
+    margin-top: 70px;
+    padding: 0 16px;
+}
+
+/* Ajustement du titre et du texte dans les cartes (mobile) */
+.cand-card h4 {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+}
+.cand-card p {
+    font-size: 0.85rem;
+}
+.cand-card .h5 {
+    font-size: 1.1rem;
+}
+.cand-card .small {
+    font-size: 0.7rem;
+}
+
+/* ========== TABLETTE (≥ 576px) ========== */
+@media (min-width: 576px) {
+    .cand-card {
+        padding: 20px;
+        margin: 0 auto 20px auto;
+        max-width: 540px;
+    }
+    .status-badge {
+        padding: 6px 15px;
+        font-size: 12px;
+    }
+    .container.py-5 {
+        margin-top: 80px;
+        padding: 0 24px;
+    }
+    .cand-card h4 {
+        font-size: 1.3rem;
+    }
+    .cand-card p {
+        font-size: 0.9rem;
+    }
+    .cand-card .h5 {
+        font-size: 1.2rem;
+    }
+}
+
+/* ========== PETIT DESKTOP (≥ 768px) ========== */
+@media (min-width: 768px) {
+    .cand-card {
+        max-width: 720px;
+        padding: 24px;
+    }
+    .container.py-5 {
+        margin-top: 90px;
+        max-width: 720px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .cand-card h4 {
+        font-size: 1.4rem;
+    }
+    .cand-card p {
+        font-size: 0.95rem;
+    }
+}
+
+/* ========== DESKTOP (≥ 1024px) ========== */
+@media (min-width: 1024px) {
+    .cand-card {
+        max-width: 850px;
+        padding: 25px;
+    }
+    .container.py-5 {
+        margin-top: 100px;
+        max-width: 850px;
+    }
+    .cand-card h4 {
+        font-size: 1.5rem;
+    }
+    .cand-card .h5 {
+        font-size: 1.3rem;
+    }
+    .status-badge {
+        font-size: 13px;
+        padding: 6px 18px;
+    }
+}

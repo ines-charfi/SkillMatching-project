@@ -1,0 +1,114 @@
+/* ============================================ */
+/* PAGE CONSULTATION PROFIL CANDIDAT (ENTREPRISE) */
+/* ============================================ */
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.main-content {
+    flex: 1;
+}
+
+/* Couleur violet SkillMatch */
+.bg-skillmatch {
+    background-color: #2b247c !important;
+}
+
+.btn-pill {
+    border-radius: 50px;
+}
+
+.card-custom {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+}
+
+.info-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.info-value {
+    font-size: 1.05rem;
+    color: #2d3748;
+    font-weight: 500;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #edf2f7;
+}
+
+/* Suppression de la bordure sous la section compétences */
+.info-value.border-0 {
+    border-bottom: none;
+}
+
+/* Responsive */
+/* ========== MOBILE FIRST (≤ 767px) ========== */
+.navbar-custom {
+    padding: 10px 16px;           /* plus petit sur mobile */
+}
+.stat-card {
+    padding: 16px;                /* réduire les marges internes */
+}
+.table-container {
+    padding: 16px;
+    overflow-x: auto;             /* permet le scroll horizontal des tableaux */
+}
+.btn-pill {
+    padding: 8px 18px;
+    font-size: 13px;
+}
+/* Les grilles passent en 1 colonne par défaut */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+/* ========== TABLETTE (≥ 768px) ========== */
+@media (min-width: 768px) {
+    .navbar-custom {
+        padding: 15px 30px;
+    }
+    .stat-card {
+        padding: 24px;
+    }
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    .table-container {
+        padding: 24px;
+    }
+    .btn-pill {
+        padding: 10px 24px;
+        font-size: 14px;
+    }
+}
+
+/* ========== DESKTOP (≥ 1024px) ========== */
+@media (min-width: 1024px) {
+    .navbar-custom {
+        padding: 15px 40px;
+    }
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    .table-container {
+        padding: 30px;
+    }
+    .btn-pill {
+        padding: 12px 32px;
+        font-size: 15px;
+    }
+}

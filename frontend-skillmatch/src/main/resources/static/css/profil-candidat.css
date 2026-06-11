@@ -1,0 +1,93 @@
+/* ============================================ */
+/* PAGE MODIFICATION PROFIL CANDIDAT - MOBILE-FIRST */
+/* ============================================ */
+
+body {
+    background-color: #f8fafc;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* ========== CARTE DU FORMULAIRE ========== */
+.profile-card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    background: white;
+    margin: 20px 16px;
+    padding: 20px;
+    transition: 0.3s;
+}
+
+/* ========== CHAMPS DE FORMULAIRE ========== */
+.form-control, .form-select {
+    border: 2px solid #f1f5f9;
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 10px 14px;
+    transition: 0.2s;
+    width: 100%;
+    font-size: 14px;
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary, #4f46e5);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+    outline: none;
+}
+
+/* ========== BOUTONS ========== */
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 50px;
+    transition: all 0.3s;
+}
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(79,70,229,0.25);
+}
+.btn-light {
+    border-radius: 50px;
+    font-weight: 600;
+    padding: 10px 20px;
+}
+
+/* ========== SÉPARATION ET ESPACES ========== */
+.form-label {
+    font-weight: 600;
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+    color: #475569;
+}
+.bg-light {
+    background-color: #f8fafc !important;
+}
+.border {
+    border-color: #e2e8f0 !important;
+}
+
+/* ========== RESPONSIVE (tablette) ========== */
+@media (min-width: 576px) {
+    .profile-card {
+        margin: 30px auto;
+        padding: 28px;
+        max-width: 540px;
+    }
+}
+@media (min-width: 768px) {
+    .profile-card {
+        max-width: 720px;
+        padding: 32px;
+    }
+}
+@media (min-width: 1024px) {
+    .profile-card {
+        max-width: 850px;
+        padding: 40px;
+    }
+}

@@ -1,0 +1,254 @@
+/* ============================================ */
+/* PAGE REGISTER – MOBILE-FIRST                 */
+/* ============================================ */
+
+:root {
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+body {
+    background: var(--gradient);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* ========== BARRE DE NAVIGATION (MOBILE) ========== */
+.register-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1100;
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+.register-nav-container {
+    max-width: 1300px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.register-logo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+}
+.register-logo-img {
+    height: 32px;
+    width: auto;
+}
+.register-logo-text {
+    display: none; /* caché sur mobile */
+}
+.btn-home {
+    background: white;
+    color: var(--primary);
+    padding: 6px 12px;
+    border-radius: 40px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.8rem;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.btn-home span {
+    display: none; /* cacher le texte sur mobile, ne garder que l'icône */
+}
+.btn-home i {
+    font-size: 1.2rem;
+}
+.btn-home:hover {
+    background: #f0f0f0;
+    transform: translateY(-2px);
+}
+
+/* ========== CONTENEUR PRINCIPAL (MOBILE) ========== */
+.register-wrapper {
+    margin-top: 70px;  /* laisser de la place sous la navbar fixe */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 70px);
+    padding: 0 16px;
+    width: 100%;
+}
+
+/* ========== CARTE D'INSCRIPTION (MOBILE) ========== */
+.register-card {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    width: 100%;
+    max-width: 100%;
+}
+
+/* ========== SÉLECTEUR DE RÔLE (MOBILE) ========== */
+.role-card {
+    border: 2px solid #f1f5f9;
+    border-radius: 15px;
+    padding: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: center;
+}
+.role-card:hover {
+    border-color: #667eea;
+    transform: translateY(-3px);
+}
+.role-card.selected {
+    border-color: var(--primary);
+    background: #eef2ff;
+}
+.role-card i {
+    font-size: 1.8rem;
+}
+.role-card h6 {
+    font-size: 0.9rem;
+}
+.role-card p {
+    font-size: 0.7rem;
+}
+
+/* ========== CHAMPS DE FORMULAIRE (MOBILE) ========== */
+.form-control {
+    border-radius: 10px;
+    padding: 10px 12px;
+    border: 2px solid #f1f5f9;
+    font-size: 14px;
+}
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: none;
+}
+
+/* ========== BOUTON D'INSCRIPTION (MOBILE) ========== */
+.btn-register {
+    background: var(--gradient);
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    font-weight: 700;
+    color: white;
+    transition: 0.3s;
+    font-size: 14px;
+}
+.btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(118, 75, 162, 0.4);
+}
+
+/* ========== TABLETTE (≥ 576px) ========== */
+@media (min-width: 576px) {
+    .register-navbar {
+        padding: 12px 24px;
+    }
+    .register-logo {
+        gap: 10px;
+        font-size: 1.1rem;
+    }
+    .register-logo-img {
+        height: 36px;
+    }
+    .btn-home {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+    .btn-home span {
+        display: inline; /* réafficher le texte */
+    }
+    .btn-home i {
+        font-size: 1rem;
+    }
+    .register-wrapper {
+        margin-top: 80px;
+        min-height: calc(100vh - 80px);
+        padding: 0 24px;
+    }
+    .register-card {
+        padding: 32px;
+        max-width: 500px;
+    }
+    .role-card {
+        padding: 16px;
+    }
+    .role-card i {
+        font-size: 2rem;
+    }
+    .role-card h6 {
+        font-size: 1rem;
+    }
+    .role-card p {
+        font-size: 0.75rem;
+    }
+    .form-control {
+        padding: 12px;
+        font-size: 15px;
+    }
+    .btn-register {
+        padding: 12px;
+        font-size: 15px;
+    }
+}
+
+/* ========== PETIT DESKTOP / GRANDE TABLETTE (≥ 768px) ========== */
+@media (min-width: 768px) {
+    .register-navbar {
+        padding: 15px 30px;
+    }
+    .register-logo {
+        font-size: 1.2rem;
+    }
+    .register-logo-img {
+        height: 40px;
+    }
+    .register-logo-text {
+        display: inline-block; /* afficher le texte SkillMatch */
+        background: rgba(255,255,255,0.2);
+        padding: 4px 12px;
+        border-radius: 30px;
+        font-size: 0.9rem;
+    }
+    .btn-home {
+        padding: 8px 18px;
+        font-size: 0.9rem;
+    }
+    .register-card {
+        padding: 40px;
+        max-width: 550px;
+    }
+}
+
+/* ========== DESKTOP (≥ 1024px) ========== */
+@media (min-width: 1024px) {
+    .register-navbar {
+        padding: 15px 40px;
+    }
+    .register-wrapper {
+        margin-top: 100px;
+    }
+    .register-card {
+        padding: 48px;
+    }
+    .role-card {
+        padding: 20px;
+    }
+    .role-card i {
+        font-size: 2.2rem;
+    }
+}

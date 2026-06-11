@@ -50,7 +50,6 @@ public class DashboardController {
     // =========================================================================
     // ESPACE CANDIDAT
     // =========================================================================
-
     @GetMapping("/dashboard-candidat")
     public String dashboardCandidat(Model model) {
         if (!sessionService.isAuthenticated() || !sessionService.isCandidat()) return "redirect:/login";
@@ -62,7 +61,7 @@ public class DashboardController {
         model.addAttribute("offres", new ArrayList<>());
         model.addAttribute("candidatures", new ArrayList<>());
 
-        // 🎯 FIX : Récupération des notifications filtrées sur le rôle 'candidate'
+        // Récupération des notifications
         try {
             model.addAttribute("notifCount", notificationClient.countNonLues(userId, "candidate"));
             model.addAttribute("notifications", notificationClient.getNotifications(userId, "candidate"));
@@ -154,7 +153,32 @@ public class DashboardController {
                                      @RequestParam(value = "photo", required = false) MultipartFile photo,
                                      RedirectAttributes ra) {
         try {
-            candidatClient.updateProfil(sessionService.getUserId(), prenom, nom, telephone, adresse, bio, competences, linkedinUrl, portfolioUrl, niveauScolaire, cv, photo);
+            // 🎯 Astuce de sécurité : Remplacer les valeurs nulles par des chaînes vides
+            // car Feign gère mal l'envoi de variables purement 'null' dans un bloc @RequestPart
+            String telParam = (telephone != null) ? telephone : "";
+            String adrParam = (adresse != null) ? adresse : "";
+            String bioParam = (bio != null) ? bio : "";
+            String compParam = (competences != null) ? competences : "";
+            String linkParam = (linkedinUrl != null) ? linkedinUrl : "";
+            String portParam = (portfolioUrl != null) ? portfolioUrl : "";
+            String nivParam = (niveauScolaire != null) ? niveauScolaire : "";
+
+            // Appel de ton client Feign mis à jour (Tout en @RequestPart)
+            candidatClient.updateProfil(
+                    sessionService.getUserId(),
+                    prenom,
+                    nom,
+                    telParam,
+                    adrParam,
+                    bioParam,
+                    compParam,
+                    linkParam,
+                    portParam,
+                    nivParam,
+                    cv,
+                    photo
+            );
+
             ra.addFlashAttribute("message", "Votre espace profil a été mis à jour avec succès !");
         } catch (Exception e) {
             System.err.println("❌ ÉCHEC DU SOUFFLAGE DE DONNÉES FRONTEND : " + e.getMessage());
@@ -174,6 +198,7 @@ public class DashboardController {
         return "redirect:/dashboard-candidat";
     }
 
+    // 🎯 FIX PROXY AVATAR
     @GetMapping("/api/candidats/avatar/{userId}")
     @ResponseBody
     public ResponseEntity<byte[]> proxyAvatar(@PathVariable Long userId) {
@@ -184,29 +209,23 @@ public class DashboardController {
         }
     }
 
+    // 🎯 FIX PROXY DOWNLOAD CV
     @GetMapping("/api/candidats/download/cv/{userId}")
     public ResponseEntity<byte[]> proxyDownloadCv(@PathVariable Long userId) {
         try {
             ResponseEntity<byte[]> response = candidatClient.downloadCV(userId);
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                String contentDisposition = response.getHeaders().containsKey(HttpHeaders.CONTENT_DISPOSITION)
-                        ? response.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION)
-                        : "attachment; filename=\"cv_" + userId + ".pdf\"";
-
                 return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"cv_" + userId + ".pdf\"")
                         .contentType(MediaType.APPLICATION_PDF)
                         .body(response.getBody());
             }
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
+            System.err.println("❌ Erreur Proxy CV : " + e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
     }
-
-    // =========================================================================
-    // ESPACE RECRUTEUR / ENTREPRISE
-    // =========================================================================
 // =========================================================================
 // ESPACE RECRUTEUR / ENTREPRISE
 // =========================================================================

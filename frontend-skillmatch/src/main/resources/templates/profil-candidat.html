@@ -6,124 +6,106 @@
     <title>SkillMatch - Modifier mon Profil</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <style>
-        body { background-color: #f8fafc; font-family: 'Segoe UI', sans-serif; }
-        .custom-nav {
-            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-            padding: 15px 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .profile-card { border: none; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); background: white; }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- CSS commun du site -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <!-- CSS spécifique à la page profil candidat -->
+    <link rel="stylesheet" th:href="@{/css/profil-candidat.css}">
 </head>
 <body>
 
-<nav class="navbar custom-nav navbar-dark mb-4">
-    <div class="container-fluid">
-        <a class="navbar-brand fw-bold fs-4" href="/dashboard-candidat">
-            <i class="bi bi-lightning-charge-fill text-warning me-2"></i>SkillMatch
-        </a>
-    </div>
-</nav>
+<div th:replace="~{fragments/header :: header}"></div>
 
-<div class="container py-2">
+<div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card profile-card p-4">
+            <div class="profile-card p-4">
                 <h3 class="fw-bold text-dark mb-1"><i class="bi bi-person-gear text-primary me-2"></i>Mon Profil Candidat</h3>
                 <p class="text-muted small mb-4">Mettez à jour vos informations personnelles, votre CV et vos compétences pour optimiser le matching.</p>
                 <hr class="mb-4">
 
-                <!-- ⚠️ LE ENCTYPE ICI EST OBLIGATOIRE POUR TRANSFERER LE CV ET LA PHOTO -->
                 <form th:action="@{/profil/update}" method="POST" enctype="multipart/form-data">
-
                     <!-- Prénom et Nom -->
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-muted">Prénom</label>
-                            <input type="text" class="form-control rounded-3" name="prenom"
-                                   th:value="${profil != null ? profil['prenom'] : ''}" required>
+                            <label class="form-label">Prénom</label>
+                            <input type="text" class="form-control" name="prenom" th:value="${profil != null ? profil['prenom'] : ''}" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-muted">Nom</label>
-                            <input type="text" class="form-control rounded-3" name="nom"
-                                   th:value="${profil != null ? profil['nom'] : ''}" required>
+                            <label class="form-label">Nom</label>
+                            <input type="text" class="form-control" name="nom" th:value="${profil != null ? profil['nom'] : ''}" required>
                         </div>
                     </div>
 
                     <!-- Téléphone et Adresse -->
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-muted">Téléphone</label>
-                            <input type="text" class="form-control rounded-3" name="telephone"
-                                   th:value="${profil != null ? profil['telephone'] : ''}">
+                            <label class="form-label">Téléphone</label>
+                            <input type="text" class="form-control" name="telephone" th:value="${profil != null ? profil['telephone'] : ''}">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-muted">Adresse / Ville</label>
-                            <input type="text" class="form-control rounded-3" name="adresse"
-                                   th:value="${profil != null ? profil['adresse'] : ''}">
+                            <label class="form-label">Adresse / Ville</label>
+                            <input type="text" class="form-control" name="adresse" th:value="${profil != null ? profil['adresse'] : ''}">
                         </div>
                     </div>
 
                     <!-- Niveau d'études -->
                     <div class="mb-3">
-                        <label class="form-label fw-semibold small text-muted">Niveau Scolaire / Diplôme</label>
-                        <select class="form-select rounded-3" name="niveauScolaire">
-                            <option value="" th:selected="${profil == null or profil['niveauScolaire'] == null}">Sélectionnez votre niveau</option>
+                        <label class="form-label">Niveau Scolaire / Diplôme</label>
+                        <select class="form-select" name="niveauScolaire">
+                            <option value="" th:selected="${profil == null or profil['niveauScolaire'] == null}">Sélectionnez</option>
                             <option value="Bac" th:selected="${profil != null and profil['niveauScolaire'] == 'Bac'}">Bac</option>
-                            <option value="Bac+2" th:selected="${profil != null and profil['niveauScolaire'] == 'Bac+2'}">Bac +2 (BTS, DUT)</option>
-                            <option value="Bac+3" th:selected="${profil != null and profil['niveauScolaire'] == 'Bac+3'}">Bac +3 (Licence, Bachelor)</option>
-                            <option value="Bac+5" th:selected="${profil != null and profil['niveauScolaire'] == 'Bac+5'}">Bac +5 (Master, Diplôme d'ingénieur)</option>
+                            <option value="Bac+2" th:selected="${profil != null and profil['niveauScolaire'] == 'Bac+2'}">Bac+2 (BTS, DUT)</option>
+                            <option value="Bac+3" th:selected="${profil != null and profil['niveauScolaire'] == 'Bac+3'}">Bac+3 (Licence)</option>
+                            <option value="Bac+5" th:selected="${profil != null and profil['niveauScolaire'] == 'Bac+5'}">Bac+5 (Master, Ingénieur)</option>
                         </select>
                     </div>
 
                     <!-- Bio -->
                     <div class="mb-3">
-                        <label class="form-label fw-semibold small text-muted">Bio / Présentation courte</label>
-                        <textarea class="form-control rounded-3" name="bio" rows="3"
-                                  placeholder="Décrivez votre projet professionnel..."
-                                  th:text="${profil != null ? profil['bio'] : ''}"></textarea>
+                        <label class="form-label">Bio / Présentation courte</label>
+                        <textarea class="form-control" name="bio" rows="3" placeholder="Décrivez votre projet professionnel..." th:text="${profil != null ? profil['bio'] : ''}"></textarea>
                     </div>
 
                     <!-- Compétences -->
                     <div class="mb-3">
-                        <label class="form-label fw-semibold small text-muted">Compétences (séparées par des virgules)</label>
-                        <input type="text" class="form-control rounded-3" name="competences"
-                               placeholder="Ex: Java, Spring Boot, Angular, Git"
-                               th:value="${profil != null ? profil['competences'] : ''}">
+                        <label class="form-label">Compétences (séparées par des virgules)</label>
+                        <input type="text" class="form-control" name="competences" placeholder="Ex: Java, Spring Boot, Angular" th:value="${profil != null ? profil['competences'] : ''}">
                     </div>
 
                     <!-- Liens réseaux sociaux -->
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-muted"><i class="bi bi-linkedin text-primary me-1"></i>URL LinkedIn</label>
-                            <input type="url" class="form-control rounded-3" name="linkedinUrl"
-                                   placeholder="https://linkedin.com/in/..."
-                                   th:value="${profil != null ? profil['linkedinUrl'] : ''}">
+                            <label class="form-label"><i class="bi bi-linkedin text-primary me-1"></i>URL LinkedIn</label>
+                            <input type="url" class="form-control" name="linkedinUrl" placeholder="https://linkedin.com/in/..." th:value="${profil != null ? profil['linkedinUrl'] : ''}">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-muted"><i class="bi bi-github text-dark me-1"></i>URL Portfolio / GitHub</label>
-                            <input type="url" class="form-control rounded-3" name="portfolioUrl"
-                                   placeholder="https://github.com/..."
-                                   th:value="${profil != null ? profil['portfolioUrl'] : ''}">
+                            <label class="form-label"><i class="bi bi-github me-1"></i>URL Portfolio / GitHub</label>
+                            <input type="url" class="form-control" name="portfolioUrl" placeholder="https://github.com/..." th:value="${profil != null ? profil['portfolioUrl'] : ''}">
                         </div>
                     </div>
 
+                    <!-- Upload fichiers + affichage photo actuelle + aperçu -->
                     <div class="p-3 bg-light rounded-3 mb-4 border">
-                        <h6 class="fw-bold mb-3 text-secondary"><i class="bi bi-file-earmark-arrow-up-fill me-2"></i>Documents & Médias</h6>
+                        <h6 class="fw-bold mb-3"><i class="bi bi-file-earmark-arrow-up-fill me-2"></i>Documents & Médias</h6>
                         <div class="row g-3">
-                            <!-- Input CV -->
                             <div class="col-md-6">
-                                <label class="form-label small fw-semibold text-muted">Mettre à jour le CV (Format PDF)</label>
+                                <label class="form-label small fw-semibold">Mettre à jour le CV (PDF)</label>
                                 <input type="file" class="form-control form-control-sm" name="cv" accept=".pdf">
                             </div>
-                            <!-- Input Photo -->
                             <div class="col-md-6">
                                 <label class="form-label small fw-semibold text-muted">Photo de profil (JPEG, PNG)</label>
                                 <input type="file" class="form-control form-control-sm" name="photo" accept="image/*">
                             </div>
+
+                                <!-- Aperçu de la nouvelle photo -->
+                                <div class="mt-2 text-center" id="newPhotoPreview" style="display: none;">
+                                    <img id="previewImg" class="rounded-circle shadow-sm" style="width: 80px; height: 80px; object-fit: cover; border: 2px solid #10b981;">
+                                    <div class="small text-success mt-1">Nouvelle photo</div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+
 
                     <!-- Boutons d'action -->
                     <div class="d-flex justify-content-end gap-2">
@@ -132,13 +114,39 @@
                             <i class="bi bi-check-lg me-1"></i> Enregistrer les modifications
                         </button>
                     </div>
-
                 </form>
             </div>
         </div>
     </div>
 </div>
 
+<div th:replace="~{fragments/footer :: footer}"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Prévisualisation de la nouvelle photo
+    const photoInput = document.getElementById('photoInput');
+    const currentPhotoBlock = document.getElementById('currentPhotoBlock');
+    const newPhotoPreview = document.getElementById('newPhotoPreview');
+    const previewImg = document.getElementById('previewImg');
+
+    if (photoInput) {
+        photoInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    newPhotoPreview.style.display = 'block';
+                    if (currentPhotoBlock) currentPhotoBlock.style.display = 'none';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                newPhotoPreview.style.display = 'none';
+                if (currentPhotoBlock) currentPhotoBlock.style.display = 'block';
+            }
+        });
+    }
+</script>
 </body>
 </html>

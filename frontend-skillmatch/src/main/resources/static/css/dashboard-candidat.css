@@ -1,0 +1,191 @@
+/* ============================================ */
+/* DASHBOARD CANDIDAT - MOBILE-FIRST            */
+/* ============================================ */
+
+/* ========== BASE (MOBILE) ========== */
+body {
+    background-color: #f8fafc;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    background: var(--gray-50);
+    padding-top: 70px;
+}
+
+/* Navbar (mobile) */
+.custom-nav {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+    padding: 10px 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.navbar-brand img {
+    height: 32px;
+    width: auto;
+}
+
+/* Conteneur principal (mobile) */
+.container.py-2 {
+    margin-top: 70px;
+    padding: 0 16px;
+}
+
+/* Cartes latérales (profil) */
+.sidebar-card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    background: white;
+    margin-bottom: 20px;
+    padding: 16px;
+}
+
+/* Cartes des offres (mobile : une colonne) */
+.offer-card {
+    border: none;
+    border-radius: 15px;
+    transition: 0.3s;
+    margin-bottom: 16px;
+    border-left: 5px solid #4f46e5;
+    background: white;
+    padding: 16px;
+}
+.offer-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+/* Badges de compétences */
+.skill-badge {
+    background: #eef2ff;
+    color: #4f46e5;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    margin: 2px;
+    display: inline-block;
+}
+
+/* Cartes statistiques (offres disponibles / candidatures) */
+.row.g-3 .col-md-6 {
+    margin-bottom: 16px;
+}
+.bg-primary.bg-opacity-10,
+.bg-success.bg-opacity-10 {
+    padding: 12px;
+    border-radius: 12px;
+}
+.h4.fw-bold {
+    font-size: 1.5rem;
+}
+.text-muted.small {
+    font-size: 0.7rem;
+}
+
+/* Titre des offres */
+.offer-card h5 {
+    font-size: 1.1rem;
+}
+.offer-card .badge {
+    font-size: 0.7rem;
+}
+
+/* Bouton postuler */
+.btn-success.btn-sm {
+    font-size: 0.75rem;
+    padding: 6px 12px;
+}
+
+/* ========== TABLETTE (≥ 576px) ========== */
+@media (min-width: 576px) {
+    .custom-nav {
+        padding: 12px 24px;
+    }
+    .navbar-brand img {
+        height: 36px;
+    }
+    .container.py-2 {
+        margin-top: 80px;
+        max-width: 540px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .sidebar-card {
+        padding: 20px;
+    }
+    .offer-card {
+        padding: 20px;
+    }
+    .skill-badge {
+        font-size: 11px;
+        padding: 4px 12px;
+    }
+    .offer-card h5 {
+        font-size: 1.2rem;
+    }
+}
+
+/* ========== PETIT DESKTOP (≥ 768px) ========== */
+@media (min-width: 768px) {
+    .custom-nav {
+        padding: 15px 30px;
+    }
+    .container.py-2 {
+        margin-top: 90px;
+        max-width: 720px;
+    }
+    .sidebar-card {
+        padding: 24px;
+    }
+    .offer-card {
+        padding: 24px;
+    }
+    .row.g-3 {
+        display: flex;
+        gap: 16px;
+    }
+    .col-md-6 {
+        flex: 0 0 calc(50% - 8px);
+        max-width: calc(50% - 8px);
+    }
+    .h4.fw-bold {
+        font-size: 1.8rem;
+    }
+    .offer-card h5 {
+        font-size: 1.3rem;
+    }
+    .btn-success.btn-sm {
+        font-size: 0.8rem;
+        padding: 6px 16px;
+    }
+}
+
+/* ========== DESKTOP (≥ 1024px) ========== */
+@media (min-width: 1024px) {
+    .custom-nav {
+        padding: 15px 40px;
+    }
+    .navbar-brand img {
+        height: 40px;
+    }
+    .container.py-2 {
+        margin-top: 100px;
+        max-width: 1000px;
+    }
+    .sidebar-card {
+        padding: 28px;
+    }
+    .offer-card {
+        padding: 28px;
+    }
+    .skill-badge {
+        font-size: 12px;
+        padding: 5px 14px;
+    }
+    .offer-card h5 {
+        font-size: 1.4rem;
+    }
+    .btn-success.btn-sm {
+        font-size: 0.85rem;
+        padding: 8px 20px;
+    }
+}

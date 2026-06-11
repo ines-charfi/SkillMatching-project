@@ -1,0 +1,288 @@
+/* ============================================ */
+/* DASHBOARD ENTREPRISE - MOBILE-FIRST          */
+/* ============================================ */
+
+:root {
+    --primary: #4f46e5;
+    --secondary: #7c3aed;
+    --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-navbar: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --radius: 16px;
+    --radius-sm: 12px;
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.03);
+    --shadow-xl: 0 20px 40px rgba(79,70,229,0.1);
+}
+
+/* ========== BASE (MOBILE) ========== */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--gray-50);
+    color: var(--gray-700);
+    margin: 0;
+    padding-top: 70px;
+}
+
+/* Navbar (mobile) */
+.navbar-custom {
+    background: var(--gradient-navbar);
+    padding: 10px 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.navbar-brand {
+    font-size: 20px;
+    font-weight: 900;
+    color: white !important;
+}
+.navbar-logo-img {
+    height: 28px;
+    width: auto;
+}
+.badge-recruteur {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 40px;
+    margin-left: 5px;
+}
+
+/* Conteneur principal (mobile) */
+.container {
+    padding: 0 16px;
+    width: 100%;
+}
+.container.pb-5 {
+    margin-top: 70px;  /* espace sous la navbar fixe */
+    padding-bottom: 30px;
+}
+
+/* Grille des statistiques (mobile : 1 colonne) */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+.stat-card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow-md);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-xl);
+}
+.icon-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    font-size: 1.5rem;
+}
+.stat-card h2 {
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+/* Tableaux (mobile : défilement horizontal) */
+.table-container {
+    background: white;
+    border-radius: var(--radius);
+    padding: 16px;
+    border: 1px solid var(--gray-200);
+    overflow-x: auto;
+    margin-bottom: 24px;
+}
+.table th {
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    color: #94a3b8;
+    white-space: nowrap;
+    padding: 10px 12px;
+}
+.table td {
+    white-space: nowrap;
+    padding: 10px 12px;
+    font-size: 13px;
+}
+.progress {
+    height: 6px;
+    border-radius: 50px;
+    background-color: var(--gray-100);
+}
+
+/* Boutons (mobile) */
+.btn-pill {
+    border-radius: 50px;
+    font-weight: 700;
+    padding: 8px 16px;
+    font-size: 13px;
+    transition: all 0.2s;
+    display: inline-block;
+}
+.btn-pill-primary {
+    background: var(--gradient);
+    color: white;
+    border: none;
+}
+.btn-pill-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 15px rgba(79,70,229,0.25);
+    color: white;
+}
+
+/* Avatar et logo container (mobile) */
+.avatar-initial {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(79,70,229,0.1);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+.logo-container {
+    width: 60px;
+    height: 60px;
+    background: rgba(79, 70, 229, 0.05);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: var(--primary);
+    border: 2px dashed #c7d2fe;
+}
+
+/* ========== TABLETTE (≥ 576px) ========== */
+@media (min-width: 576px) {
+    .navbar-custom {
+        padding: 12px 24px;
+    }
+    .navbar-brand {
+        font-size: 22px;
+    }
+    .navbar-logo-img {
+        height: 32px;
+    }
+    .container {
+        padding: 0 24px;
+    }
+    .container.pb-5 {
+        margin-top: 80px;
+    }
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    .stat-card {
+        padding: 20px;
+    }
+    .icon-circle {
+        width: 55px;
+        height: 55px;
+        font-size: 1.8rem;
+    }
+    .stat-card h2 {
+        font-size: 2rem;
+    }
+    .table-container {
+        padding: 20px;
+    }
+    .btn-pill {
+        padding: 9px 20px;
+        font-size: 14px;
+    }
+    .avatar-initial {
+        width: 40px;
+        height: 40px;
+    }
+    .logo-container {
+        width: 80px;
+        height: 80px;
+        font-size: 36px;
+    }
+}
+
+/* ========== PETIT DESKTOP (≥ 768px) ========== */
+@media (min-width: 768px) {
+    .navbar-custom {
+        padding: 15px 30px;
+    }
+    .navbar-logo-img {
+        height: 36px;
+    }
+    .container {
+        max-width: 720px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .container.pb-5 {
+        margin-top: 90px;
+    }
+    .stats-grid {
+        gap: 24px;
+    }
+    .table-container {
+        padding: 24px;
+    }
+    .btn-pill {
+        padding: 10px 24px;
+        font-size: 15px;
+    }
+}
+
+/* ========== DESKTOP (≥ 1024px) ========== */
+@media (min-width: 1024px) {
+    .navbar-custom {
+        padding: 15px 40px;
+    }
+    .navbar-brand {
+        font-size: 24px;
+    }
+    .navbar-logo-img {
+        height: 40px;
+    }
+    .container {
+        max-width: 1000px;
+    }
+    .container.pb-5 {
+        margin-top: 100px;
+    }
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    .stat-card {
+        padding: 24px;
+    }
+    .icon-circle {
+        width: 60px;
+        height: 60px;
+    }
+    .table-container {
+        padding: 30px;
+    }
+    .table th, .table td {
+        padding: 12px 16px;
+    }
+    .btn-pill {
+        padding: 10px 28px;
+    }
+}
