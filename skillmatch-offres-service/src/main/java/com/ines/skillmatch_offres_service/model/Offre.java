@@ -19,6 +19,9 @@ public class Offre {
     @Column(name = "entreprise_id", nullable = false)
     private Long entrepriseId;
 
+    @Column(name = "user_id") //  Persisté en BDD pour les notifications
+    private Long userId;
+
     @Column(nullable = false)
     private String titre;
 

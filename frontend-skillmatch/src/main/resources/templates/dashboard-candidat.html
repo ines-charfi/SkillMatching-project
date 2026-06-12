@@ -16,7 +16,7 @@
 <nav class="navbar custom-nav navbar-dark mb-4">
     <div class="container-fluid d-flex justify-content-between align-items-center">
         <a class="navbar-brand fw-bold fs-4" href="/dashboard-candidat">
-            <i class="bi bi-lightning-charge-fill text-warning me-2"></i>SkillMatch
+            <img th:src="@{/img/logo.png}" alt="SkillMatch Logo" class="navbar-logo-img">
         </a>
 
         <div class="d-flex align-items-center gap-3">
@@ -119,14 +119,6 @@
 
         <div class="col-lg-8">
             <div class="row g-3 mb-4">
-                <div class="col-12">
-                    <div class="card sidebar-card p-2">
-                        <div class="input-group">
-                            <span class="input-group-text bg-transparent border-0"><i class="bi bi-search"></i></span>
-                            <input type="text" class="form-control border-0" placeholder="Rechercher un métier (ex: Développeur Java)...">
-                        </div>
-                    </div>
-                </div>
 
                 <div class="col-md-6">
                     <div class="card sidebar-card p-3 d-flex flex-row align-items-center gap-3">

@@ -9,6 +9,8 @@ import com.ines.skillmatch_auth_service.service.client.CandidatClient;
 import com.ines.skillmatch_auth_service.service.client.EntrepriseClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +21,11 @@ import org.springframework.transaction.annotation.Transactional;
     @Service
     @RequiredArgsConstructor
     @Slf4j
+    // 1. On force JPA à ne scanner QUE le package 'jpa'
+    @EnableJpaRepositories(basePackages = "com.ines.skillmatch_auth_service.repository.jpa")
+
+// 2. On force MongoDB à ne scanner QUE le package 'mongodb'
+    @EnableMongoRepositories(basePackages = "com.ines.skillmatch_auth_service.repository.mongodb")
     public class AuthService {
 
         private final UserRepository userRepository;

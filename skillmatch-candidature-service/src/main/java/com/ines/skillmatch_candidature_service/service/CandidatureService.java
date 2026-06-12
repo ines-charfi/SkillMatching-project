@@ -64,7 +64,7 @@ public class CandidatureService {
 
                     Map<String, Object> notifData = new HashMap<>();
                     notifData.put("userIdTarget", recruteurUserId);
-                    notifData.put("recipientRole", "recruiter"); // 🎯 FIX : Identifié pour l'espace Entreprise uniquement
+                    notifData.put("recipientRole", "recruiter"); //  FIX : Identifié pour l'espace Entreprise uniquement
                     notifData.put("type", "new_application");
                     notifData.put("titreNotif", "Nouvelle candidature reçue ! 📩");
                     notifData.put("message", prenomCand + " " + nomCand + " a postulé pour le poste : " + titreOffre + " (Score Matching : " + score + "%)");

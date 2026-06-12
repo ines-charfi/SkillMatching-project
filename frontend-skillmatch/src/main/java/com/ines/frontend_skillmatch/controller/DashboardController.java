@@ -247,8 +247,8 @@ public class DashboardController {
                 model.addAttribute("profil", profil);
 
                 try {
-                    model.addAttribute("notifCount", notificationClient.countNonLues(userId, "entreprise"));
-                    model.addAttribute("notifications", notificationClient.getNotifications(userId, "entreprise"));
+                    model.addAttribute("notifCount", notificationClient.countNonLues(userId, "recruiter"));
+                    model.addAttribute("notifications", notificationClient.getNotifications(userId, "recruiter"));
                 } catch (Exception e) {
                     System.err.println("⚠️ Échec récupération notifications entreprise : " + e.getMessage());
                 }

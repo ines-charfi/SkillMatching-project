@@ -9,6 +9,7 @@ import lombok.Data;
 @NoArgsConstructor // Requis pour que Jackson lise la Map du Frontend sans planter
 public class OffreDTO {
     private Long entrepriseId;
+    private Long userId;
     private String titre;
     private String description;
     private String competencesRequises;

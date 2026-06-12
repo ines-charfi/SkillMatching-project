@@ -25,6 +25,7 @@ public class OffreService {
     public Offre create(OffreDTO dto) {
         Offre offre = Offre.builder()
                 .entrepriseId(dto.getEntrepriseId())
+                .userId(dto.getUserId())
                 .titre(dto.getTitre())
                 .description(dto.getDescription())
                 .competencesRequises(dto.getCompetencesRequises())
