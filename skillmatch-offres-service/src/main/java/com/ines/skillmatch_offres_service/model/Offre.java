@@ -1,5 +1,6 @@
 package com.ines.skillmatch_offres_service.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ public class Offre {
     private Long entrepriseId;
 
     @Column(name = "user_id") //  Persisté en BDD pour les notifications
+    @JsonProperty("userId") // ✨ FORCE la clé JSON à s'appeler "userId" lors de la sérialisation
     private Long userId;
 
     @Column(nullable = false)

@@ -158,7 +158,6 @@ public class AdminController {
 
         if (!sessionService.isAuthenticated() || !sessionService.isAdmin()) return "redirect:/login";
 
-        // LOGGER DE SECOURS : Pour voir exactement ce que le contrôleur reçoit dans ta console !
         System.out.println("[ADMIN ARBITRAGE] Reçu -> id: " + id + ", statut: " + statut + ", typeFichier: " + typeFichier + ", userId: " + userId);
 
         try {
@@ -171,14 +170,15 @@ public class AdminController {
             if ("VALIDE".equalsIgnoreCase(statut) && userId != null) {
                 Map<String, Object> notif = new HashMap<>();
                 notif.put("userIdTarget", userId);
+                notif.put("lu", false); // Optionnel mais propre : on initialise à faux
 
                 if ("LOGO".equalsIgnoreCase(typeFichier)) {
-                    notif.put("recipientRole", "entreprise");
-                    notif.put("titreNotif", "Logo d'entreprise validé !");
-                    notif.put("message", "Le logo de votre structure a été approuvé par l'administration.");
+                    notif.put("recipientRole", "recruiter"); //  FIX : Remplacé "entreprise" par "recruiter"
+                    notif.put("titreNotif", "Profil Validé ! 🎉");
+                    notif.put("message", "Félicitations ! Votre profil entreprise a été validé par l'administrateur. Vous pouvez désormais publier des offres.");
                 } else {
-                    notif.put("recipientRole", "candidate");
-                    notif.put("titreNotif", "Profil Validé !");
+                    notif.put("recipientRole", "candidate"); // Reste inchangé pour le candidat
+                    notif.put("titreNotif", "Profil Validé ! 🎉");
                     notif.put("message", "Félicitations, votre profil SkillMatch a été approuvé par l'administrateur.");
                 }
 
@@ -190,7 +190,6 @@ public class AdminController {
         }
         return "redirect:/admin/verification";
     }
-
     @GetMapping("/admin/fichiers/download-cv")
     public ResponseEntity<Resource> downloadCv(@RequestParam("id") Long id) {
         if (!sessionService.isAuthenticated() || !sessionService.isAdmin()) {

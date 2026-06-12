@@ -35,6 +35,9 @@ public class CandidatureService {
             Map<String, Object> candidat = candidatClient.getProfil(userId);
             Map<String, Object> offre = offreClient.getOffre(offreId);
 
+            // 🎯 LOGS DE DEBUG : Pour traquer la structure exacte de l'offre reçue en cas de problème
+            log.info("🔍 [DEBUG NOTIF] Offre récupérée via Feign : {}", offre);
+
             int score = matchingService.calculateScore(
                     (String) candidat.get("competences"),
                     (String) offre.get("competencesRequises"),
@@ -54,9 +57,17 @@ public class CandidatureService {
             try {
                 if (offre != null && offre.get("entrepriseId") != null) {
                     Long entId = Long.valueOf(offre.get("entrepriseId").toString());
-                    Long recruteurUserId = (offre.get("userId") != null)
-                            ? Long.valueOf(offre.get("userId").toString())
-                            : entId;
+
+                    // 🎯 RECTIFICATION DOUBLE SÉCURITÉ (userId vs user_id)
+                    Long recruteurUserId = null;
+                    if (offre.get("userId") != null) {
+                        recruteurUserId = Long.valueOf(offre.get("userId").toString());
+                    } else if (offre.get("user_id") != null) {
+                        recruteurUserId = Long.valueOf(offre.get("user_id").toString());
+                    } else {
+                        log.warn("⚠️ Pas de userId trouvé dans l'offre. Utilisation de l'ID Entreprise (entId) en secours.");
+                        recruteurUserId = entId;
+                    }
 
                     String prenomCand = candidat.get("prenom") != null ? candidat.get("prenom").toString() : "";
                     String nomCand = candidat.get("nom") != null ? candidat.get("nom").toString() : "Un candidat";
@@ -64,14 +75,15 @@ public class CandidatureService {
 
                     Map<String, Object> notifData = new HashMap<>();
                     notifData.put("userIdTarget", recruteurUserId);
-                    notifData.put("recipientRole", "recruiter"); //  FIX : Identifié pour l'espace Entreprise uniquement
+                    notifData.put("recipientRole", "recruiter"); // Rôle de l'espace entreprise
                     notifData.put("type", "new_application");
                     notifData.put("titreNotif", "Nouvelle candidature reçue ! 📩");
                     notifData.put("message", prenomCand + " " + nomCand + " a postulé pour le poste : " + titreOffre + " (Score Matching : " + score + "%)");
                     notifData.put("lu", false);
 
+                    log.info("🚀 Envoi de la notification au Recruteur User ID cible : {}", recruteurUserId);
                     notificationClient.envoyerNotification(notifData);
-                    log.info("🚀 Notification de postulation envoyée avec succès au Recruteur User ID {}", recruteurUserId);
+
                 } else {
                     log.warn("⚠️ Impossible d'envoyer la notification : entrepriseId introuvable dans l'offre.");
                 }
@@ -121,7 +133,7 @@ public class CandidatureService {
 
             Map<String, Object> notifData = new HashMap<>();
             notifData.put("userIdTarget", candidatUserId);
-            notifData.put("recipientRole", "candidate"); // 🎯 FIX : Identifié pour l'espace Candidat uniquement
+            notifData.put("recipientRole", "candidate"); // Identifié pour l'espace Candidat uniquement
             notifData.put("titreNotif", titreNotif);
             notifData.put("message", message);
             notifData.put("lu", false);

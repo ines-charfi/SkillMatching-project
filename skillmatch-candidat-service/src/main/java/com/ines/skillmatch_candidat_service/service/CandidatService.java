@@ -3,7 +3,9 @@ package com.ines.skillmatch_candidat_service.service;
 import com.ines.skillmatch_candidat_service.dto.CandidatDTO;
 import com.ines.skillmatch_candidat_service.model.Candidat;
 import com.ines.skillmatch_candidat_service.repository.CandidatRepository;
+import com.ines.skillmatch_candidat_service.service.client.NotificationClient; // 🎯 AJOUT : Import du client de notification
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j; // 🎯 AJOUT : Pour les logs
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,13 +14,17 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j // 🎯 AJOUT : Pour gérer proprement les messages de logs
 public class CandidatService {
 
     private final CandidatRepository candidatRepository;
+    private final NotificationClient notificationClient; // 🎯 AJOUT : Injection du client Feign pour l'envoi de notifs
 
     @Value("${app.upload.dir:uploads}")
     private String uploadDir;
@@ -34,7 +40,7 @@ public class CandidatService {
     public Candidat getByUserId(Long userId) {
         return candidatRepository.findByUserId(userId)
                 .orElseGet(() -> {
-                    System.out.println("⚠️ Aucun candidat trouvé pour userId " + userId + ". Création d'un profil par défaut...");
+                    log.info("⚠️ Aucun candidat trouvé pour userId {}. Création d'un profil par défaut...", userId);
                     Candidat nouveauCandidat = Candidat.builder()
                             .userId(userId)
                             .nom("Candidat")
@@ -84,14 +90,12 @@ public class CandidatService {
             Files.createDirectories(uploadPath);
         }
 
-        // On isole uniquement l'extension (.pdf, .jpg, etc.) pour ne pas hériter des anciens UUIDs du nom complet
         String originalFilename = file.getOriginalFilename();
         String extension = "";
         if (originalFilename != null && originalFilename.contains(".")) {
             extension = originalFilename.substring(originalFilename.lastIndexOf("."));
         }
 
-        // Le nom final sera STRICTEMENT composé d'un unique UUID + son extension d'origine
         String fileName = UUID.randomUUID().toString() + extension;
 
         Path filePath = uploadPath.resolve(fileName);
@@ -106,7 +110,6 @@ public class CandidatService {
         Candidat candidatExistant = candidatRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Candidat introuvable pour le user ID : " + userId));
 
-        // Remplissage des données textuelles
         candidatExistant.setPrenom(dto.getPrenom());
         candidatExistant.setNom(dto.getNom());
         candidatExistant.setTelephone(dto.getTelephone());
@@ -117,10 +120,13 @@ public class CandidatService {
         candidatExistant.setPortfolioUrl(dto.getPortfolioUrl());
         candidatExistant.setNiveauScolaire(dto.getNiveauScolaire());
 
+        boolean hasNewCv = false;
+
         // Sauvegarde du CV s'il y en a un nouveau fourni
         if (cv != null && !cv.isEmpty()) {
             String cvName = saveFile(cv, "cvs");
             candidatExistant.setCvPath(cvName);
+            hasNewCv = true; // 🎯 Le drapeau passe à true
         }
 
         // Sauvegarde de la Photo s'il y en a une nouvelle fournie
@@ -129,6 +135,27 @@ public class CandidatService {
             candidatExistant.setPhotoPath(photoName);
         }
 
-        return candidatRepository.save(candidatExistant);
+        Candidat savedCandidat = candidatRepository.save(candidatExistant);
+
+        // 🎯 AJOUT : Si un nouveau CV est ajouté/modifié, on envoie la notification à l'admin
+        if (hasNewCv) {
+            try {
+                Map<String, Object> notifAdmin = new HashMap<>();
+                notifAdmin.put("userIdTarget", 1L); // ID fixe de ton administrateur
+                notifAdmin.put("recipientRole", "admin"); // Pour cibler son Dashboard
+                notifAdmin.put("type", "new_cv");
+                notifAdmin.put("titreNotif", "Nouveau document à vérifier 📄");
+                notifAdmin.put("message", savedCandidat.getPrenom() + " " + savedCandidat.getNom() + " a ajouté ou modifié son CV. Une analyse est requise.");
+                notifAdmin.put("lu", false);
+
+                notificationClient.envoyerNotification(notifAdmin);
+                log.info("🚀 Notification de nouveau CV transmise à l'administrateur.");
+            } catch (Exception ex) {
+                // Protège le candidat : le profil reste enregistré même si l'auth-service/notif ne répond pas
+                log.error("⚠️ Impossible de notifier l'admin pour le nouveau CV : {}", ex.getMessage());
+            }
+        }
+
+        return savedCandidat;
     }
 }

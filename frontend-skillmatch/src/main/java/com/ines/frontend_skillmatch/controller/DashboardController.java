@@ -325,13 +325,24 @@ public class DashboardController {
     }
 
     @PostMapping("/offre/creer")
-    public String handleOffreCreation(@RequestParam String titre, @RequestParam String description, @RequestParam String niveauRequis, @RequestParam String salaire, @RequestParam String competencesRequises, RedirectAttributes ra) {
+    public String handleOffreCreation(@RequestParam String titre,
+                                      @RequestParam String description,
+                                      @RequestParam String niveauRequis,
+                                      @RequestParam String salaire,
+                                      @RequestParam String competencesRequises,
+                                      RedirectAttributes ra) {
         if (!sessionService.isAuthenticated() || !sessionService.isEntreprise()) return "redirect:/login";
         try {
+            // 🎯 On utilise directement l'appel au sessionService pour éviter l'erreur de variable
             Map<String, Object> profil = entrepriseClient.getByUserId(sessionService.getUserId());
             Long codebaseId = (profil != null && profil.get("id") != null) ? Long.valueOf(profil.get("id").toString()) : null;
+
             Map<String, Object> offreData = new HashMap<>();
             offreData.put("entrepriseId", codebaseId);
+
+            // ✨ RECTIFICATION : On injecte directement l'ID utilisateur ici
+            offreData.put("userId", sessionService.getUserId());
+
             offreData.put("titre", titre);
             offreData.put("description", description);
             offreData.put("competencesRequises", competencesRequises);
@@ -339,9 +350,12 @@ public class DashboardController {
             offreData.put("salaire", salaire);
             offreData.put("ville", (profil != null && profil.get("ville") != null) ? profil.get("ville").toString() : "");
             offreData.put("typeContrat", "CDI");
+
             offreClient.create(offreData);
             ra.addFlashAttribute("message", "Offre d'emploi publiée !");
-        } catch (Exception e) { ra.addFlashAttribute("error", "Erreur publication."); }
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", "Erreur publication.");
+        }
         return "redirect:/dashboard-entreprise";
     }
 
