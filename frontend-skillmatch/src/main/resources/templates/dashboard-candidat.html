@@ -6,9 +6,7 @@
     <title>SkillMatch - Mon Espace</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <!-- CSS commun du site (variables, reset, etc.) -->
     <link rel="stylesheet" th:href="@{/css/style.css}">
-    <!-- CSS spécifique au dashboard candidat -->
     <link rel="stylesheet" th:href="@{/css/dashboard-candidat.css}">
 </head>
 <body>
@@ -119,7 +117,6 @@
 
         <div class="col-lg-8">
             <div class="row g-3 mb-4">
-
                 <div class="col-md-6">
                     <div class="card sidebar-card p-3 d-flex flex-row align-items-center gap-3">
                         <div class="bg-primary bg-opacity-10 p-3 rounded-3 text-primary"><i class="bi bi-briefcase-fill fs-4"></i></div>
@@ -142,6 +139,7 @@
             </div>
 
             <h5 class="fw-bold mb-3 text-dark">Offres pour vous</h5>
+
             <div th:if="${offres == null or #lists.isEmpty(offres)}" class="card offer-card p-4 shadow-sm text-center">
                 <p class="text-muted mb-0">Aucune offre disponible pour le moment.</p>
             </div>
@@ -149,8 +147,16 @@
             <div th:if="${offres != null and not #lists.isEmpty(offres)}" th:each="offre : ${offres}" class="card offer-card p-4 shadow-sm">
                 <div class="d-flex justify-content-between mb-2">
                     <div>
-                        <h5 class="fw-bold mb-1 text-dark" th:text="${offre['titre'] ?: 'Titre inconnu'}">Titre de l'offre</h5>
-                        <p class="text-primary fw-bold small mb-0" th:text="'🏢 Recruteur (ID: ' + ${offre['entrepriseId']} + ') 📍 ' + ${offre['ville'] ?: 'Distance'}">Entreprise</p>
+                        <h5 class="fw-bold mb-1 text-dark offer-title-link"
+                            data-bs-toggle="modal"
+                            th:data-bs-target="'#modalOffre' + ${offre['id']}"
+                            th:text="${offre['titre'] ?: 'Titre inconnu'}">Titre de l'offre</h5>
+
+                        <p class="text-primary fw-bold small mb-0">
+                            <i class="bi bi-building me-1"></i><span th:text="${offre['entrepriseNom'] ?: 'Entreprise non spécifiée'}">Entreprise</span>
+                            <span class="text-muted mx-2">•</span>
+                            <i class="bi bi-geo-alt-fill me-1"></i><span th:text="${offre['ville'] ?: 'Lieu non spécifié'}">Ville</span>
+                        </p>
                     </div>
                     <div class="text-end">
                         <span class="badge bg-primary bg-opacity-10 text-primary p-2">
@@ -159,7 +165,8 @@
                     </div>
                 </div>
 
-                <p class="text-muted small" th:text="${offre['description'] ?: 'Aucune description fournie.'}">Description...</p>
+                <p class="text-muted small text-truncate-custom" th:text="${offre['description'] ?: 'Aucune description fournie.'}">Description...</p>
+
                 <div class="mb-2">
                     <span class="badge bg-secondary bg-opacity-10 text-secondary mb-2" th:text="'💰 ' + ${offre['salaire'] ?: 'Non spécifié'}">Salaire</span>
                     <span class="badge bg-dark bg-opacity-10 text-dark mb-2" th:text="'📄 ' + ${offre['typeContrat'] ?: 'CDI'}">Contrat</span>
@@ -171,10 +178,68 @@
                             <span th:each="s : ${#strings.arraySplit(offre['competencesRequises'], ',')}" class="skill-badge" th:text="${s.trim()}">Java</span>
                         </div>
                     </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-secondary btn-sm px-3 rounded-pill"
+                                data-bs-toggle="modal"
+                                th:data-bs-target="'#modalOffre' + ${offre['id']}">
+                            <i class="bi bi-eye-fill me-1"></i> Détails
+                        </button>
+                        <form th:action="@{/postuler}" method="post" class="mb-0">
+                            <input type="hidden" name="offreId" th:value="${offre['id']}">
+                            <button type="submit" class="btn btn-success btn-sm px-4 rounded-pill shadow-sm">
+                                <i class="bi bi-send-fill me-1"></i> Postuler
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div> </div> </div> </div> <div th:if="${offres != null and not #lists.isEmpty(offres)}" th:each="offre : ${offres}">
+    <div class="modal fade" th:id="'modalOffre' + ${offre['id']}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg modal-custom-radius">
+                <div class="modal-header bg-light border-0 py-3 px-4">
+                    <h5 class="modal-title fw-bold text-dark"><i class="bi bi-briefcase-fill text-indigo me-2"></i>Détails du poste</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h3 class="fw-bold text-dark mb-1" th:text="${offre['titre']}">Intitulé de l'offre</h3>
+                            <p class="fs-5 text-indigo fw-semibold mb-0">
+                                <i class="bi bi-building me-1"></i><span th:text="${offre['entrepriseNom'] ?: 'Entreprise'}">Entreprise</span>
+                            </p>
+                            <p class="text-muted small mt-1">
+                                <i class="bi bi-geo-alt-fill me-1"></i><span th:text="${offre['ville'] ?: 'Lieu'}">Ville</span>
+                            </p>
+                        </div>
+                        <div class="text-end">
+                            <div class="badge bg-primary bg-opacity-10 text-primary p-3 fs-6 rounded-3">
+                                <i class="bi bi-lightning-charge-fill me-1"></i>Score Match : <span class="fw-bold" th:text="${offre['scoreMatching'] != null ? offre['scoreMatching'] : 0}">0</span>%
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mb-4">
+                        <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2 fs-7" th:text="'💰 Salaire : ' + ${offre['salaire'] ?: 'Non spécifié'}">Salaire</span>
+                        <span class="badge bg-dark bg-opacity-10 text-dark px-3 py-2 fs-7" th:text="'📄 Contrat : ' + ${offre['typeContrat'] ?: 'CDI'}">Contrat</span>
+                    </div>
+
+                    <hr class="text-muted opacity-25">
+
+                    <h6 class="fw-bold text-dark mb-2 fs-6 text-uppercase tracking-wider">Description complète du poste</h6>
+                    <p class="text-secondary modal-description-text mb-4" th:text="${offre['description'] ?: 'Aucune description détaillée fournie.'}">Contenu de la description...</p>
+
+                    <h6 class="fw-bold text-dark mb-2 fs-6 text-uppercase tracking-wider">Compétences attendues</h6>
+                    <div th:if="${offre['competencesRequises'] != null and offre['competencesRequises'] != ''}">
+                        <span th:each="s : ${#strings.arraySplit(offre['competencesRequises'], ',')}" class="skill-badge py-2 px-3 fs-7" th:text="${s.trim()}">Java</span>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 bg-light py-3 px-4 d-flex justify-content-between">
+                    <button type="button" class="btn btn-light rounded-pill px-4 fw-semibold border" data-bs-dismiss="modal">Fermer</button>
                     <form th:action="@{/postuler}" method="post" class="mb-0">
                         <input type="hidden" name="offreId" th:value="${offre['id']}">
-                        <button type="submit" class="btn btn-success btn-sm px-4 rounded-pill shadow-sm">
-                            <i class="bi bi-send-fill me-1"></i> Postuler
+                        <button type="submit" class="btn btn-success rounded-pill px-4 shadow-sm fw-semibold">
+                            <i class="bi bi-send-fill me-1"></i> Postuler maintenant
                         </button>
                     </form>
                 </div>

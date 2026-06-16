@@ -14,4 +14,6 @@ public interface EntrepriseClient {
 
     @GetMapping("/api/entreprises/{id}")
     Map<String, Object> getById(@PathVariable("id") Long id);
+
+
 }

@@ -23,7 +23,50 @@ body {
     margin: 0;
     padding-top: 70px;
 }
+/* Zone utilisateur */
+.dashboard-user-area {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.4rem 1rem;
+    border-radius: 50px;
+    backdrop-filter: blur(4px);
+}
 
+.dashboard-user-info {
+    text-align: right;
+    line-height: 1.3;
+}
+
+.dashboard-user-email {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #cbd5e1;
+}
+
+.dashboard-user-role {
+    font-size: 0.7rem;
+    background: #fbbf24;
+    color: #0f172a;
+    padding: 0.15rem 0.5rem;
+    border-radius: 20px;
+    font-weight: bold;
+}
+
+.dashboard-avatar {
+    width: 36px;
+    height: 36px;
+    background: #fbbf24;
+    color: #0f172a;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
 .container {
     max-width: 100%;
     margin: 16px auto;

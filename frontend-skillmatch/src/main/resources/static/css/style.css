@@ -762,7 +762,7 @@ body {
 /* ============================================ */
 
 .dashboard-navbar {
-    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
     border-bottom: 1px solid rgba(255,255,255,0.15);
     position: sticky;
     top: 0;
@@ -856,13 +856,13 @@ body {
 }
 
 .dashboard-logout {
-    color: #fbbf24;
+    color: #ef4444;
     font-size: 22px;
     line-height: 1;
     transition: 0.2s;
 }
 .dashboard-logout:hover {
-    color: #f59e0b;
+    color: #dc2626;
     transform: scale(1.08);
 }
 

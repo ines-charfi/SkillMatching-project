@@ -46,10 +46,9 @@ public class DashboardController {
         if (!sessionService.isAuthenticated()) return "redirect:/login";
         return "redirect:" + sessionService.getRedirectUrlByRole();
     }
-
     // =========================================================================
-    // ESPACE CANDIDAT
-    // =========================================================================
+// ESPACE CANDIDAT
+// =========================================================================
     @GetMapping("/dashboard-candidat")
     public String dashboardCandidat(Model model) {
         if (!sessionService.isAuthenticated() || !sessionService.isCandidat()) return "redirect:/login";
@@ -103,6 +102,20 @@ public class DashboardController {
                         int score = candidatureClient.getScore(userId, offreId);
                         if (score >= 50) {
                             o.put("scoreMatching", score);
+
+                            // 🛠️ CHANGEMENT ICI : On crée la variable attendue par Thymeleaf
+                            // Si le microservice offre déjà une variable comme "entrepriseNom" ou "nomEntreprise", on l'utilise.
+                            // Sinon, on met un nom générique pour éviter que Thymeleaf n'affiche du vide.
+                            if (o.containsKey("entrepriseNom")) {
+                                // Le microservice envoyait déjà le nom, on s'assure qu'il reste
+                                o.put("entrepriseNom", o.get("entrepriseNom"));
+                            } else if (o.containsKey("nomEntreprise")) {
+                                o.put("entrepriseNom", o.get("nomEntreprise"));
+                            } else {
+                                // Si le microservice n'envoie VRAIMENT que l'ID, on écrit "Société anonyme"
+                                o.put("entrepriseNom", "Société anonyme (ID: " + o.get("entrepriseId") + ")");
+                            }
+
                             offresFiltrees.add(o);
                         }
                     } catch (Exception feignEx) {

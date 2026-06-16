@@ -6,15 +6,12 @@
     <title>SkillMatch - Inscription</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- CSS commun du site -->
+    <link href="https://fonts.googleapis.com/css2=family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style.css}">
-    <!-- CSS spécifique à la page register -->
     <link rel="stylesheet" th:href="@{/css/register.css}">
 </head>
-<body>
+<body class="register-body">
 
-<!-- Barre de navigation simplifiée -->
 <nav class="register-navbar">
     <div class="register-nav-container">
         <a th:href="@{/}" class="register-logo">
@@ -27,31 +24,27 @@
     </div>
 </nav>
 
-<!-- Carte d'inscription -->
-<div class="container register-wrapper">
-    <div class="register-card mx-auto">
-        <h2 class="text-center fw-bold mb-4" style="color: #1e1b4b;">📝 Créer un compte</h2>
+<main class="register-wrapper">
+    <div class="register-card">
+        <h2 class="register-title">Créer un compte</h2>
 
-        <!-- Message d'erreur -->
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-        <!-- Formulaire -->
         <form th:action="@{/register}" method="post">
 
-            <!-- Sélection du rôle -->
             <div class="mb-4">
-                <label class="form-label fw-bold small text-uppercase text-muted">Je suis :</label>
+                <label class="form-label role-label">Je suis :</label>
                 <div class="row g-3">
                     <div class="col-6">
-                        <div class="role-card text-center selected" id="cardCandidat" onclick="selectRole('CANDIDAT')">
-                            <i class="bi bi-person-circle fs-1 text-primary"></i>
+                        <div class="role-card card-candidat selected" id="cardCandidat" onclick="selectRole('CANDIDAT')">
+                            <i class="bi bi-person-circle role-icon text-primary"></i>
                             <h6 class="mt-2 fw-bold">Candidat</h6>
                             <p class="text-muted small mb-0">Je cherche un job</p>
                         </div>
                     </div>
                     <div class="col-6">
-                        <div class="role-card text-center" id="cardEntreprise" onclick="selectRole('ENTREPRISE')">
-                            <i class="bi bi-building fs-1 text-success"></i>
+                        <div class="role-card card-entreprise" id="cardEntreprise" onclick="selectRole('ENTREPRISE')">
+                            <i class="bi bi-building role-icon text-success"></i>
                             <h6 class="mt-2 fw-bold">Entreprise</h6>
                             <p class="text-muted small mb-0">Je recrute</p>
                         </div>
@@ -60,62 +53,57 @@
                 <input type="hidden" name="role" id="selectedRole" value="CANDIDAT">
             </div>
 
-            <!-- Email et mot de passe -->
             <div class="mb-3">
-                <label class="form-label fw-bold small">Email</label>
-                <input type="email" class="form-control" name="email" placeholder="vous@exemple.com" required>
+                <label class="form-label field-label">Email</label>
+                <input type="email" class="form-control custom-input" name="email" placeholder="vous@exemple.com" required>
             </div>
             <div class="mb-3">
-                <label class="form-label fw-bold small">Mot de passe</label>
-                <input type="password" class="form-control" name="password" placeholder="Min. 6 caractères" minlength="6" required>
+                <label class="form-label field-label">Mot de passe</label>
+                <input type="password" class="form-control custom-input" name="password" placeholder="Min. 6 caractères" minlength="6" required>
             </div>
 
-            <!-- Champs spécifiques au candidat -->
-            <div id="candidatFields">
+            <div id="candidatFields" class="conditional-fields">
                 <div class="row">
                     <div class="col-6 mb-3">
-                        <label class="form-label fw-bold small">Prénom</label>
-                        <input type="text" class="form-control" name="prenom" id="inputPrenom" placeholder="Paul">
+                        <label class="form-label field-label">Prénom</label>
+                        <input type="text" class="form-control custom-input" name="prenom" id="inputPrenom" placeholder="Paul">
                     </div>
                     <div class="col-6 mb-3">
-                        <label class="form-label fw-bold small">Nom</label>
-                        <input type="text" class="form-control" name="nom" id="inputNom" placeholder="Dupont">
+                        <label class="form-label field-label">Nom</label>
+                        <input type="text" class="form-control custom-input" name="nom" id="inputNom" placeholder="Dupont">
                     </div>
                 </div>
             </div>
 
-            <!-- Champs spécifiques à l'entreprise -->
-            <div id="entrepriseFields" style="display: none;">
+            <div id="entrepriseFields" class="conditional-fields hidden-fields">
                 <div class="mb-3">
-                    <label class="form-label fw-bold small">Nom de l'entreprise</label>
-                    <input type="text" class="form-control" name="nomEntreprise" id="inputEntreprise" placeholder="TechCorp">
+                    <label class="form-label field-label">Nom de l'entreprise</label>
+                    <input type="text" class="form-control custom-input" name="nomEntreprise" id="inputEntreprise" placeholder="TechCorp">
                 </div>
             </div>
 
-            <button type="submit" class="btn-register w-100 mt-3">
+            <button type="submit" class="btn-register w-100 mt-2">
                 <i class="bi bi-person-plus-fill me-2"></i> Créer mon compte
             </button>
         </form>
 
-        <!-- Connexion via OAuth -->
         <div class="text-center mt-4">
-            <p class="small text-muted">Ou inscrivez-vous avec :</p>
+            <p class="social-divider-text">Ou inscrivez-vous avec :</p>
             <div class="d-flex justify-content-center gap-2">
-                <a th:href="@{/oauth2/authorization/google}" class="btn btn-light border btn-sm px-3 rounded-pill">
+                <a th:href="@{/oauth2/authorization/google}" class="btn btn-oauth">
                     <i class="bi bi-google text-danger"></i> Google
                 </a>
-                <a th:href="@{/oauth2/authorization/github}" class="btn btn-light border btn-sm px-3 rounded-pill">
+                <a th:href="@{/oauth2/authorization/github}" class="btn btn-oauth">
                     <i class="bi bi-github text-dark"></i> GitHub
                 </a>
             </div>
         </div>
 
-        <!-- Lien vers connexion -->
         <p class="text-center mt-4 mb-0 small">
-            Déjà inscrit ? <a th:href="@{/login}" class="fw-bold text-primary text-decoration-none">Se connecter</a>
+            Déjà inscrit ? <a th:href="@{/login}" class="login-redirect-link">Se connecter</a>
         </p>
     </div>
-</div>
+</main>
 
 <script>
     function selectRole(role) {
@@ -123,20 +111,22 @@
 
         const cardC = document.getElementById('cardCandidat');
         const cardE = document.getElementById('cardEntreprise');
+        const candidatFields = document.getElementById('candidatFields');
+        const entrepriseFields = document.getElementById('entrepriseFields');
 
         if (role === 'CANDIDAT') {
             cardC.classList.add('selected');
             cardE.classList.remove('selected');
-            document.getElementById('candidatFields').style.display = 'block';
-            document.getElementById('entrepriseFields').style.display = 'none';
+            candidatFields.classList.remove('hidden-fields');
+            entrepriseFields.classList.add('hidden-fields');
             document.getElementById('inputPrenom').required = true;
             document.getElementById('inputNom').required = true;
             document.getElementById('inputEntreprise').required = false;
         } else {
             cardE.classList.add('selected');
             cardC.classList.remove('selected');
-            document.getElementById('candidatFields').style.display = 'none';
-            document.getElementById('entrepriseFields').style.display = 'block';
+            candidatFields.classList.add('hidden-fields');
+            entrepriseFields.classList.remove('hidden-fields');
             document.getElementById('inputPrenom').required = false;
             document.getElementById('inputNom').required = false;
             document.getElementById('inputEntreprise').required = true;

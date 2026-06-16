@@ -1,254 +1,255 @@
-/* ============================================ */
-/* PAGE REGISTER – MOBILE-FIRST                 */
-/* ============================================ */
-
-:root {
-    --primary: #4f46e5;
-    --primary-dark: #4338ca;
-    --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-body {
-    background: var(--gradient);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
+/* ==========================================================================
+   STYLE GLOBAL & ARRIÈRE-PLAN ANIMÉ COMPATIBLE MOBILE FIRST
+   ========================================================================== */
+.register-body {
     font-family: 'Inter', sans-serif;
     margin: 0;
     padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    /* Dégradé moderne et profond fidèle au dossier de conception */
+    background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 50%, #681f72 100%);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    overflow-x: hidden;
 }
 
-/* ========== BARRE DE NAVIGATION (MOBILE) ========== */
+/* Navbar épurée */
 .register-navbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1100;
-    padding: 10px 16px;
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255,255,255,0.2);
+    background-color: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0.75rem 2rem;
+    z-index: 10;
 }
+
 .register-nav-container {
-    max-width: 1300px;
-    margin: 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
 }
+
 .register-logo {
     display: flex;
     align-items: center;
-    gap: 6px;
     text-decoration: none;
-    color: white;
-    font-weight: 700;
-    font-size: 1rem;
+    gap: 0.5rem;
 }
+
 .register-logo-img {
     height: 32px;
     width: auto;
 }
+
 .register-logo-text {
-    display: none; /* caché sur mobile */
-}
-.btn-home {
-    background: white;
-    color: var(--primary);
-    padding: 6px 12px;
-    border-radius: 40px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.8rem;
-    transition: 0.3s;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-.btn-home span {
-    display: none; /* cacher le texte sur mobile, ne garder que l'icône */
-}
-.btn-home i {
+    color: #ffffff;
+    font-weight: 700;
     font-size: 1.2rem;
-}
-.btn-home:hover {
-    background: #f0f0f0;
-    transform: translateY(-2px);
+    letter-spacing: -0.5px;
 }
 
-/* ========== CONTENEUR PRINCIPAL (MOBILE) ========== */
+.btn-home {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    padding: 0.4rem 1rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.btn-home:hover {
+    background-color: #ffffff;
+    color: #4c1d95;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ==========================================================================
+   CONTENEUR ET CARTE D'INSCRIPTION (Résout le problème de coupure)
+   ========================================================================== */
 .register-wrapper {
-    margin-top: 70px;  /* laisser de la place sous la navbar fixe */
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: calc(100vh - 70px);
-    padding: 0 16px;
+    padding: 2rem 1rem; /* Marges de sécurité pour éviter le collage sur mobile */
     width: 100%;
 }
 
-/* ========== CARTE D'INSCRIPTION (MOBILE) ========== */
 .register-card {
-    background: white;
+    background: #ffffff;
     border-radius: 20px;
-    padding: 24px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     width: 100%;
-    max-width: 100%;
+    max-width: 540px; /* Largeur de lecture optimale */
+    padding: 2.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    transition: transform 0.3s ease;
 }
 
-/* ========== SÉLECTEUR DE RÔLE (MOBILE) ========== */
-.role-card {
-    border: 2px solid #f1f5f9;
-    border-radius: 15px;
-    padding: 12px;
-    cursor: pointer;
-    transition: 0.3s;
+.register-title {
+    color: #1e1b4b; /* Bleu très profond institutionnel */
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 1.75rem;
     text-align: center;
 }
-.role-card:hover {
-    border-color: #667eea;
-    transform: translateY(-3px);
-}
-.role-card.selected {
-    border-color: var(--primary);
-    background: #eef2ff;
-}
-.role-card i {
-    font-size: 1.8rem;
-}
-.role-card h6 {
-    font-size: 0.9rem;
-}
-.role-card p {
-    font-size: 0.7rem;
-}
 
-/* ========== CHAMPS DE FORMULAIRE (MOBILE) ========== */
-.form-control {
-    border-radius: 10px;
-    padding: 10px 12px;
-    border: 2px solid #f1f5f9;
-    font-size: 14px;
-}
-.form-control:focus {
-    border-color: var(--primary);
-    box-shadow: none;
-}
-
-/* ========== BOUTON D'INSCRIPTION (MOBILE) ========== */
-.btn-register {
-    background: var(--gradient);
-    border: none;
-    border-radius: 10px;
-    padding: 10px;
+/* Labels */
+.role-label {
     font-weight: 700;
-    color: white;
-    transition: 0.3s;
-    font-size: 14px;
+    font-size: 0.8rem;
+    text-uppercase: uppercase;
+    color: #64748b;
+    letter-spacing: 0.5px;
 }
-.btn-register:hover {
+
+.field-label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #334155;
+    margin-bottom: 0.4rem;
+}
+
+/* Inputs personnalisés (Focus Ring exigé par l'Accessibilité A11y du projet) */
+.custom-input {
+    border: 2px solid #e2e8f0;
+    padding: 0.65rem 1rem;
+    font-size: 0.95rem;
+    border-radius: 10px;
+    transition: all 0.2s ease-in-out;
+    color: #1e293b;
+}
+
+.custom-input:focus {
+    border-color: #4c1d95;
+    box-shadow: 0 0 0 4px rgba(76, 29, 149, 0.15);
+    outline: none;
+}
+
+/* ==========================================================================
+   COMPOSANTS COMPORTEMENTAUX (Cartes Rôles)
+   ========================================================================== */
+.role-card {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    background-color: #fafafa;
+}
+
+.role-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(118, 75, 162, 0.4);
+    border-color: #cbd5e1;
 }
 
-/* ========== TABLETTE (≥ 576px) ========== */
-@media (min-width: 576px) {
-    .register-navbar {
-        padding: 12px 24px;
-    }
-    .register-logo {
-        gap: 10px;
-        font-size: 1.1rem;
-    }
-    .register-logo-img {
-        height: 36px;
-    }
-    .btn-home {
-        padding: 8px 16px;
-        font-size: 0.9rem;
-    }
-    .btn-home span {
-        display: inline; /* réafficher le texte */
-    }
-    .btn-home i {
-        font-size: 1rem;
-    }
-    .register-wrapper {
-        margin-top: 80px;
-        min-height: calc(100vh - 80px);
-        padding: 0 24px;
-    }
+.role-icon {
+    font-size: 2rem !important;
+}
+
+/* États sélectionnés dynamiques */
+.card-candidat.selected {
+    border-color: #3b82f6 !important;
+    background-color: rgba(59, 130, 246, 0.05) !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.card-entreprise.selected {
+    border-color: #10b981 !important; /* Vert émeraude */
+    background-color: rgba(16, 185, 129, 0.05) !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+}
+
+/* Gestion de l'affichage des blocs optionnels */
+.conditional-fields {
+    transition: all 0.3s ease-in-out;
+}
+
+.hidden-fields {
+    display: none !important;
+}
+
+/* ==========================================================================
+   BOUTONS ET LIENS ET EN-TÊTES SÉCURISÉES
+   ========================================================================== */
+.btn-register {
+    background: linear-gradient(135deg, #4c1d95 0%, #681f72 100%);
+    color: #ffffff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(104, 31, 114, 0.2);
+}
+
+.btn-register:hover {
+    filter: brightness(1.15);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(104, 31, 114, 0.3);
+}
+
+.btn-register:active {
+    transform: translateY(1px);
+}
+
+/* Séparateur Social OAuth */
+.social-divider-text {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.btn-oauth {
+    border: 2px solid #e2e8f0;
+    background-color: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.5rem 1.25rem;
+    border-radius: 50px;
+    transition: all 0.2s ease;
+    color: #334155;
+}
+
+.btn-oauth:hover {
+    background-color: #f8fafc;
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+}
+
+/* Lien de redirection */
+.login-redirect-link {
+    color: #4c1d95;
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.login-redirect-link:hover {
+    color: #681f72;
+    text-decoration: underline;
+}
+
+/* Responsive design pour écrans compacts (Mobile & Tablettes) */
+@media (max-width: 576px) {
     .register-card {
-        padding: 32px;
-        max-width: 500px;
+        padding: 1.5rem;
+        border-radius: 16px;
     }
-    .role-card {
-        padding: 16px;
-    }
-    .role-card i {
-        font-size: 2rem;
-    }
-    .role-card h6 {
-        font-size: 1rem;
-    }
-    .role-card p {
-        font-size: 0.75rem;
-    }
-    .form-control {
-        padding: 12px;
-        font-size: 15px;
-    }
-    .btn-register {
-        padding: 12px;
-        font-size: 15px;
-    }
-}
-
-/* ========== PETIT DESKTOP / GRANDE TABLETTE (≥ 768px) ========== */
-@media (min-width: 768px) {
     .register-navbar {
-        padding: 15px 30px;
-    }
-    .register-logo {
-        font-size: 1.2rem;
-    }
-    .register-logo-img {
-        height: 40px;
+        padding: 0.75rem 1rem;
     }
     .register-logo-text {
-        display: inline-block; /* afficher le texte SkillMatch */
-        background: rgba(255,255,255,0.2);
-        padding: 4px 12px;
-        border-radius: 30px;
-        font-size: 0.9rem;
-    }
-    .btn-home {
-        padding: 8px 18px;
-        font-size: 0.9rem;
-    }
-    .register-card {
-        padding: 40px;
-        max-width: 550px;
-    }
-}
-
-/* ========== DESKTOP (≥ 1024px) ========== */
-@media (min-width: 1024px) {
-    .register-navbar {
-        padding: 15px 40px;
-    }
-    .register-wrapper {
-        margin-top: 100px;
-    }
-    .register-card {
-        padding: 48px;
-    }
-    .role-card {
-        padding: 20px;
-    }
-    .role-card i {
-        font-size: 2.2rem;
+        font-size: 1rem;
     }
 }

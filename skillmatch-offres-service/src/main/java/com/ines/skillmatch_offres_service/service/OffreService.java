@@ -106,17 +106,19 @@ public class OffreService {
      * Remplit les champs @Transient pour le Frontend
      */
     private void enrichOffre(Offre offre) {
-        // 1. Récupérer les infos de l'entreprise
-        try {
-            Map<String, Object> entreprise = entrepriseClient.getEntrepriseByUserId(offre.getEntrepriseId());
-            if (entreprise != null) {
-                offre.setEntrepriseNom((String) entreprise.get("nomEntreprise"));
-                offre.setEntrepriseLogo((String) entreprise.get("logoPath"));
+
+            // 1. Récupérer les infos de l'entreprise
+            try {
+                // CORRECTION ICI : On utilise getById au lieu de getEntrepriseByUserId
+                Map<String, Object> entreprise = entrepriseClient.getById(offre.getEntrepriseId());
+                if (entreprise != null) {
+                    offre.setEntrepriseNom((String) entreprise.get("nomEntreprise"));
+                    offre.setEntrepriseLogo((String) entreprise.get("logoPath"));
+                }
+            } catch (Exception e) {
+                log.warn("Impossible de récupérer l'entreprise pour l'offre {}: {}", offre.getId(), e.getMessage());
+                offre.setEntrepriseNom("Entreprise inconnue");
             }
-        } catch (Exception e) {
-            log.warn("Impossible de récupérer l'entreprise pour l'offre {}: {}", offre.getId(), e.getMessage());
-            offre.setEntrepriseNom("Entreprise inconnue");
-        }
 
         // 2. Récupérer le nombre de candidatures
         try {

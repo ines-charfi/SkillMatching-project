@@ -24,6 +24,7 @@ public class EntrepriseService {
 
     private final EntrepriseRepository repository;
     private final NotificationClient notificationClient; // 🎯 AJOUT : Injection du client Feign pour l'envoi de notifs
+    private final EntrepriseRepository entrepriseRepository;
 
     @Value("${app.upload.dir:uploads}")
     private String uploadDir;
@@ -100,4 +101,9 @@ public class EntrepriseService {
         Files.copy(file.getInputStream(), path.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
         return fileName;
     }
+
+    public Entreprise findById(Long id) {
+        return entrepriseRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Entreprise non trouvée avec l'ID : " + id));
+}
 }

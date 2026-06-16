@@ -77,4 +77,8 @@ public class EntrepriseController {
             return ResponseEntity.internalServerError().build();
         }
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<Entreprise> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(entrepriseService.findById(id));
+    }
 }
