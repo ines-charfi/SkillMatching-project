@@ -33,7 +33,7 @@ public class SecurityConfig {
                                 // 4. Pages Entreprise
                                 "/dashboard-entreprise", "/dashboard-entreprise/**",
                                 "/profil-entreprise", "/profil-entreprise/update",
-                                "/offre", "/offre/**",
+                                "/offre", "/offre/**","/offres/**",
                                 "/offre/nouveau", "/offre/creer",
                                 "/offre/supprimer/**", "/offre/modifier/**", "/offre/update/**",
                                 "/candidatures/statut", "/candidature/statut",

@@ -56,6 +56,14 @@ body {
     margin: 4px 2px;
     display: inline-block;
 }
+/* Ajustement de la photo de profil */
+.profile-img {
+    width: 100px !important;    /* Taille idéale pour une sidebar */
+    height: 100px !important;   /* Maintient le cercle parfait */
+    object-fit: cover;          /* Évite que l'image ne soit déformée */
+    border: 3px solid #ffffff;  /* Petit bord blanc pour le style */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* Ombre douce */
+}
 
 /* CARTES DES OFFRES */
 .offer-card {

@@ -65,25 +65,24 @@
 
     <div class="row">
         <div class="col-lg-4">
-            <div class="card sidebar-card p-4 text-center mb-4">
+            <div class="card sidebar-card text-center">
                 <div class="text-center mb-3">
                     <img th:src="${profil != null and profil['photoPath'] != null and profil['photoPath'] != ''} ? '/api/candidats/avatar/' + (${session.userId != null} ? ${session.userId} : ${profil['userId']}) : 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'"
                          alt="Photo de profil"
-                         class="rounded-circle img-thumbnail shadow-sm"
-                         style="width: 130px; height: 130px; object-fit: cover;"
+                         class="rounded-circle img-thumbnail shadow-sm profile-img"
                          onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png';">
                 </div>
 
-                <h4 class="fw-bold mb-1">
+                <h4 class="fw-bold">
                     <span th:text="${profil != null and profil['prenom'] != null ? profil['prenom'] : 'Nouveau'}">Nouveau</span>
                     <span th:text="${profil != null and profil['nom'] != null ? profil['nom'] : 'Candidat'}">Candidat</span>
                 </h4>
 
-                <p class="text-muted small mb-3" th:text="${profil != null and profil['bio'] != null and profil['bio'] != '' ? profil['bio'] : 'Complétez votre bio pour attirer les recruteurs.'}">Bio...</p>
+                <p class="text-muted small" th:text="${profil != null and profil['bio'] != null and profil['bio'] != '' ? profil['bio'] : 'Complétez votre bio pour attirer les recruteurs.'}">Bio...</p>
                 <hr>
 
                 <div class="text-start">
-                    <h6 class="fw-bold small mb-2"><i class="bi bi-tools me-2"></i>COMPÉTENCES</h6>
+                    <h6 class="fw-bold small"><i class="bi bi-tools me-2"></i>COMPÉTENCES</h6>
                     <div th:if="${profil != null and profil['competences'] != null and profil['competences'] != ''}">
                         <span th:each="s : ${#strings.arraySplit(profil['competences'], ',')}" class="skill-badge" th:text="${s.trim()}">Java</span>
                     </div>
@@ -91,34 +90,34 @@
                         <p class="small text-muted">Aucune compétence renseignée.</p>
                     </div>
 
-                    <h6 class="fw-bold small mt-4 mb-2"><i class="bi bi-mortarboard-fill me-2"></i>ÉDUCATION</h6>
+                    <h6 class="fw-bold small"><i class="bi bi-mortarboard-fill me-2"></i>ÉDUCATION</h6>
                     <p class="small text-muted" th:text="${profil != null and profil['niveauScolaire'] != null and profil['niveauScolaire'] != '' ? profil['niveauScolaire'] : 'Non renseigné'}">Bac+5</p>
 
-                    <h6 class="fw-bold small mt-4 mb-2"><i class="bi bi-geo-alt-fill me-2"></i>LOCALISATION</h6>
+                    <h6 class="fw-bold small"><i class="bi bi-geo-alt-fill me-2"></i>LOCALISATION</h6>
                     <p class="small text-muted" th:text="${profil != null and profil['adresse'] != null and profil['adresse'] != '' ? profil['adresse'] : 'Non renseignée'}">Adresse...</p>
                 </div>
 
-                <div class="mt-4">
-                    <h5 class="fw-bold small mb-2">📄 DOCUMENT</h5>
+                <div class="border-top border-light">
+                    <h6 class="fw-bold small">📄 DOCUMENT</h6>
                     <div th:if="${profil != null and profil['cvPath'] != null and profil['cvPath'] != ''}">
-                        <p class="text-muted mb-2 small">Votre CV est bien enregistré dans notre système.</p>
+                        <p class="text-muted mb-2 small" style="font-size: 0.72rem !important;">Votre CV est enregistré.</p>
                         <a th:href="@{/api/candidats/download/cv/{id}(id=${profil.userId})}"
                            class="btn btn-outline-primary btn-sm px-3 rounded-pill" target="_blank">
-                            <i class="bi bi-download me-1"></i> Voir / Télécharger mon CV
+                            <i class="bi bi-download me-1"></i> Voir mon CV
                         </a>
                     </div>
                     <div th:unless="${profil != null and profil['cvPath'] != null and profil['cvPath'] != ''}">
-                        <p class="text-danger small">⚠️ Aucun CV téléversé. Veuillez modifier votre profil pour ajouter un CV.</p>
+                        <p class="text-danger small mb-0" style="font-size: 0.72rem !important;">⚠️ Aucun CV téléversé.</p>
                     </div>
                 </div>
-                <a href="/profil" class="btn btn-primary w-100 rounded-pill mt-3 shadow-sm">Modifier le profil</a>
+                <a href="/profil" class="btn btn-primary w-100 rounded-pill shadow-sm">Modifier le profil</a>
             </div>
         </div>
 
         <div class="col-lg-8">
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
-                    <div class="card sidebar-card p-3 d-flex flex-row align-items-center gap-3">
+                    <div class="card stat-card p-3 d-flex flex-row align-items-center gap-3">
                         <div class="bg-primary bg-opacity-10 p-3 rounded-3 text-primary"><i class="bi bi-briefcase-fill fs-4"></i></div>
                         <div>
                             <div class="h4 fw-bold mb-0" th:text="${offres != null ? offres.size() : 0}">0</div>
@@ -128,7 +127,7 @@
                 </div>
 
                 <div class="col-md-6">
-                    <div class="card sidebar-card p-3 d-flex flex-row align-items-center gap-3">
+                    <div class="card stat-card p-3 d-flex flex-row align-items-center gap-3">
                         <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success"><i class="bi bi-send-fill fs-4"></i></div>
                         <div>
                             <div class="h4 fw-bold mb-0" th:text="${candidatures != null ? candidatures.size() : 0}">0</div>
@@ -144,35 +143,33 @@
                 <p class="text-muted mb-0">Aucune offre disponible pour le moment.</p>
             </div>
 
-            <div th:if="${offres != null and not #lists.isEmpty(offres)}" th:each="offre : ${offres}" class="card offer-card p-4 shadow-sm">
-                <div class="d-flex justify-content-between mb-2">
-                    <div>
-                        <h5 class="fw-bold mb-1 text-dark offer-title-link"
-                            data-bs-toggle="modal"
-                            th:data-bs-target="'#modalOffre' + ${offre['id']}"
-                            th:text="${offre['titre'] ?: 'Titre inconnu'}">Titre de l'offre</h5>
-
-                        <p class="text-primary fw-bold small mb-0">
-                            <i class="bi bi-building me-1"></i><span th:text="${offre['entrepriseNom'] ?: 'Entreprise non spécifiée'}">Entreprise</span>
-                            <span class="text-muted mx-2">•</span>
-                            <i class="bi bi-geo-alt-fill me-1"></i><span th:text="${offre['ville'] ?: 'Lieu non spécifié'}">Ville</span>
-                        </p>
+            <div th:if="${offres != null and not #lists.isEmpty(offres)}" th:each="offre : ${offres}" class="card offer-card">
+                <div class="offer-clickable-area" data-bs-toggle="modal" th:data-bs-target="'#modalOffre' + ${offre['id']}">
+                    <div class="d-flex justify-content-between mb-2">
+                        <div>
+                            <h5 class="fw-bold mb-1 text-dark offer-title-link" th:text="${offre['titre'] ?: 'Titre inconnu'}">Titre de l'offre</h5>
+                            <p class="text-primary fw-bold small mb-0">
+                                <i class="bi bi-building me-1"></i><span th:text="${offre['entrepriseNom'] ?: 'Entreprise non spécifiée'}">Entreprise</span>
+                                <span class="text-muted mx-2">•</span>
+                                <i class="bi bi-geo-alt-fill me-1"></i><span th:text="${offre['ville'] ?: 'Lieu non spécifié'}">Ville</span>
+                            </p>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-primary bg-opacity-10 text-primary p-2">
+                                🎯 Match : <span th:text="${offre['scoreMatching'] != null ? offre['scoreMatching'] : 0}">0</span>%
+                            </span>
+                        </div>
                     </div>
-                    <div class="text-end">
-                        <span class="badge bg-primary bg-opacity-10 text-primary p-2">
-                            🎯 Match : <span th:text="${offre['scoreMatching'] != null ? offre['scoreMatching'] : 0}">0</span>%
-                        </span>
+
+                    <p class="text-muted small text-truncate-custom" th:text="${offre['description'] ?: 'Aucune description fournie.'}">Description...</p>
+
+                    <div class="mb-2">
+                        <span class="badge bg-secondary bg-opacity-10 text-secondary mb-2" th:text="'💰 ' + ${offre['salaire'] ?: 'Non spécifié'}">Salaire</span>
+                        <span class="badge bg-dark bg-opacity-10 text-dark mb-2" th:text="'📄 ' + ${offre['typeContrat'] ?: 'CDI'}">Contrat</span>
                     </div>
                 </div>
 
-                <p class="text-muted small text-truncate-custom" th:text="${offre['description'] ?: 'Aucune description fournie.'}">Description...</p>
-
-                <div class="mb-2">
-                    <span class="badge bg-secondary bg-opacity-10 text-secondary mb-2" th:text="'💰 ' + ${offre['salaire'] ?: 'Non spécifié'}">Salaire</span>
-                    <span class="badge bg-dark bg-opacity-10 text-dark mb-2" th:text="'📄 ' + ${offre['typeContrat'] ?: 'CDI'}">Contrat</span>
-                </div>
-
-                <div class="d-flex justify-content-between align-items-center mt-3">
+                <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top border-light">
                     <div>
                         <div th:if="${offre['competencesRequises'] != null and offre['competencesRequises'] != ''}">
                             <span th:each="s : ${#strings.arraySplit(offre['competencesRequises'], ',')}" class="skill-badge" th:text="${s.trim()}">Java</span>
@@ -192,8 +189,12 @@
                         </form>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-            </div> </div> </div> </div> <div th:if="${offres != null and not #lists.isEmpty(offres)}" th:each="offre : ${offres}">
+<div th:if="${offres != null and not #lists.isEmpty(offres)}" th:each="offre : ${offres}">
     <div class="modal fade" th:id="'modalOffre' + ${offre['id']}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow-lg modal-custom-radius">

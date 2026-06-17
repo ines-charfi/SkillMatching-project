@@ -26,6 +26,7 @@
 
 <main class="register-wrapper">
     <div class="register-card">
+        <img th:src="@{/img/logo.png}" alt="SkillMatch Logo" class="navbar-logo-img">
         <h2 class="register-title">Créer un compte</h2>
 
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
