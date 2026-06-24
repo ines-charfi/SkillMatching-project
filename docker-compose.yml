@@ -29,7 +29,7 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - mongo-data:/data/db # 🔥 CORRIGÉ ICI : Remplacement de l'underscore par un tiret
+      - mongo-data:/data/db
     networks:
       - skillmatch-network
     healthcheck:

@@ -20,7 +20,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j // 🎯 AJOUT : Pour gérer proprement les messages de logs
+@Slf4j // AJOUT : Pour gérer proprement les messages de logs
 public class CandidatService {
 
     private final CandidatRepository candidatRepository;

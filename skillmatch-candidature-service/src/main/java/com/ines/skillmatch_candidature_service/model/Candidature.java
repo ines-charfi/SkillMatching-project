@@ -5,7 +5,13 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "candidatures")
+// 1. 🟢 AJOUT CRITIQUE : Configuration de l'index unique composite pour bloquer la double postulation
+@Table(
+        name = "candidatures",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "UK_candidat_offre", columnNames = {"candidat_id", "offre_id"})
+        }
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

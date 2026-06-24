@@ -19,7 +19,16 @@
         </processorPath>
         <module name="frontend-skillmatch" />
       </profile>
-      <profile name="Annotation profile for skillmatch-entreprise-service" enabled="true">
+      <profile name="Annotation profile for skillmatch-offre-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.34/lombok-1.18.34.jar" />
+        </processorPath>
+        <module name="skillmatch-offres-service" />
+      </profile>
+      <profile name="Annotation profile for skillmatch-candidature-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -30,15 +39,6 @@
         <module name="skillmatch-candidat-service" />
         <module name="skillmatch-auth-service" />
         <module name="skillmatch-entreprise-service" />
-      </profile>
-      <profile name="Annotation profile for skillmatch-offre-service" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.34/lombok-1.18.34.jar" />
-        </processorPath>
-        <module name="skillmatch-offres-service" />
       </profile>
     </annotationProcessing>
   </component>

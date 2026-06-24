@@ -17,6 +17,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.disable())
                 .authorizeHttpRequests(auth -> auth
+
                         .requestMatchers(
                                 // 1. Accueil, Ressources Statiques et Dépendances
                                 "/", "/home", "/css/**", "/js/**", "/img/**", "/webjars/**", "/favicon.ico",
@@ -25,7 +26,7 @@ public class SecurityConfig {
                                 // 2. Authentification et gestion des erreurs
                                 "/login", "/register", "/logout", "/logout-user", "/oauth2/**", "/login-error",
 
-                                // 3. Pages Candidat (🔥 Sécurisé avec des patterns larges globaux)
+                                // 3. Pages Candidat ( Sécurisé avec des patterns larges globaux)
                                 "/dashboard-candidat", "/dashboard-candidat/**",
                                 "/profil", "/profil/**", "/profil/update",
                                 "/mes-candidatures", "/mes-candidatures/**", "/postuler", "/candidat/**",
