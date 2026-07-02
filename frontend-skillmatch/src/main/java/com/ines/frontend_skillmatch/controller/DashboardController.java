@@ -54,7 +54,7 @@ public class DashboardController {
         if (!sessionService.isAuthenticated() || !sessionService.isCandidat()) return "redirect:/login";
 
         Long userId = sessionService.getUserId();
-        System.out.println("📌 Chargement Dashboard Candidat pour l'utilisateur ID : " + userId);
+        System.out.println("Chargement Dashboard Candidat pour l'utilisateur ID : " + userId);
 
         model.addAttribute("profil", new HashMap<>());
         model.addAttribute("offres", new ArrayList<>());
@@ -119,7 +119,7 @@ public class DashboardController {
                             offresFiltrees.add(o);
                         }
                     } catch (Exception feignEx) {
-                        System.err.println("💥 Calcul de matching indisponible pour l'offre ID " + offreId);
+                        System.err.println(" Calcul de matching indisponible pour l'offre ID " + offreId);
                     }
                 }
             }
@@ -166,7 +166,7 @@ public class DashboardController {
                                      @RequestParam(value = "photo", required = false) MultipartFile photo,
                                      RedirectAttributes ra) {
         try {
-            // 🎯 Astuce de sécurité : Remplacer les valeurs nulles par des chaînes vides
+            //  Astuce de sécurité : Remplacer les valeurs nulles par des chaînes vides
             // car Feign gère mal l'envoi de variables purement 'null' dans un bloc @RequestPart
             String telParam = (telephone != null) ? telephone : "";
             String adrParam = (adresse != null) ? adresse : "";
@@ -211,7 +211,7 @@ public class DashboardController {
         return "redirect:/dashboard-candidat";
     }
 
-    // 🎯 FIX PROXY AVATAR
+    //  FIX PROXY AVATAR
     @GetMapping("/api/candidats/avatar/{userId}")
     @ResponseBody
     public ResponseEntity<byte[]> proxyAvatar(@PathVariable Long userId) {
@@ -222,7 +222,7 @@ public class DashboardController {
         }
     }
 
-    // 🎯 FIX PROXY DOWNLOAD CV
+    //  FIX PROXY DOWNLOAD CV
     @GetMapping("/api/candidats/download/cv/{userId}")
     public ResponseEntity<byte[]> proxyDownloadCv(@PathVariable Long userId) {
         try {
@@ -346,7 +346,7 @@ public class DashboardController {
                                       RedirectAttributes ra) {
         if (!sessionService.isAuthenticated() || !sessionService.isEntreprise()) return "redirect:/login";
         try {
-            // 🎯 On utilise directement l'appel au sessionService pour éviter l'erreur de variable
+            // On utilise directement l'appel au sessionService pour éviter l'erreur de variable
             Map<String, Object> profil = entrepriseClient.getByUserId(sessionService.getUserId());
             Long codebaseId = (profil != null && profil.get("id") != null) ? Long.valueOf(profil.get("id").toString()) : null;
 

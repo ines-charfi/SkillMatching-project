@@ -24,7 +24,7 @@ import java.util.UUID;
 public class CandidatService {
 
     private final CandidatRepository candidatRepository;
-    private final NotificationClient notificationClient; // 🎯 AJOUT : Injection du client Feign pour l'envoi de notifs
+    private final NotificationClient notificationClient; // AJOUT : Injection du client Feign pour l'envoi de notifs
 
     @Value("${app.upload.dir:uploads}")
     private String uploadDir;

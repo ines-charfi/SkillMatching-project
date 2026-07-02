@@ -42,14 +42,14 @@ class CandidatControllerIntegrationTest {
     void testGetCandidatProfile_ShouldReturnCandidat() throws Exception {
         // On insère manuellement un candidat en base H2 pour le test
         Candidat candidat = new Candidat();
-        candidat.setNom("Jean Dupont");
+        candidat.setNom("Charfi Saja");
         candidat = candidatRepository.save(candidat);
 
         // Appel de l'API REST
         mockMvc.perform(get("/api/candidats/" + candidat.getId()) // Adapte l'URL de ton controlleur
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nom").value("Jean Dupont"));
+                .andExpect(jsonPath("$.nom").value("Charfi Saja"));
     }
 
     @Test

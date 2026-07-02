@@ -42,117 +42,26 @@
     </div>
 </div>
 
+<!-- ... reste du code HTML ... -->
+
 <div id="notif" class="notification">✅ Candidature envoyée !</div>
 
 <div th:replace="~{fragments/footer :: footer}"></div>
 
+<!-- 1. Déclaration des variables globales (Le pont Thymeleaf -> JS) -->
 <script th:inline="javascript">
-    // 1. SYNCHRONISATION SESSION JAVA -> JAVASCRIPT
-    const API_BASE_URL = 'http://localhost:8080';
-    const token = /*[[${session.user_token}]]*/ null;
-    const userId = /*[[${session.user_id}]]*/ null;
-    const userRole = /*[[${session.user_role}]]*/ null;
-
-    let allOffres = [];
-    let mesCandidaturesIds = [];
-
-    document.addEventListener('DOMContentLoaded', async () => {
-        if (!token) {
-            window.location.href = '/login';
-            return;
-        }
-        await loadInitialData();
-    });
-
-    async function loadInitialData() {
-        try {
-            const [offresRes, candsRes] = await Promise.all([
-                fetch(`${API_BASE_URL}/api/offres`, { headers: { 'Authorization': `Bearer ${token}` } }),
-                userRole === 'CANDIDAT' ?
-                    fetch(`${API_BASE_URL}/api/candidatures/candidat/${userId}`, { headers: { 'Authorization': `Bearer ${token}` } }) :
-                    Promise.resolve({ ok: true, json: () => [] })
-            ]);
-
-            allOffres = await offresRes.json();
-            const cands = await candsRes.json();
-            mesCandidaturesIds = cands.map(c => c.offreId);
-
-            displayOffres(allOffres);
-        } catch (error) {
-            document.getElementById('offresList').innerHTML = '<p class="text-center text-danger">Erreur de connexion aux microservices.</p>';
-        }
-    }
-
-    function displayOffres(offres) {
-        const container = document.getElementById('offresList');
-        if (offres.length === 0) {
-            container.innerHTML = '<div class="text-center p-5 text-muted"><h3>Aucune offre trouvée</h3></div>';
-            return;
-        }
-
-        container.innerHTML = offres.map(o => {
-            const aPostule = mesCandidaturesIds.includes(o.id);
-            return `
-                <div class="offre-card">
-                    <div class="offre-header">
-                        <div>
-                            <h3 class="offre-title">${o.titre}</h3>
-                            <p class="offre-company">🏢 ${o.entrepriseNom || 'Entreprise'} • ${o.ville || 'France'}</p>
-                        </div>
-                        <span class="offre-salaire">${o.salaire || 'A négocier'}</span>
-                    </div>
-                    <p class="offre-description">${o.description ? o.description.substring(0, 200) + '...' : ''}</p>
-                    <div class="offre-skills">
-                        ${o.competencesRequises ? o.competencesRequises.split(',').map(s => `<span class="skill-tag">${s.trim()}</span>`).join('') : ''}
-                    </div>
-                    <div class="offre-footer">
-                        <div class="text-muted small">🎓 Niveau : ${o.niveauRequis || 'N/C'}</div>
-                        ${userRole === 'CANDIDAT' ? `
-                            <button class="btn-postuler" ${aPostule ? 'disabled' : `onclick="postuler(${o.id}, this)"`}>
-                                ${aPostule ? '✅ Déjà postulé' : '📤 Postuler'}
-                            </button>
-                        ` : ''}
-                    </div>
-                </div>
-            `;
-        }).join('');
-    }
-
-    function filterOffres() {
-        const search = document.getElementById('searchInput').value.toLowerCase();
-        const ville = document.getElementById('villeFilter').value.toLowerCase();
-
-        const filtered = allOffres.filter(o =>
-            (o.titre.toLowerCase().includes(search) || (o.entrepriseNom && o.entrepriseNom.toLowerCase().includes(search))) &&
-            (ville === "" || (o.ville && o.ville.toLowerCase().includes(ville)))
-        );
-        displayOffres(filtered);
-    }
-
-    async function postuler(offreId, btn) {
-        btn.disabled = true;
-        btn.textContent = "⏳...";
-        try {
-            const res = await fetch(`${API_BASE_URL}/api/candidatures?candidatId=${userId}&offreId=${offreId}`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (res.ok) {
-                btn.textContent = "✅ Postulé";
-                showNotif();
-                mesCandidaturesIds.push(offreId);
-            }
-        } catch (e) {
-            btn.disabled = false;
-            btn.textContent = "📤 Postuler";
-        }
-    }
-
-    function showNotif() {
-        const n = document.getElementById('notif');
-        n.style.display = 'block';
-        setTimeout(() => n.style.display = 'none', 3000);
-    }
+    const SESSION_DATA = {
+        token: /*[[${session.user_token}]]*/ null,
+        userId: /*[[${session.user_id}]]*/ null,
+        userRole: /*[[${session.user_role}]]*/ null,
+        apiBaseUrl: 'http://localhost:8080'
+    };
 </script>
+
+<!-- 2. Appel du fichier JS externe -->
+<script th:src="@{/js/liste-offre.js}"></script>
+
+</body>
+</html>
 </body>
 </html>

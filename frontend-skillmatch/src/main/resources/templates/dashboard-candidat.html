@@ -22,8 +22,8 @@
                 <button class="btn btn-link position-relative text-white p-2" type="button" id="candidatNotifBell" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="bi bi-bell-fill fs-4"></i>
                     <span th:if="${notifCount != null and notifCount > 0}"
-                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                          th:text="${notifCount}" style="font-size: 0.65rem;">0</span>
+                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notif-badge-count"
+                          th:text="${notifCount}">0</span>
                 </button>
 
                 <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-0" aria-labelledby="candidatNotifBell" style="width: 320px; max-height: 400px; overflow-y: auto; border-radius: 12px;">
@@ -98,7 +98,7 @@
                 </div>
 
                 <div class="border-top border-light">
-                    <h6 class="fw-bold small">📄 DOCUMENT</h6>
+                    <h6 class="fw-bold small"> DOCUMENT</h6>
                     <div th:if="${profil != null and profil['cvPath'] != null and profil['cvPath'] != ''}">
                         <p class="text-muted mb-2 small" style="font-size: 0.72rem !important;">Votre CV est enregistré.</p>
                         <a th:href="@{/api/candidats/download/cv/{id}(id=${profil.userId})}"
@@ -156,7 +156,7 @@
                         </div>
                         <div class="text-end">
                             <span class="badge bg-primary bg-opacity-10 text-primary p-2">
-                                🎯 Match : <span th:text="${offre['scoreMatching'] != null ? offre['scoreMatching'] : 0}">0</span>%
+                                 Score Match : <span th:text="${offre['scoreMatching'] != null ? offre['scoreMatching'] : 0}">0</span>%
                             </span>
                         </div>
                     </div>
@@ -215,7 +215,7 @@
                         </div>
                         <div class="text-end">
                             <div class="badge bg-primary bg-opacity-10 text-primary p-3 fs-6 rounded-3">
-                                <i class="bi bi-lightning-charge-fill me-1"></i>Score Match : <span class="fw-bold" th:text="${offre['scoreMatching'] != null ? offre['scoreMatching'] : 0}">0</span>%
+                                <i class="bi bi-lightning-charge-fill me-1"></i> Votre Score Match : <span class="fw-bold" th:text="${offre['scoreMatching'] != null ? offre['scoreMatching'] : 0}">0</span>%
                             </div>
                         </div>
                     </div>

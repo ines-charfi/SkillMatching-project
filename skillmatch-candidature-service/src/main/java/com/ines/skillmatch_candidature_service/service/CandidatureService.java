@@ -35,7 +35,7 @@ public class CandidatureService {
             Map<String, Object> candidat = candidatClient.getProfil(userId);
             Map<String, Object> offre = offreClient.getOffre(offreId);
 
-            // 🎯 LOGS DE DEBUG : Pour traquer la structure exacte de l'offre reçue en cas de problème
+            //  LOGS DE DEBUG : Pour traquer la structure exacte de l'offre reçue en cas de problème
             log.info("🔍 [DEBUG NOTIF] Offre récupérée via Feign : {}", offre);
 
             int score = matchingService.calculateScore(

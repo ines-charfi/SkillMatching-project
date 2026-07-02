@@ -1,124 +1,124 @@
 /* ============================================ */
-/* MES CANDIDATURES - MOBILE-FIRST              */
+/* MES CANDIDATURES - RESPONSIVE OPTIMIZED      */
 /* ============================================ */
 
-/* ========== MOBILE (défaut) ========== */
 body {
-    background: #f8fafc;
-    font-family: 'Inter', sans-serif;
-    margin: 0;
-    padding: 0;
+    background: #f8fafc; /* Couleur de fond légère */
 }
 
-/* Cartes de candidature (mobile) */
+.container.py-5 {
+    margin-top: 80px; /* Espace pour le header fixe */
+}
+
+.page-main-title {
+    font-size: 1.5rem;
+    color: var(--gray-800);
+}
+
+/* --- Cartes de candidature --- */
 .cand-card {
     background: white;
     border-radius: 16px;
-    padding: 16px;
-    margin: 0 16px 16px 16px;   /* marges latérales sur mobile */
+    padding: 20px;
+    margin-bottom: 20px;
     border: none;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
-    transition: transform 0.2s, box-shadow 0.2s;
+    border-left: 5px solid #cbd5e1; /* Bordure par défaut */
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
 .cand-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
 }
 
-/* Badge de statut (mobile) */
-.status-badge {
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-weight: 700;
-    font-size: 11px;
-    display: inline-block;
+/* Couleurs des bordures de statut (classes dynamiques) */
+.cand-card.border-success { border-left-color: var(--success) !important; }
+.cand-card.border-danger { border-left-color: var(--danger) !important; }
+.cand-card.border-warning { border-left-color: var(--warning) !important; }
+
+/* --- Typographie interne --- */
+.cand-title {
+    font-size: 1.15rem;
+    color: var(--gray-900);
 }
 
-/* Espacement sous le header (mobile) */
-.container.py-5 {
-    margin-top: 70px;
-    padding: 0 16px;
+.cand-company {
+    font-size: 0.95rem;
 }
 
-/* Ajustement du titre et du texte dans les cartes (mobile) */
-.cand-card h4 {
-    font-size: 1.2rem;
-    margin-bottom: 8px;
-}
-.cand-card p {
+.cand-date {
     font-size: 0.85rem;
 }
-.cand-card .h5 {
-    font-size: 1.1rem;
-}
-.cand-card .small {
-    font-size: 0.7rem;
+
+.score-value {
+    color: var(--primary);
 }
 
-/* ========== TABLETTE (≥ 576px) ========== */
-@media (min-width: 576px) {
-    .cand-card {
-        padding: 20px;
-        margin: 0 auto 20px auto;
-        max-width: 540px;
-    }
-    .status-badge {
-        padding: 6px 15px;
-        font-size: 12px;
-    }
+.score-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* --- Badges de statut --- */
+.status-badge {
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.status-accepted { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+.status-refused { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+.status-pending { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+
+/* --- État vide --- */
+.empty-state {
+    background: white;
+    border-radius: 20px;
+    border: 2px dashed var(--gray-200);
+}
+
+/* ============================================ */
+/* MEDIA QUERIES                                */
+/* ============================================ */
+
+/* Mobile (ajustements fins) */
+@media (max-width: 576px) {
     .container.py-5 {
-        margin-top: 80px;
-        padding: 0 24px;
+        margin-top: 60px;
+        padding-left: 15px;
+        padding-right: 15px;
     }
-    .cand-card h4 {
-        font-size: 1.3rem;
+
+    .cand-card {
+        padding: 15px;
     }
-    .cand-card p {
-        font-size: 0.9rem;
+
+    .cand-title {
+        font-size: 1.05rem;
     }
-    .cand-card .h5 {
-        font-size: 1.2rem;
+
+    .score-value {
+        font-size: 1rem;
     }
 }
 
-/* ========== PETIT DESKTOP (≥ 768px) ========== */
+/* Tablette et Desktop (ajustements de taille) */
 @media (min-width: 768px) {
-    .cand-card {
-        max-width: 720px;
-        padding: 24px;
+    .page-main-title {
+        font-size: 2rem;
+        margin-bottom: 2rem;
     }
-    .container.py-5 {
-        margin-top: 90px;
-        max-width: 720px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-    .cand-card h4 {
-        font-size: 1.4rem;
-    }
-    .cand-card p {
-        font-size: 0.95rem;
-    }
-}
 
-/* ========== DESKTOP (≥ 1024px) ========== */
-@media (min-width: 1024px) {
-    .cand-card {
-        max-width: 850px;
-        padding: 25px;
-    }
-    .container.py-5 {
-        margin-top: 100px;
-        max-width: 850px;
-    }
-    .cand-card h4 {
-        font-size: 1.5rem;
-    }
-    .cand-card .h5 {
+    .cand-title {
         font-size: 1.3rem;
     }
-    .status-badge {
-        font-size: 13px;
-        padding: 6px 18px;
+
+    .cand-card {
+        padding: 25px;
     }
 }

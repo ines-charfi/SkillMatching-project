@@ -171,6 +171,14 @@ body {
     border: 2px dashed #c7d2fe;
 }
 
+/* Taille personnalisée pour le compteur de notifications */
+.notif-badge-count {
+    font-size: 0.65rem !important;
+}
+.notif-badge {
+    background: var(--gradient-navbar);
+    color: var(--primary);
+}
 /* ========== TABLETTE (≥ 576px) ========== */
 @media (min-width: 576px) {
     .navbar-custom {

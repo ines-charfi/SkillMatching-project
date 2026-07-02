@@ -27,7 +27,7 @@
                     <i class="bi bi-bell-fill fs-4"></i>
                     <span th:if="${notifCount != null and notifCount > 0}"
                           class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                          th:text="${notifCount}" style="font-size: 0.65rem;">0</span>
+                          th:text="${notifCount}" >0</span>
                 </button>
 
                 <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-0" aria-labelledby="entrepriseNotifBell" style="width: 340px; max-height: 400px; overflow-y: auto; border-radius: 12px;">
@@ -234,7 +234,6 @@
                                 <input type="hidden" name="id" th:value="${c['id']}">
                                 <select name="statut" class="form-select form-select-sm rounded-pill" style="width: 130px;" onchange="this.form.submit()">
                                     <option value="" disabled selected>Modifier...</option>
-                                    <option value="EN_COURS">À l'étude</option>
                                     <option value="ENTRETIEN_PLANIFIE">Entretien</option>
                                     <option value="ACCEPTE">Accepter</option>
                                     <option value="REFUSE">Refuser</option>
@@ -292,5 +291,6 @@
 </div>
 <div th:replace="~{fragments/footer :: footer}"></div>
 <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+
 </body>
 </html>

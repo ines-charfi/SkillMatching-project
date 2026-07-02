@@ -1,0 +1,53 @@
+/* ============================================ */
+/* TALENT POOL STYLES                           */
+/* ============================================ */
+
+body {
+    background: #f4f7f6;
+}
+
+.talent-card {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.talent-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.skill-tag {
+    background: #eef2ff;
+    color: #4f46e5;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    margin: 2px;
+    display: inline-block;
+}
+
+/* Avatar stylisé (le carré avec initiales) */
+.talent-avatar {
+    border-radius: 12px;
+    background-color: #4f46e5; /* Couleur primaire */
+    color: white;
+    padding: 15px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 55px;
+    height: 55px;
+}
+
+/* Pour s'assurer que le bouton reste en bas de la carte */
+.talent-card button {
+    margin-top: auto;
+}

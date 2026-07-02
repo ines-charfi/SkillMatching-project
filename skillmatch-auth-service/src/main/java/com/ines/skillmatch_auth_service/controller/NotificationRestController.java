@@ -24,7 +24,7 @@ public class NotificationRestController {
                 notification.setUserIdTarget(Long.valueOf(payload.get("userIdTarget").toString()));
             }
 
-            // 🎯 FIX : Extraction du rôle du destinataire ('candidate' ou 'recruiter')
+            // FIX : Extraction du rôle du destinataire ('candidate' ou 'recruiter')
             if (payload.get("recipientRole") != null) {
                 notification.setRecipientRole((String) payload.get("recipientRole"));
             }
@@ -47,13 +47,13 @@ public class NotificationRestController {
         }
     }
 
-    // 🎯 FIX : Utilisation du RequestParam pour injecter le filtre du rôle
+    //  FIX : Utilisation du RequestParam pour injecter le filtre du rôle
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Notification>> getNotifications(@PathVariable Long userId, @RequestParam String role) {
         return ResponseEntity.ok(notificationRepository.findByUserIdTargetAndRecipientRoleOrderByDateCreationDesc(userId, role));
     }
 
-    // 🎯 FIX : Utilisation du RequestParam pour compter selon le rôle
+    //  FIX : Utilisation du RequestParam pour compter selon le rôle
     @GetMapping("/user/{userId}/count")
     public ResponseEntity<Long> countNonLues(@PathVariable Long userId, @RequestParam String role) {
         return ResponseEntity.ok(notificationRepository.countByUserIdTargetAndRecipientRoleAndLuFalse(userId, role));
