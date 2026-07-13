@@ -18,8 +18,11 @@ import java.util.Optional;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+// Integration tests for EntrepriseController – tests all REST endpoints with a real application context.
 @SpringBootTest
+// Configures MockMvc for testing web layer without starting a full server.
 @AutoConfigureMockMvc
+// Uses the 'test' profile (e.g., in-memory H2 database, disabled file uploads).
 @ActiveProfiles("test")
 class EntrepriseControllerIntegrationTest {
 
@@ -34,6 +37,7 @@ class EntrepriseControllerIntegrationTest {
 
     private Entreprise entrepriseTest;
 
+    // Sets up a test company before each test method.
     @BeforeEach
     void setUp() {
         repository.deleteAll();
@@ -45,6 +49,7 @@ class EntrepriseControllerIntegrationTest {
         repository.save(entrepriseTest);
     }
 
+    // Tests the /init endpoint – ensures a new company profile can be created.
     @Test
     void testInitEntreprise() throws Exception {
         mockMvc.perform(post("/api/entreprises/init")
@@ -57,6 +62,7 @@ class EntrepriseControllerIntegrationTest {
         assert("NewCompany".equals(saved.get().getNomEntreprise()));
     }
 
+    // Tests the /user/{userId} endpoint – verifies a company can be retrieved by user ID.
     @Test
     void testGetByUserId() throws Exception {
         mockMvc.perform(get("/api/entreprises/user/100"))
@@ -64,6 +70,7 @@ class EntrepriseControllerIntegrationTest {
                 .andExpect(jsonPath("$.nomEntreprise").value("TechCorp"));
     }
 
+    // Tests the multipart profile update endpoint – ensures text fields and logo can be updated together.
     @Test
     void testUpdateProfil_WithMultipartData() throws Exception {
         MockMultipartFile logo = new MockMultipartFile("logo", "logo.png", "image/png", "test".getBytes());
@@ -82,9 +89,10 @@ class EntrepriseControllerIntegrationTest {
                 .andExpect(jsonPath("$.secteur").value("Cloud"));
     }
 
+    // Tests the logo download endpoint – expects 404 because the file doesn't exist on disk.
     @Test
     void testGetLogo_WhenExists() throws Exception {
-        // Créer une entreprise avec un logo
+        // Create a company with a logo path (but no actual file on disk)
         Entreprise entreprise = Entreprise.builder()
                 .userId(300L)
                 .nomEntreprise("LogoInc")
@@ -93,7 +101,7 @@ class EntrepriseControllerIntegrationTest {
         repository.save(entreprise);
 
         mockMvc.perform(get("/api/entreprises/" + entreprise.getId() + "/logo"))
-                .andExpect(status().isNotFound()); // car le fichier n'existe pas réellement sur disque
-        // En conditions réelles avec fichier présent, on attend 200 et content type image.
+                .andExpect(status().isNotFound()); // file not actually present on disk
+        // In a real scenario with a file present, we'd expect 200 and image content type.
     }
 }

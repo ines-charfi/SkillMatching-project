@@ -14,6 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+/**
+ * Service class handling the business logic for job applications (Candidatures).
+ * Coordinates data from Candidate, Job Offer, and Notification microservices.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -26,6 +30,14 @@ public class CandidatureService {
     private final NotificationClient notificationClient;
     private final com.ines.skillmatch_candidature_service.repository.EntretienRepository entretienRepository;
 
+    /**
+     * Orchestrates the application process:
+     * 1. Checks for existing applications.
+     * 2. Fetches Candidate and Job details via OpenFeign.
+     * 3. Calculates the matching score.
+     * 4. Persists the application.
+     * 5. Sends a real-time notification to the recruiter.
+     */
     @Transactional
     public Candidature postuler(Long userId, Long offreId) {
         if (candidatureRepository.existsByCandidatIdAndOffreId(userId, offreId)) {
@@ -35,7 +47,7 @@ public class CandidatureService {
             Map<String, Object> candidat = candidatClient.getProfil(userId);
             Map<String, Object> offre = offreClient.getOffre(offreId);
 
-            //  LOGS DE DEBUG : Pour traquer la structure exacte de l'offre reçue en cas de problème
+            // DEBUG LOGS: To track the exact structure of the job offer received via Feign
             log.info("🔍 [DEBUG NOTIF] Offre récupérée via Feign : {}", offre);
 
             int score = matchingService.calculateScore(
@@ -58,7 +70,7 @@ public class CandidatureService {
                 if (offre != null && offre.get("entrepriseId") != null) {
                     Long entId = Long.valueOf(offre.get("entrepriseId").toString());
 
-                    // 🎯 RECTIFICATION DOUBLE SÉCURITÉ (userId vs user_id)
+                    // Double security check for recruiter User ID mapping
                     Long recruteurUserId = null;
                     if (offre.get("userId") != null) {
                         recruteurUserId = Long.valueOf(offre.get("userId").toString());
@@ -73,9 +85,10 @@ public class CandidatureService {
                     String nomCand = candidat.get("nom") != null ? candidat.get("nom").toString() : "Un candidat";
                     String titreOffre = offre.get("titre") != null ? offre.get("titre").toString() : "votre offre";
 
+                    // Prepare notification payload for the recruiter
                     Map<String, Object> notifData = new HashMap<>();
                     notifData.put("userIdTarget", recruteurUserId);
-                    notifData.put("recipientRole", "recruiter"); // Rôle de l'espace entreprise
+                    notifData.put("recipientRole", "recruiter");
                     notifData.put("type", "new_application");
                     notifData.put("titreNotif", "Nouvelle candidature reçue ! 📩");
                     notifData.put("message", prenomCand + " " + nomCand + " a postulé pour le poste : " + titreOffre + " (Score Matching : " + score + "%)");
@@ -97,6 +110,10 @@ public class CandidatureService {
         }
     }
 
+    /**
+     * Updates the application status and sends a tailored notification to the candidate
+     * based on the new status (Accepted, Rejected, Interview).
+     */
     @Transactional
     public Candidature updateStatut(Long id, String statut) {
         Candidature candidature = candidatureRepository.findById(id)
@@ -113,6 +130,7 @@ public class CandidatureService {
             String titreNotif = "Mise à jour de votre candidature 📋";
             String message = "";
 
+            // Dynamic notification content based on workflow state
             switch (statut.toUpperCase()) {
                 case "ACCEPTE":
                     titreNotif = "Candidature Acceptée ! 🎉";
@@ -133,7 +151,7 @@ public class CandidatureService {
 
             Map<String, Object> notifData = new HashMap<>();
             notifData.put("userIdTarget", candidatUserId);
-            notifData.put("recipientRole", "candidate"); // Identifié pour l'espace Candidat uniquement
+            notifData.put("recipientRole", "candidate");
             notifData.put("titreNotif", titreNotif);
             notifData.put("message", message);
             notifData.put("lu", false);
@@ -148,6 +166,10 @@ public class CandidatureService {
         return updatedCandidature;
     }
 
+    /**
+     * Retrieves and enriches job applications for a company.
+     * Iterates through company offers and fetches associated candidates to build DTOs.
+     */
     public List<CandidatureDTO> findAllByEntrepriseId(Long entrepriseId) {
         List<CandidatureDTO> results = new ArrayList<>();
         try {
@@ -174,11 +196,15 @@ public class CandidatureService {
         return results;
     }
 
+    // Access methods for basic application retrieval and statistics
     public List<Candidature> getByCandidat(Long userId) { return candidatureRepository.findByCandidatId(userId); }
     public List<Candidature> getByOffre(Long offreId) { return candidatureRepository.findByOffreId(offreId); }
     public long countByOffre(Long offreId) { return candidatureRepository.countByOffreId(offreId); }
     public long countByCandidat(Long candidatId) { return candidatureRepository.countByCandidatId(candidatId); }
 
+    /**
+     * Aggregates recruitment statistics for a specific company's dashboard.
+     */
     public Map<String, Object> getStatsEntreprise(Long entrepriseId) {
         Map<String, Object> stats = new HashMap<>();
         List<Map<String, Object>> offres = offreClient.getOffresByEntreprise(entrepriseId);

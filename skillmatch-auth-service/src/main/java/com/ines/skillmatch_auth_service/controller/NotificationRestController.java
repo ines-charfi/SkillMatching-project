@@ -15,6 +15,7 @@ public class NotificationRestController {
 
     private final NotificationRepository notificationRepository;
 
+    // Creates a new notification from the provided payload (title, message, target user, role).
     @PostMapping
     public ResponseEntity<Notification> creerNotification(@RequestBody java.util.Map<String, Object> payload) {
         Notification notification = new Notification();
@@ -24,7 +25,7 @@ public class NotificationRestController {
                 notification.setUserIdTarget(Long.valueOf(payload.get("userIdTarget").toString()));
             }
 
-            // FIX : Extraction du rôle du destinataire ('candidate' ou 'recruiter')
+            // Extract the recipient's role ('candidate' or 'recruiter') from the payload
             if (payload.get("recipientRole") != null) {
                 notification.setRecipientRole((String) payload.get("recipientRole"));
             }
@@ -47,18 +48,19 @@ public class NotificationRestController {
         }
     }
 
-    //  FIX : Utilisation du RequestParam pour injecter le filtre du rôle
+    // Retrieves all notifications for a specific user, filtered by their role (candidate/recruiter).
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Notification>> getNotifications(@PathVariable Long userId, @RequestParam String role) {
         return ResponseEntity.ok(notificationRepository.findByUserIdTargetAndRecipientRoleOrderByDateCreationDesc(userId, role));
     }
 
-    //  FIX : Utilisation du RequestParam pour compter selon le rôle
+    // Counts unread notifications for a specific user, filtered by their role.
     @GetMapping("/user/{userId}/count")
     public ResponseEntity<Long> countNonLues(@PathVariable Long userId, @RequestParam String role) {
         return ResponseEntity.ok(notificationRepository.countByUserIdTargetAndRecipientRoleAndLuFalse(userId, role));
     }
 
+    // Marks a specific notification as read by its ID.
     @PutMapping("/{id}/lire")
     public ResponseEntity<Void> marquerCommeLue(@PathVariable String id) {
         notificationRepository.findById(id).ifPresent(n -> {

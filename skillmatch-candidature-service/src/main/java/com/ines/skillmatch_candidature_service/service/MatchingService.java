@@ -7,6 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.util.*;
 
+/**
+ * Service dedicated to the core matching algorithm.
+ * It calculates the compatibility between a candidate's profile and a job offer
+ * based on weighted technical skills and education levels.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -16,54 +21,68 @@ public class MatchingService {
     private final OffreClient offreClient;
 
     /**
-     * Orchestre le calcul du score en récupérant les données via Feign
+     * Orchestrates the scoring process by retrieving data from remote microservices via Feign.
+     *
+     * @param userId ID of the candidate
+     * @param offreId ID of the job offer
+     * @return The final matching score as an integer (0 to 100)
      */
     public int generateFullScore(Long userId, Long offreId) {
         try {
-            // 1. Récupération des données microservices
+            // 1. Fetch data from external microservices
             Map<String, Object> profil = candidatClient.getProfil(userId);
             Map<String, Object> offre = offreClient.getOffre(offreId);
 
             if (profil == null || offre == null) return 0;
 
-            // 2. Extraction des données (selon ton script SQL)
+            // 2. Extract specific fields from the generic Map responses
             String candComp = (String) profil.get("competences");
             String candNiveau = (String) profil.get("niveauScolaire");
 
             String offreComp = (String) offre.get("competencesRequises");
             String offreNiveau = (String) offre.get("niveauRequis");
 
-            // 3. Appel de ton algorithme de calcul
+            // 3. Execute the matching calculation
             return calculateScore(candComp, offreComp, candNiveau, offreNiveau);
 
         } catch (Exception e) {
-            log.error("Erreur lors du calcul du matching : {}", e.getMessage());
+            log.error("Error during matching calculation: {}", e.getMessage());
             return 0;
         }
     }
 
+    /**
+     * Main calculation method using a weighted formula.
+     * Weights: 70% for technical skills, 30% for education level.
+     */
     public int calculateScore(String candComp, String offreComp, String candNiv, String offreNiv) {
         double score = 0;
 
-        // 1. Matching compétences (70%)
+        // 1. Technical skills matching (70% of the total score)
         if (candComp != null && offreComp != null && !offreComp.isEmpty()) {
             score += calculateCompetenceScore(candComp, offreComp) * 0.7;
         }
 
-        // 2. Matching niveau d'études (30%)
+        // 2. Education level matching (30% of the total score)
         if (candNiv != null && offreNiv != null) {
             score += calculateNiveauScore(candNiv, offreNiv) * 0.3;
         }
 
+        // Round the result and cap it at 100%
         return (int) Math.min(Math.round(score), 100);
     }
 
+    /**
+     * Calculates skill matching using an intersection-based approach (Jaccard similarity style).
+     * Compares how many of the required skills the candidate possesses.
+     */
     private double calculateCompetenceScore(String candComp, String offreComp) {
         Set<String> candidatSet = parseCompetences(candComp);
         Set<String> offreSet = parseCompetences(offreComp);
 
         if (offreSet.isEmpty()) return 0;
 
+        // Count how many required skills are present in the candidate's profile
         long matches = offreSet.stream()
                 .filter(candidatSet::contains)
                 .count();
@@ -71,15 +90,23 @@ public class MatchingService {
         return ((double) matches / offreSet.size()) * 100;
     }
 
+    /**
+     * Compares standardized education levels.
+     * Returns 100% if the candidate meets or exceeds the requirement.
+     * Returns 50% if the candidate is exactly one level below (e.g., Bac+4 for a Bac+5 job).
+     */
     private double calculateNiveauScore(String candNiv, String offreNiv) {
         int nivCand = normaliserNiveau(candNiv);
         int nivOffre = normaliserNiveau(offreNiv);
 
-        if (nivCand >= nivOffre) return 100; // Profil égal ou supérieur
-        if (nivCand == nivOffre - 1) return 50; // Un niveau en dessous (ex: Bac+4 pour Bac+5)
+        if (nivCand >= nivOffre) return 100; // Profile meets or exceeds requirements
+        if (nivCand == nivOffre - 1) return 50; // Profile is close (one year/level difference)
         return 0;
     }
 
+    /**
+     * Converts natural language education strings into comparable numeric ranks.
+     */
     private int normaliserNiveau(String niveau) {
         if (niveau == null) return 0;
         String n = niveau.toLowerCase();
@@ -92,6 +119,10 @@ public class MatchingService {
         return 0;
     }
 
+    /**
+     * Utility method to transform comma-separated strings into a cleaned set of unique keywords.
+     * Handles case-insensitivity and whitespace trimming.
+     */
     private Set<String> parseCompetences(String input) {
         if (input == null || input.isEmpty()) return Collections.emptySet();
         Set<String> result = new HashSet<>();

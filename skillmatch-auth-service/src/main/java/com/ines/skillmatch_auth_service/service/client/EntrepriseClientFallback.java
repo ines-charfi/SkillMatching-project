@@ -4,16 +4,17 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
 
+// Fallback implementation for EntrepriseClient – called when the enterprise service is unavailable.
 @Component
 public class EntrepriseClientFallback implements EntrepriseClient {
 
+    // Fallback for company initialization: throws an exception to prevent incomplete registration.
     @Override
     public void initEntreprise(Long userId, String nom) {
-        // Mode secours : Si le service entreprise est en panne au moment où un recruteur crée son compte,
-        // on jette une exception pour stopper l'inscription proprement plutôt que de créer un compte incomplet.
         throw new RuntimeException("Impossible d'initialiser le compte entreprise. Le service entreprise est indisponible.");
     }
 
+    // Fallback for fetching company profile: returns dummy data with an error message.
     @Override
     public Map<String, Object> getEntrepriseByUserId(Long userId) {
         Map<String, Object> fallback = new HashMap<>();

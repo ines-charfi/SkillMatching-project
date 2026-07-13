@@ -4,16 +4,17 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
 
+// Fallback implementation for CandidatClient – called when the candidate service is unavailable.
 @Component
 public class CandidatClientFallback implements CandidatClient {
 
+    // Fallback for profile initialization: throws an exception to prevent incomplete registration.
     @Override
     public void initCandidat(Long userId, String nom, String prenom) {
-        // Mode secours : On jette une exception pour empêcher la finalisation de l'inscription
-        // si le microservice candidat ne peut pas être initialisé.
         throw new RuntimeException("Impossible d'initialiser le profil candidat. Le service candidat est indisponible.");
     }
 
+    // Fallback for fetching candidate profile: returns dummy data with an error message.
     @Override
     public Map<String, Object> getCandidatByUserId(Long userId) {
         Map<String, Object> fallback = new HashMap<>();

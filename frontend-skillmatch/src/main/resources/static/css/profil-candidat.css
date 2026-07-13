@@ -14,7 +14,7 @@ body {
     border: none;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-    background: white;
+    background: #94b5fd;
     margin: 20px 16px;
     padding: 20px;
     transition: 0.3s;
@@ -62,7 +62,7 @@ body {
     font-weight: 600;
     font-size: 0.8rem;
     margin-bottom: 4px;
-    color: #475569;
+    color: #313c49;
 }
 .bg-light {
     background-color: #f8fafc !important;

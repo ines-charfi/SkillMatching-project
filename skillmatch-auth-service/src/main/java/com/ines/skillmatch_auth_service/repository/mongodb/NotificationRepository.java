@@ -7,7 +7,10 @@ import java.util.List;
 
 @Repository
 public interface NotificationRepository extends MongoRepository<Notification, String> {
-    // FIX : Filtrage croisé avec l'ID et le rôle du destinataire
+
+    // Finds all notifications for a specific user and role, sorted newest first.
     List<Notification> findByUserIdTargetAndRecipientRoleOrderByDateCreationDesc(Long userIdTarget, String recipientRole);
+
+    // Counts unread notifications for a specific user and role.
     long countByUserIdTargetAndRecipientRoleAndLuFalse(Long userIdTarget, String recipientRole);
 }

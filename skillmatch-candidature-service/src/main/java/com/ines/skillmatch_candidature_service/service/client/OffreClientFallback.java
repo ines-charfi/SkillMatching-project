@@ -7,9 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// Fallback implementation for OffreClient – called when the offer service is unavailable.
 @Component
 public class OffreClientFallback implements OffreClient {
 
+    // Fallback for fetching a single offer by ID: returns a dummy offer with a maintenance message.
     @Override
     public Map<String, Object> getOffre(Long id) {
         Map<String, Object> fallback = new HashMap<>();
@@ -19,10 +21,10 @@ public class OffreClientFallback implements OffreClient {
         fallback.put("statut", "MAINTENANCE");
         return fallback;
     }
+
+    // Fallback for fetching offers by company: returns an empty list to avoid breaking the frontend display.
     @Override
     public List<Map<String, Object>> getOffresByEntreprise(Long entrepriseId) {
-        // En cas de panne du service Offre, on renvoie une liste vide.
-        // Cela évite de faire planter l'affichage du profil de l'entreprise sur le frontend.
         return new ArrayList<>();
     }
 }

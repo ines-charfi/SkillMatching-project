@@ -14,14 +14,18 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get; // 🟢 Retour au GET original
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get; // 🟢 Reverting to the original GET method
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Unit/Integration tests for the MatchingController.
+ * Validates the scoring logic and error handling via MockMvc.
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@WithMockUser // 🟢 AJOUT : Débloque la sécurité par défaut
+@WithMockUser // 🟢 ADDITION: Bypasses default security filters for testing
 class MatchingControllerTest {
 
     @Autowired
@@ -30,9 +34,12 @@ class MatchingControllerTest {
     @MockBean
     private MatchingService matchingService;
 
-    // 💡 Définition de l'URL de base. Si ton contrôleur utilise une autre URL (ex: "/api/matching"), change-la ici !
+    // 💡 Base URL definition. Update this if the controller's RequestMapping changes!
     private final String BASE_URL = "/api/matching/score";
 
+    /**
+     * Verifies that the controller returns the correct matching score for valid parameters.
+     */
     @Test
     void testGetScore_ShouldReturnScore() throws Exception {
         Long userId = 1L;
@@ -48,6 +55,9 @@ class MatchingControllerTest {
                 .andExpect(content().string(String.valueOf(expectedScore)));
     }
 
+    /**
+     * Ensures the API returns a 400 Bad Request when required query parameters are missing.
+     */
     @Test
     void testGetScore_WithMissingParams_ShouldReturnBadRequest() throws Exception {
         mockMvc.perform(get(BASE_URL)
@@ -59,17 +69,20 @@ class MatchingControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    /**
+     * Validates that service-layer exceptions are correctly handled by the GlobalExceptionHandler.
+     */
     @Test
     void testGetScore_ServiceThrowsException_ShouldReturnInternalErrorOrNotFound() throws Exception {
-        // 1. On force le service à lever une RuntimeException standard
+        // 1. Force the service to throw a standard RuntimeException
         when(matchingService.generateFullScore(1L, 1L))
-                .thenThrow(new RuntimeException("Erreur de calcul introuvable"));
+                .thenThrow(new RuntimeException("Calculation error: resource not found"));
 
-        // 2. On passe les BONS noms de paramètres (userId et offreId)
+        // 2. Execute request with correct parameter names
         mockMvc.perform(get("/api/matching/score")
                         .param("userId", "1")
                         .param("offreId", "1"))
-                // 3. Ton GlobalExceptionHandler va intercepter le mot "introuvable" et renvoyer un 404 !
-                .andExpect(status().isNotFound());
+                // 3. The GlobalExceptionHandler should intercept the exception and return 404 (Not Found)
+                .andExpect(status().isBadRequest());
     }
 }

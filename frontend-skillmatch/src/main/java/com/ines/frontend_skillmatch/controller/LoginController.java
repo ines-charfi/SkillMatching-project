@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 import java.util.HashMap;
 
+/**
+ * Controller responsible for public access and identity management.
+ * Handles the home page, user authentication (Login), and account creation (Registration).
+ */
 @Controller
 public class LoginController {
 
@@ -21,6 +25,11 @@ public class LoginController {
         this.authClient = authClient;
     }
 
+    /**
+     * ENDPOINT: GET /
+     * FUNCTION: Displays the public landing page (Home).
+     * LOGIC: Fetches and displays global public statistics (Total users and job offers) from the Auth microservice.
+     */
     @GetMapping("/")
     public String home(Model model) {
         try {
@@ -34,12 +43,19 @@ public class LoginController {
         return "home";
     }
 
+    /**
+     * ENDPOINT: GET /login
+     * FUNCTION: Displays the login form.
+     * LOGIC:
+     * 1. Handles feedback messages for errors, successful logout, or account creation.
+     * 2. (Note: Automatic redirection for authenticated users is currently disabled for debugging).
+     */
     @GetMapping("/login")
     public String loginPage(@RequestParam(required = false) String error,
                             @RequestParam(required = false) String logout,
                             @RequestParam(required = false) String success,
                             Model model) {
-        // CORRECTION : On commente le "if" pour empêcher la redirection automatique sauvage
+        // NOTE: Redirection logic is commented out to allow manual testing
         /* if (sessionService.isAuthenticated()) {
             return "redirect:" + sessionService.getRedirectUrlByRole();
         }
@@ -52,6 +68,15 @@ public class LoginController {
         return "login";
     }
 
+    /**
+     * ENDPOINT: POST /login
+     * FUNCTION: Processes authentication.
+     * LOGIC:
+     * 1. Sends credentials to the Auth microservice.
+     * 2. If successful, retrieves the JWT token, userId, email, and role.
+     * 3. Initializes the user session via SessionService and redirects to the role-based dashboard.
+     * 4. In case of failure, logs the technical stack trace for debugging purposes.
+     */
     @PostMapping("/login")
     public String login(@RequestParam String email, @RequestParam String password, Model model) {
         try {
@@ -72,19 +97,22 @@ public class LoginController {
                 return "login";
             }
         } catch (Exception e) {
-            // 🔥 LE LOG CHIRURGICAL : On affiche l'erreur réelle dans le terminal
-            System.err.println("[🔴 FRONTEND DEBUG] L'appel d'authentification a échoué ! Cause réelle :");
+            // Log real cause in the terminal for developer troubleshooting
+            System.err.println("[ FRONTEND DEBUG] L'appel d'authentification a échoué ! Cause réelle :");
             e.printStackTrace();
 
-            // On affiche le vrai message d'erreur de la cause sur l'interface pour t'aider
             model.addAttribute("error", "Erreur technique : " + e.getMessage());
             return "login";
         }
     }
 
+    /**
+     * ENDPOINT: GET /register
+     * FUNCTION: Displays the user registration form.
+     */
     @GetMapping("/register")
     public String registerPage() {
-        // CORRECTION : On commente aussi ici pour pouvoir créer des comptes sans être bloqué
+        // Note: Automatic redirection is disabled to allow account creation during active sessions
         /*
         if (sessionService.isAuthenticated()) {
             return "redirect:" + sessionService.getRedirectUrlByRole();
@@ -93,6 +121,14 @@ public class LoginController {
         return "register";
     }
 
+    /**
+     * ENDPOINT: POST /register
+     * FUNCTION: Processes new user registration.
+     * LOGIC:
+     * 1. Collects data based on the selected role (Candidat vs Entreprise).
+     * 2. Submits data to the AuthClient.
+     * 3. Redirects to login page upon success.
+     */
     @PostMapping("/register")
     public String register(@RequestParam String email,
                            @RequestParam String password,
@@ -123,18 +159,28 @@ public class LoginController {
         }
     }
 
+    /**
+     * ENDPOINT: GET /logout-user
+     * FUNCTION: Standard user logout.
+     * LOGIC: Destroys the custom session through SessionService and redirects with a logout flag.
+     */
     @GetMapping("/logout-user")
     public String logout() {
         sessionService.destroySession();
         return "redirect:/login?logout=true";
     }
 
+    /**
+     * ENDPOINT: GET /logout
+     * FUNCTION: Alternative logout through HttpSession invalidation.
+     * LOGIC: Invalidates the underlying HTTP session and redirects to login.
+     */
     @GetMapping("/logout")
     public String logout(HttpSession session) {
-        // 1. On détruit la session personnalisée (ton SessionService)
+        // 1. Invalidate custom session management
         session.invalidate();
 
-        // 2. On redirige vers la page de login avec le paramètre de succès
+        // 2. Redirect to login page
         return "redirect:/login?logout";
     }
 }

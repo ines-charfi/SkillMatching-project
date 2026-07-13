@@ -9,17 +9,19 @@ import java.util.Map;
 @Component
 public class OffreClientFallback implements OffreClient {
 
+    // Fallback for active offers: returns an empty list to avoid UI crashes.
     @Override
     public List<Map<String, Object>> getAllActive() {
-        // Renvoie une liste vide si le service des offres est indisponible
         return new ArrayList<>();
     }
 
+    // Fallback for offers by company: returns an empty list.
     @Override
     public List<Map<String, Object>> getByEntreprise(Long entrepriseId) {
         return new ArrayList<>();
     }
 
+    // Fallback for creating an offer: returns an error map.
     @Override
     public Map<String, Object> create(Map<String, Object> offreData) {
         Map<String, Object> fallback = new HashMap<>();
@@ -27,11 +29,13 @@ public class OffreClientFallback implements OffreClient {
         return fallback;
     }
 
+    // Fallback for deleting an offer: silently logs or does nothing.
     @Override
     public void delete(Long id) {
-        // Log ou gestion silencieuse en mode dégradé
+        // Silent degradation: no action taken
     }
 
+    // Fallback for fetching an offer by ID: returns a placeholder with limited info.
     @Override
     public Map<String, Object> getById(Long id) {
         Map<String, Object> fallback = new HashMap<>();
@@ -40,6 +44,7 @@ public class OffreClientFallback implements OffreClient {
         return fallback;
     }
 
+    // Fallback for updating an offer: returns an error map.
     @Override
     public Map<String, Object> update(Long id, Map<String, Object> offreData) {
         Map<String, Object> fallback = new HashMap<>();

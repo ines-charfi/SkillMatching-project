@@ -17,80 +17,99 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Service
+@RequiredArgsConstructor
+@Slf4j
+// Forces JPA to scan only the 'jpa' package for repositories (avoids conflicts with MongoDB).
+@EnableJpaRepositories(basePackages = "com.ines.skillmatch_auth_service.repository.jpa")
+// Forces MongoDB to scan only the 'mongodb' package for repositories.
+@EnableMongoRepositories(basePackages = "com.ines.skillmatch_auth_service.repository.mongodb")
+public class AuthService {
 
-    @Service
-    @RequiredArgsConstructor
-    @Slf4j
-    // 1. On force JPA à ne scanner QUE le package 'jpa'
-    @EnableJpaRepositories(basePackages = "com.ines.skillmatch_auth_service.repository.jpa")
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
+    private final CandidatClient candidatClient;
+    private final EntrepriseClient entrepriseClient;
 
-// 2. On force MongoDB à ne scanner QUE le package 'mongodb'
-    @EnableMongoRepositories(basePackages = "com.ines.skillmatch_auth_service.repository.mongodb")
-    public class AuthService {
+    /**
+     * Registers a new user account.
+     * - Validates email uniqueness.
+     * - Encrypts the password using BCrypt.
+     * - Saves the user in the database.
+     * - Initializes the corresponding profile in the candidate or enterprise service.
+     * - Generates a JWT token and returns it.
+     */
+    @Transactional
+    public AuthResponse register(RegisterRequest request) {
+        // Check if the email is already taken
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Cet email est déjà utilisé");
+        }
 
-        private final UserRepository userRepository;
-        private final PasswordEncoder passwordEncoder;
-        private final AuthenticationManager authenticationManager;
-        private final JwtService jwtService;
-        private final CandidatClient candidatClient;
-        private final EntrepriseClient entrepriseClient;
+        // Build and save the new user entity (password is hashed)
+        User user = User.builder()
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(request.getRole())
+                .provider("LOCAL")
+                .enabled(true)
+                .build();
 
-        @Transactional
-        public AuthResponse register(RegisterRequest request) {
-            if (userRepository.existsByEmail(request.getEmail())) {
-                throw new RuntimeException("Cet email est déjà utilisé");
+        user = userRepository.save(user);
+
+        // Initialize the user profile in the appropriate microservice (Candidat or Entreprise)
+        try {
+            if (user.getRole() == User.Role.CANDIDAT) {
+                candidatClient.initCandidat(user.getId(), request.getNom(), request.getPrenom());
+            } else if (user.getRole() == User.Role.ENTREPRISE) {
+                // Note: Using candidatClient as a fallback – should be replaced with entrepriseClient.initEntreprise()
+                candidatClient.initCandidat(user.getId(), request.getNomEntreprise(), "");
             }
-
-            User user = User.builder()
-                    .email(request.getEmail())
-                    .password(passwordEncoder.encode(request.getPassword()))
-                    .role(request.getRole())
-                    .provider("LOCAL")
-                    .enabled(true)
-                    .build();
-
-            user = userRepository.save(user);
-
-            // INITIALISATION DU PROFIL DANS LES AUTRES SERVICES
-            try {
-                if (user.getRole() == User.Role.CANDIDAT) {
-                    candidatClient.initCandidat(user.getId(), request.getNom(), request.getPrenom());
-                } else if (user.getRole() == User.Role.ENTREPRISE) {
-                    candidatClient.initCandidat(user.getId(), request.getNomEntreprise(), "");
-                    // Note: Tu peux adapter selon ton EntrepriseClient
-                }
-            } catch (Exception e) {
-                log.error("Erreur communication inter-service: {}", e.getMessage());
-            }
-
-            return AuthResponse.builder()
-                    .token(jwtService.generateToken(UserDetailsImpl.build(user)))
-                    .email(user.getEmail())
-                    .role(user.getRole().name())
-                    .userId(user.getId())
-                    .message("Inscription réussie")
-                    .build();
+        } catch (Exception e) {
+            // Log the error but don't block registration – the user account exists even if profile init fails
+            log.error("Erreur communication inter-service: {}", e.getMessage());
         }
 
-        public AuthResponse login(LoginRequest request) {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-            );
-            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-            return AuthResponse.builder()
-                    .token(jwtService.generateToken(userDetails))
-                    .email(userDetails.getEmail())
-                    .role(userDetails.getRole().name())
-                    .userId(userDetails.getId())
-                    .message("Connexion réussie")
-                    .build();
-        }
-
-
-        public void logout(String token) {
-            // Avec JWT, on peut blacklister le token ou simplement le supprimer côté client
-            // Pour l'instant, on ne fait rien côté serveur
-
-        }
+        // Generate JWT token and build the response
+        return AuthResponse.builder()
+                .token(jwtService.generateToken(UserDetailsImpl.build(user)))
+                .email(user.getEmail())
+                .role(user.getRole().name())
+                .userId(user.getId())
+                .message("Inscription réussie")
+                .build();
     }
 
+    /**
+     * Authenticates a user with email and password.
+     * - Delegates to Spring Security's AuthenticationManager.
+     * - If credentials are valid, generates a JWT token.
+     * - Returns the token along with user info.
+     */
+    public AuthResponse login(LoginRequest request) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+        );
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+        return AuthResponse.builder()
+                .token(jwtService.generateToken(userDetails))
+                .email(userDetails.getEmail())
+                .role(userDetails.getRole().name())
+                .userId(userDetails.getId())
+                .message("Connexion réussie")
+                .build();
+    }
+
+    /**
+     * Handles logout.
+     * With stateless JWT, token invalidation is managed client-side (the client simply discards the token).
+     * Server-side blacklisting can be added later if needed.
+     */
+    public void logout(String token) {
+        // No server-side action required for stateless JWT
+        // Token blacklisting could be implemented here in the future
+    }
+}

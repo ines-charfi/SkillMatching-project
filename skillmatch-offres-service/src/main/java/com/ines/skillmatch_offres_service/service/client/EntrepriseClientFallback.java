@@ -4,9 +4,11 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
 
+// Fallback implementation for EntrepriseClient – called when the enterprise service is unavailable.
 @Component
 public class EntrepriseClientFallback implements EntrepriseClient {
 
+    // Fallback for fetching company by user ID: returns dummy data with a "DOWN" status.
     @Override
     public Map<String, Object> getEntrepriseByUserId(Long userId) {
         Map<String, Object> fallback = new HashMap<>();
@@ -16,6 +18,7 @@ public class EntrepriseClientFallback implements EntrepriseClient {
         return fallback;
     }
 
+    // Fallback for fetching company by internal ID: returns dummy data with a "DOWN" status.
     @Override
     public Map<String, Object> getById(Long id) {
         Map<String, Object> fallback = new HashMap<>();

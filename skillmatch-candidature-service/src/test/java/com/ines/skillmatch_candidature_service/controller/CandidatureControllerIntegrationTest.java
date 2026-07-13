@@ -21,10 +21,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-// 1. 🟢 IMPORT CRITIQUE : Permet de contourner le blocage du jeton anti-falsification (CSRF) de Spring Security
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -85,7 +84,6 @@ class CandidatureControllerIntegrationTest {
         Mockito.when(candidatClient.getProfil(3L)).thenReturn(candidatMock);
         Mockito.when(offreClient.getOffre(12L)).thenReturn(offreMock);
 
-        // 2. 🟢 CORRECTION : Ajout du jeton CSRF pour passer la barrière de sécurité en POST
         mockMvc.perform(post("/api/candidatures")
                         .param("candidatId", "3")
                         .param("offreId", "12")
@@ -100,7 +98,6 @@ class CandidatureControllerIntegrationTest {
         Map<String, String> updateBody = new HashMap<>();
         updateBody.put("statut", "ACCEPTE");
 
-        // 3. 🟢 CORRECTION : Ajout du jeton CSRF pour passer la barrière de sécurité en PATCH
         mockMvc.perform(patch("/api/candidatures/999")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateBody))
@@ -116,7 +113,6 @@ class CandidatureControllerIntegrationTest {
         candidature.setStatut(Candidature.Statut.EN_ATTENTE);
         candidatureRepository.save(candidature);
 
-        // 4. 🟢 CORRECTION : Ajout du jeton CSRF
         mockMvc.perform(post("/api/candidatures/entreprise/entretiens/planifier")
                         .param("candidatureId", candidature.getId().toString())
                         .param("date", "2026-06-12T11:15")
@@ -128,13 +124,38 @@ class CandidatureControllerIntegrationTest {
 
     @Test
     void testPlanifierEntretien_CandidatureIntrouvable_ShouldThrowException() throws Exception {
-        // Plus besoin de assertThrows ! On vérifie le comportement de l'API directement
         mockMvc.perform(post("/api/candidatures/entreprise/entretiens/planifier")
                         .param("candidatureId", "999")
                         .param("date", "2026-06-12T11:15")
                         .param("lieu", "Nulle part")
-                        .param("notes", "Test Erreur")
+                        .param("notes", "Error Test Case")
                         .with(csrf()))
-                .andExpect(status().isNotFound()); // Ou .isInternalServerError() selon ton GlobalExceptionHandler
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser
+    void testGetByCandidat_ShouldReturnList() throws Exception {
+        // 🔧 1. Insérer deux candidatures pour le candidat 1
+        Candidature c1 = new Candidature();
+        c1.setCandidatId(1L);
+        c1.setOffreId(10L);
+        c1.setStatut(Candidature.Statut.EN_ATTENTE);
+        c1.setScoreMatching(75);
+        candidatureRepository.save(c1);
+
+        Candidature c2 = new Candidature();
+        c2.setCandidatId(1L);
+        c2.setOffreId(20L);
+        c2.setStatut(Candidature.Statut.ACCEPTE);
+        c2.setScoreMatching(90);
+        candidatureRepository.save(c2);
+
+        // 🔧 2. Appeler l'endpoint et vérifier que la réponse contient 2 éléments
+        mockMvc.perform(get("/api/candidatures/candidat/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(2));
     }
 }

@@ -25,7 +25,7 @@ body {
 }
 
 .navbar-brand img {
-    height: 32px;
+    height: 50px;
     width: auto;
 }
 
@@ -148,4 +148,121 @@ body {
 .notif-badge {
     background: var(--gradient-navbar);
     color: var(--primary);
+}
+/* ==========================================================================
+   NOUVELLES CLASSES POUR REMPLACER LES STYLES INLINE
+   ========================================================================== */
+
+/* 1. Dropdown des notifications */
+.notif-dropdown {
+    width: 320px;
+    max-height: 400px;
+    overflow-y: auto;
+    border-radius: 12px;
+}
+
+/* 2. Texte très petit (remplace font-size: 0.72rem) */
+.text-xs {
+    font-size: 0.72rem !important;
+}
+
+/* 3. Améliorations globales (fond, cartes, bouton) */
+body {
+    background: linear-gradient(145deg, #eef2ff 0%, #f8fafc 100%) !important;
+}
+
+.sidebar-card,
+.offer-card,
+.stat-card {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    box-shadow: 0 8px 32px rgba(79, 70, 229, 0.08) !important;
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.offer-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(79, 70, 229, 0.12) !important;
+}
+
+.sidebar-card .btn-primary {
+    background: linear-gradient(135deg, #4f46e5, #6366f1) !important;
+    border: none !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.3px;
+    transition: all 0.25s ease !important;
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25) !important;
+}
+
+.sidebar-card .btn-primary:hover {
+    transform: scale(1.02) !important;
+    box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4) !important;
+    background: linear-gradient(135deg, #4338ca, #4f46e5) !important;
+}
+
+.sidebar-card .border-top.border-light {
+    padding-top: 1.25rem !important;
+    margin-top: 0.5rem !important;
+}
+
+.sidebar-card .btn-primary.w-100 {
+    margin-top: 1.5rem !important;
+}
+
+.sidebar-card .border-top.border-light h6 {
+    color: #4f46e5 !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    font-size: 0.75rem !important;
+}
+
+.sidebar-card .btn-outline-primary {
+    border-color: #4f46e5 !important;
+    color: #4f46e5 !important;
+    transition: all 0.2s ease !important;
+}
+
+.sidebar-card .btn-outline-primary:hover {
+    background: #4f46e5 !important;
+    color: #fff !important;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3) !important;
+}
+
+.skill-badge {
+    background: #e0e7ff !important;
+    color: #3730a3 !important;
+    font-weight: 600 !important;
+    padding: 5px 14px !important;
+    border-radius: 30px !important;
+    font-size: 11px !important;
+    transition: 0.2s;
+}
+
+.skill-badge:hover {
+    background: #c7d2fe !important;
+    transform: translateY(-1px);
+}
+
+.stat-card {
+    background: #ffffff !important;
+    border-left: 4px solid #4f46e5 !important;
+    border-radius: 16px !important;
+}
+
+.stat-card .bg-primary.bg-opacity-10 {
+    background: #eef2ff !important;
+}
+
+.stat-card .text-primary {
+    color: #4f46e5 !important;
+}
+
+.stat-card .bg-success.bg-opacity-10 {
+    background: #dcfce7 !important;
+}
+
+.stat-card .text-success {
+    color: #16a34a !important;
 }

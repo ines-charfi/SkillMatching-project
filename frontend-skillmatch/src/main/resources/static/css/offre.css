@@ -1,7 +1,14 @@
 /* ============================================ */
 /* PAGE CRÉER OFFRE – MOBILE-FIRST              */
 /* ============================================ */
+.container {
+    padding-top: 40px; /* Espace entre la navbar et le titre "Offres d'emploi" */
+}
 
+.page-title {
+    margin-bottom: 30px;
+    font-weight: 700;
+}
 /* ========== MOBILE (défaut) ========== */
 .offre-wrapper {
     margin-top: 70px;          /* espace réduit pour le header sticky */

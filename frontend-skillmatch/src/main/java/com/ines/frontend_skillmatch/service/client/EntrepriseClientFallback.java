@@ -10,6 +10,7 @@ import java.util.Map;
 @Component
 public class EntrepriseClientFallback implements EntrepriseClient {
 
+    // Fallback for fetching company profile: returns a dummy profile with a placeholder message.
     @Override
     public Map<String, Object> getByUserId(Long userId) {
         Map<String, Object> fallback = new HashMap<>();
@@ -20,6 +21,7 @@ public class EntrepriseClientFallback implements EntrepriseClient {
         return fallback;
     }
 
+    // Fallback for updating company profile: returns an error indicating service unavailability.
     @Override
     public Map<String, Object> updateProfil(Long userId, String nomEntreprise, String secteur,
                                             String description, String siteWeb, String telephone,
@@ -30,10 +32,9 @@ public class EntrepriseClientFallback implements EntrepriseClient {
         return fallback;
     }
 
+    // Fallback for downloading company logo: returns HTTP 503 so the frontend can display a default placeholder.
     @Override
     public ResponseEntity<byte[]> getLogo(Long id) {
-        // En cas de panne du service, on retourne un code HTTP 503 (Service Unavailable)
-        // Cela permettra à ton contrôleur frontend d'intercepter la panne et d'afficher une image/logo par défaut (placeholder)
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
     }
 }

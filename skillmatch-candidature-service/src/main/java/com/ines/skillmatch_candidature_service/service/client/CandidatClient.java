@@ -6,9 +6,20 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Map;
 
-// On lie l'interface à sa classe de secours en cas de panne
+/**
+ * Declarative REST client for inter-service communication with the Candidate microservice.
+ * This interface allows the Candidature service to fetch candidate profile details.
+ * It is integrated with a fallback mechanism for fault tolerance and resilience.
+ */
 @FeignClient(name = "skillmatch-candidat-service", fallback = CandidatClientFallback.class)
 public interface CandidatClient {
+
+    /**
+     * Retrieves a candidate's profile data from the remote service using the user ID.
+     *
+     * @param userId The unique identifier of the user linked to the candidate profile
+     * @return A Map containing candidate profile information (e.g., skills, education)
+     */
     @GetMapping("/api/candidats/user/{userId}")
     Map<String, Object> getProfil(@PathVariable("userId") Long userId);
 }

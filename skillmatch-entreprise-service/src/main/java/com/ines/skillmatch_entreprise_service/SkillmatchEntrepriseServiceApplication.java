@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@EnableFeignClients // Indispensable pour la communication microservices
+@EnableFeignClients //to improve the  communication of microservices
 public class SkillmatchEntrepriseServiceApplication {
 
 	public static void main(String[] args) {

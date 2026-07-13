@@ -7,18 +7,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.List;
 import java.util.Map;
 
-// Ton annotation @FeignClient doit déjà être là, ne touche qu'aux méthodes en dessous :
-@FeignClient(name = "skillmatch-offre-service", url = "http://offre-service:8084", fallback = OffreClientFallback.class) // ou ton URL actuelle
+// Feign client for the Offre microservice. Uses a fixed URL (dev config) and a fallback for resilience.
+@FeignClient(name = "skillmatch-offres-service", url = "http://offre-service:8084", fallback = OffreClientFallback.class)
 public interface OffreClient {
 
-    // Garde tes méthodes actuelles (comme countAllOffres()) et AJOUTE ces deux-là :
-
-    @GetMapping("/api/offres") // Vérifie que c'est bien le bon endpoint de ton microservice Offre
+    // Retrieves all job offers from the offer service.
+    @GetMapping("/api/offres")
     List<Map<String, Object>> getAllOffres();
 
-    @DeleteMapping("/api/offres/{id}") // Vérifie aussi cet endpoint de suppression
+    // Deletes a specific job offer by its ID.
+    @DeleteMapping("/api/offres/{id}")
     void deleteOffre(@PathVariable("id") Long id);
 
-    @GetMapping("/api/offres/count") // Exemple de ce que tu avais peut-être déjà
+    // Counts the total number of job offers (used for statistics).
+    @GetMapping("/api/offres/count")
     Long countAllOffres();
 }

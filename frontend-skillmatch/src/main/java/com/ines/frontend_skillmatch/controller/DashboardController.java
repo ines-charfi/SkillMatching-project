@@ -12,11 +12,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
+/**
+ * Controller managing User Dashboards for both Candidates and Recruiters.
+ * It coordinates profile management, job offers, applications, and notifications.
+ */
 @Controller
 public class DashboardController {
 
@@ -41,14 +43,31 @@ public class DashboardController {
         this.sessionService = sessionService;
     }
 
+    /**
+     * ENDPOINT: GET /dashboard
+     * FUNCTION: Central routing point.
+     * LOGIC: Checks authentication and redirects users to their specific dashboard based on their security role.
+     */
     @GetMapping("/dashboard")
     public String genericDashboard() {
         if (!sessionService.isAuthenticated()) return "redirect:/login";
         return "redirect:" + sessionService.getRedirectUrlByRole();
     }
+
     // =========================================================================
-// ESPACE CANDIDAT
-// =========================================================================
+    // CANDIDATE SPACE
+    // =========================================================================
+
+    /**
+     * ENDPOINT: GET /dashboard-candidat
+     * FUNCTION: Loads the candidate's personal area.
+     * LOGIC:
+     * 1. Fetches candidate profile and notifications.
+     * 2. Retrieves all active job offers.
+     * 3. Calculates a matching score for each offer using the Matching service.
+     * 4. Filters offers to show only those with a score >= 50%.
+     * 5. Displays the history of submitted applications.
+     */
     @GetMapping("/dashboard-candidat")
     public String dashboardCandidat(Model model) {
         if (!sessionService.isAuthenticated() || !sessionService.isCandidat()) return "redirect:/login";
@@ -60,7 +79,6 @@ public class DashboardController {
         model.addAttribute("offres", new ArrayList<>());
         model.addAttribute("candidatures", new ArrayList<>());
 
-        // Récupération des notifications
         try {
             model.addAttribute("notifCount", notificationClient.countNonLues(userId, "candidate"));
             model.addAttribute("notifications", notificationClient.getNotifications(userId, "candidate"));
@@ -70,7 +88,6 @@ public class DashboardController {
             model.addAttribute("notifications", new ArrayList<>());
         }
 
-        // Profil Réel
         try {
             Map<String, Object> profil = candidatClient.getProfil(userId);
             System.out.println(">>>> PROFIL BRUT RECU : " + profil);
@@ -79,7 +96,6 @@ public class DashboardController {
             System.err.println("❌ Erreur Feign getProfil : " + e.getMessage());
         }
 
-        // Offres d'emploi & Algorithme de Matching
         try {
             Object reponseOffres = offreClient.getAllActive();
             List<Map<String, Object>> toutesLesOffres = null;
@@ -103,16 +119,11 @@ public class DashboardController {
                         if (score >= 50) {
                             o.put("scoreMatching", score);
 
-                            // 🛠️ CHANGEMENT ICI : On crée la variable attendue par Thymeleaf
-                            // Si le microservice offre déjà une variable comme "entrepriseNom" ou "nomEntreprise", on l'utilise.
-                            // Sinon, on met un nom générique pour éviter que Thymeleaf n'affiche du vide.
                             if (o.containsKey("entrepriseNom")) {
-                                // Le microservice envoyait déjà le nom, on s'assure qu'il reste
                                 o.put("entrepriseNom", o.get("entrepriseNom"));
                             } else if (o.containsKey("nomEntreprise")) {
                                 o.put("entrepriseNom", o.get("nomEntreprise"));
                             } else {
-                                // Si le microservice n'envoie VRAIMENT que l'ID, on écrit "Société anonyme"
                                 o.put("entrepriseNom", "Société anonyme (ID: " + o.get("entrepriseId") + ")");
                             }
 
@@ -128,7 +139,6 @@ public class DashboardController {
             System.err.println("❌ Erreur récupération des offres : " + e.getMessage());
         }
 
-        // Historique des candidatures envoyées
         try {
             List<?> candidaturesData = candidatureClient.getByCandidat(userId);
             if (candidaturesData != null) model.addAttribute("candidatures", candidaturesData);
@@ -139,6 +149,10 @@ public class DashboardController {
         return "dashboard-candidat";
     }
 
+    /**
+     * ENDPOINT: GET /profil
+     * FUNCTION: Renders the profile settings page for a candidate.
+     */
     @GetMapping("/profil")
     public String profilPage(Model model) {
         if (!sessionService.isAuthenticated() || sessionService.isEntreprise()) return "redirect:/login";
@@ -152,6 +166,11 @@ public class DashboardController {
         return "profil-candidat";
     }
 
+    /**
+     * ENDPOINT: POST /profil/update
+     * FUNCTION: Processes candidate profile updates including file uploads.
+     * LOGIC: Sanitizes null inputs to empty strings for Feign compatibility and sends multi-part data (CV, Photo).
+     */
     @PostMapping("/profil/update")
     public String handleProfilUpdate(@RequestParam("prenom") String prenom,
                                      @RequestParam("nom") String nom,
@@ -166,8 +185,6 @@ public class DashboardController {
                                      @RequestParam(value = "photo", required = false) MultipartFile photo,
                                      RedirectAttributes ra) {
         try {
-            //  Astuce de sécurité : Remplacer les valeurs nulles par des chaînes vides
-            // car Feign gère mal l'envoi de variables purement 'null' dans un bloc @RequestPart
             String telParam = (telephone != null) ? telephone : "";
             String adrParam = (adresse != null) ? adresse : "";
             String bioParam = (bio != null) ? bio : "";
@@ -176,7 +193,6 @@ public class DashboardController {
             String portParam = (portfolioUrl != null) ? portfolioUrl : "";
             String nivParam = (niveauScolaire != null) ? niveauScolaire : "";
 
-            // Appel de ton client Feign mis à jour (Tout en @RequestPart)
             candidatClient.updateProfil(
                     sessionService.getUserId(),
                     prenom,
@@ -200,6 +216,10 @@ public class DashboardController {
         return "redirect:/dashboard-candidat";
     }
 
+    /**
+     * ENDPOINT: POST /postuler
+     * FUNCTION: Submits a new job application for the current user.
+     */
     @PostMapping("/postuler")
     public String postuler(@RequestParam Long offreId, RedirectAttributes ra) {
         try {
@@ -211,7 +231,10 @@ public class DashboardController {
         return "redirect:/dashboard-candidat";
     }
 
-    //  FIX PROXY AVATAR
+    /**
+     * ENDPOINT: GET /api/candidats/avatar/{userId}
+     * FUNCTION: Proxies requests to retrieve a candidate's avatar from the storage service.
+     */
     @GetMapping("/api/candidats/avatar/{userId}")
     @ResponseBody
     public ResponseEntity<byte[]> proxyAvatar(@PathVariable Long userId) {
@@ -222,7 +245,10 @@ public class DashboardController {
         }
     }
 
-    //  FIX PROXY DOWNLOAD CV
+    /**
+     * ENDPOINT: GET /api/candidats/download/cv/{userId}
+     * FUNCTION: Proxies the download of a CV file, enforcing PDF media type.
+     */
     @GetMapping("/api/candidats/download/cv/{userId}")
     public ResponseEntity<byte[]> proxyDownloadCv(@PathVariable Long userId) {
         try {
@@ -239,13 +265,23 @@ public class DashboardController {
             return ResponseEntity.internalServerError().build();
         }
     }
-// =========================================================================
-// ESPACE RECRUTEUR / ENTREPRISE
-// =========================================================================
+
+    // =========================================================================
+    // RECRUITER / ENTERPRISE SPACE
+    // =========================================================================
+
+    /**
+     * ENDPOINT: GET /dashboard-entreprise
+     * FUNCTION: Loads the recruiter's management area.
+     * LOGIC:
+     * 1. Fetches company profile and notifications.
+     * 2. Retrieves company-specific statistics and published offers.
+     * 3. Fetches all received applications and enriches them with Candidate's full name and Matching scores.
+     */
     @GetMapping("/dashboard-entreprise")
     public String dashboardEntreprise(Model model) {
         if (!sessionService.isAuthenticated() || !sessionService.isEntreprise()) return "redirect:/login";
-        Long userId = sessionService.getUserId(); // C'est cet ID qui reçoit la notif !
+        Long userId = sessionService.getUserId();
 
         model.addAttribute("profil", new HashMap<>());
         model.addAttribute("offres", new ArrayList<>());
@@ -269,10 +305,9 @@ public class DashboardController {
                 if (profil.get("id") != null) {
                     Long entId = Long.valueOf(profil.get("id").toString());
 
-                    // Le reste de ton code pour les offres, stats et candidatures reste inchangé...
                     try { model.addAttribute("offres", offreClient.getByEntreprise(entId)); } catch (Exception e) {}
                     try { model.addAttribute("stats", candidatureClient.getStatsEntreprise(entId)); } catch (Exception e) {}
-                    // Récupération et enrichissement des candidatures reçues
+
                     try {
                         List<Map<String, Object>> candidatures = candidatureClient.getByEntreprise(entId);
                         if (candidatures != null) {
@@ -280,7 +315,6 @@ public class DashboardController {
                                 if (c.get("candidatId") != null) {
                                     Long candidatId = Long.valueOf(c.get("candidatId").toString());
 
-                                    // Insertion Nom complet du candidat
                                     try {
                                         Map<String, Object> profilCandidat = candidatClient.getProfil(candidatId);
                                         if (profilCandidat != null) {
@@ -294,7 +328,6 @@ public class DashboardController {
                                         c.put("candidatNomComplet", "Candidat N°" + candidatId);
                                     }
 
-                                    // Insertion du score de matching pour l'affichage
                                     try {
                                         if (c.get("offreId") != null) {
                                             Long offreId = Long.valueOf(c.get("offreId").toString());
@@ -317,6 +350,10 @@ public class DashboardController {
         return "dashboard-entreprise";
     }
 
+    /**
+     * ENDPOINT: GET /profil-entreprise
+     * FUNCTION: Renders the company profile edit page.
+     */
     @GetMapping("/profil-entreprise")
     public String profilEntreprisePage(Model model) {
         if (!sessionService.isAuthenticated() || !sessionService.isEntreprise()) return "redirect:/login";
@@ -324,12 +361,20 @@ public class DashboardController {
         return "profil-entreprise";
     }
 
+    /**
+     * ENDPOINT: POST /profil-entreprise/update
+     * FUNCTION: Updates company information including the corporate logo.
+     */
     @PostMapping("/profil-entreprise/update")
     public String handleEntrepriseProfilUpdate(@RequestParam String nomEntreprise, @RequestParam(required = false) String secteur, @RequestParam(required = false) String description, @RequestParam(required = false) String contactEmail, @RequestParam(required = false) String telephone, @RequestParam(required = false) String siteWeb, @RequestParam(required = false) String ville, @RequestParam(required = false) MultipartFile logo, RedirectAttributes ra) {
         try { entrepriseClient.updateProfil(sessionService.getUserId(), nomEntreprise, secteur, description, siteWeb, telephone, contactEmail, logo); ra.addFlashAttribute("message", "Profil entreprise mis à jour !"); } catch (Exception e) { ra.addFlashAttribute("error", "Échec."); }
         return "redirect:/dashboard-entreprise";
     }
 
+    /**
+     * ENDPOINT: GET /offre/nouveau
+     * FUNCTION: Displays the form for creating a new job offer.
+     */
     @GetMapping("/offre/nouveau")
     public String nouvelleOffreForm(Model model) {
         if (!sessionService.isAuthenticated() || !sessionService.isEntreprise()) return "redirect:/login";
@@ -337,6 +382,11 @@ public class DashboardController {
         return "creer-offre";
     }
 
+    /**
+     * ENDPOINT: POST /offre/creer
+     * FUNCTION: Saves a new job offer to the platform.
+     * LOGIC: Injects both the internal company ID and the associated User ID for tracking.
+     */
     @PostMapping("/offre/creer")
     public String handleOffreCreation(@RequestParam String titre,
                                       @RequestParam String description,
@@ -346,16 +396,12 @@ public class DashboardController {
                                       RedirectAttributes ra) {
         if (!sessionService.isAuthenticated() || !sessionService.isEntreprise()) return "redirect:/login";
         try {
-            // On utilise directement l'appel au sessionService pour éviter l'erreur de variable
             Map<String, Object> profil = entrepriseClient.getByUserId(sessionService.getUserId());
             Long codebaseId = (profil != null && profil.get("id") != null) ? Long.valueOf(profil.get("id").toString()) : null;
 
             Map<String, Object> offreData = new HashMap<>();
             offreData.put("entrepriseId", codebaseId);
-
-            // ✨ RECTIFICATION : On injecte directement l'ID utilisateur ici
             offreData.put("userId", sessionService.getUserId());
-
             offreData.put("titre", titre);
             offreData.put("description", description);
             offreData.put("competencesRequises", competencesRequises);
@@ -372,6 +418,10 @@ public class DashboardController {
         return "redirect:/dashboard-entreprise";
     }
 
+    /**
+     * ENDPOINT: GET /offre/modifier/{id}
+     * FUNCTION: Retrieves an existing offer's data for the edit form.
+     */
     @GetMapping("/offre/modifier/{id}")
     public String modifierOffreForm(@PathVariable Long id, Model model, RedirectAttributes ra) {
         if (!sessionService.isAuthenticated() || !sessionService.isEntreprise()) return "redirect:/login";
@@ -382,6 +432,10 @@ public class DashboardController {
         } catch (Exception e) { return "redirect:/dashboard-entreprise"; }
     }
 
+    /**
+     * ENDPOINT: POST /offre/update/{id}
+     * FUNCTION: Updates an existing job offer's details.
+     */
     @PostMapping("/offre/update/{id}")
     public String handleOffreUpdate(@PathVariable("id") Long id, @RequestParam String titre, @RequestParam String description, @RequestParam String niveauRequis, @RequestParam String salaire, @RequestParam String competencesRequises, RedirectAttributes ra) {
         try {
@@ -393,18 +447,30 @@ public class DashboardController {
         return "redirect:/dashboard-entreprise";
     }
 
+    /**
+     * ENDPOINT: POST /offre/supprimer/{id}
+     * FUNCTION: Permanently removes a job offer from the platform.
+     */
     @PostMapping("/offre/supprimer/{id}")
     public String supprimerOffre(@PathVariable("id") Long id, RedirectAttributes ra) {
         try { offreClient.delete(id); ra.addFlashAttribute("message", "Offre supprimée !"); } catch (Exception e) { ra.addFlashAttribute("error", "Erreur."); }
         return "redirect:/dashboard-entreprise";
     }
 
+    /**
+     * ENDPOINT: POST /candidature/statut
+     * FUNCTION: Updates the application workflow status (e.g., ACCEPTED, REJECTED).
+     */
     @PostMapping("/candidature/statut")
     public String updateCandidatureStatut(@RequestParam Long id, @RequestParam String statut, RedirectAttributes ra) {
         try { candidatureClient.updateStatut(id, statut); ra.addFlashAttribute("message", "Statut changé !"); } catch (Exception e) { ra.addFlashAttribute("error", "Erreur."); }
         return "redirect:/dashboard-entreprise";
     }
 
+    /**
+     * ENDPOINT: GET /candidat/profil/{candidatureId}
+     * FUNCTION: Displays a full candidate profile to a recruiter based on a received application.
+     */
     @GetMapping("/candidat/profil/{candidatureId}")
     public String voirProfilCandidat(@PathVariable("candidatureId") Long candidatureId, Model model, RedirectAttributes ra) {
         try {
@@ -425,21 +491,59 @@ public class DashboardController {
         } catch (Exception e) { return "redirect:/dashboard-entreprise"; }
     }
 
+    /**
+     * ENDPOINT: GET /offre
+     * FUNCTION: Lists all active job offers for public viewing.
+     */
     @GetMapping("/offre")
     public String listOffres(Model model) {
-        try { model.addAttribute("offres", offreClient.getAllActive()); } catch (Exception e) { model.addAttribute("offres", new ArrayList<>()); }
+        Set<Long> appliedOfferIds = new HashSet<>();
+        List<Map<String, Object>> offres = new ArrayList<>();
+
+        try {
+            // 1. Récupérer toutes les offres (commun à tout le monde)
+            offres = offreClient.getAllActive();
+
+            // 2. Si c'est un CANDIDAT, on cherche ses IDs d'offres déjà postulées
+            if ("CANDIDAT".equals(sessionService.getUserRole())) {
+                Long userId = sessionService.getUserId();
+                List<Map<String, Object>> mesCandidatures = candidatureClient.getByCandidat(userId);
+
+                if (mesCandidatures != null) {
+                    appliedOfferIds = mesCandidatures.stream()
+                            .map(c -> Long.valueOf(c.get("offreId").toString()))
+                            .collect(Collectors.toSet());
+                }
+            }
+        } catch (Exception e) {
+            // En cas d'erreur microservice, on laisse les listes vides (évite le crash)
+            System.err.println("Erreur récupération offres/candidatures : " + e.getMessage());
+        }
+
+        model.addAttribute("offres", offres);
+        model.addAttribute("appliedOfferIds", appliedOfferIds);
         return "offre";
     }
 
+    /**
+     * ENDPOINT: GET /api/entreprises/{id}/logo
+     * FUNCTION: Proxies the retrieval of a company logo from the backend service.
+     */
     @GetMapping("/api/entreprises/{id}/logo")
     @ResponseBody
     public ResponseEntity<byte[]> proxyLogo(@PathVariable("id") Long codebaseId) {
         try { return entrepriseClient.getLogo(codebaseId); } catch (Exception e) { return ResponseEntity.notFound().build(); }
     }
 
+    /**
+     * ENDPOINT: POST /entreprise/entretiens/planifier
+     * FUNCTION: Creates a scheduled interview entry for a candidate.
+     */
     @PostMapping("/entreprise/entretiens/planifier")
     public String planifierEntretien(@RequestParam("candidatureId") Long candidatureId, @RequestParam("date") String dateStr, @RequestParam("lieu") String lieu, @RequestParam("notes") String notes, RedirectAttributes ra) {
-        try { candidatureClient.planifierEntretien(candidatureId, dateStr, lieu, notes); ra.addFlashAttribute("message", "Entretien planifié !"); } catch (Exception e) { ra.addFlashAttribute("error", "Échec."); }
+        try { candidatureClient.planifierEntretien(candidatureId, dateStr, lieu, notes); ra.addFlashAttribute("message", "Entretien planifié !");
+        }
+        catch (Exception e) { ra.addFlashAttribute("error", "Échec."); }
         return "redirect:/dashboard-entreprise";
     }
 }

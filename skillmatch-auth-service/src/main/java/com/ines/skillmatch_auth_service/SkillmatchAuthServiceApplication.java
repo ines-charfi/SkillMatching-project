@@ -7,14 +7,16 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
+// Main entry point for the authentication microservice.
+// Combines Spring Boot auto-configuration, service discovery, and Feign clients.
 @SpringBootApplication
+// Registers this service with Consul (service registry) so it can be discovered by other services.
 @EnableDiscoveryClient
-@EnableFeignClients   //--- TRÈS IMPORTANT : Permet d'utiliser les interfaces CandidatClient/EntrepriseClient
-
+// Enables Feign client proxies – required for using @FeignClient interfaces (CandidatClient, EntrepriseClient, etc.).
+@EnableFeignClients
 public class SkillmatchAuthServiceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SkillmatchAuthServiceApplication.class, args);
 	}
-
 }

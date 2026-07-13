@@ -9,6 +9,7 @@ import java.util.Map;
 @Component
 public class CandidatureClientFallback implements CandidatureClient {
 
+    // Fallback for applying: returns an error indicating the service is unavailable.
     @Override
     public Map<String, Object> postuler(Long candidatId, Long offreId) {
         Map<String, Object> fallback = new HashMap<>();
@@ -17,18 +18,19 @@ public class CandidatureClientFallback implements CandidatureClient {
         return fallback;
     }
 
+    // Fallback for fetching applications by candidate: returns an empty list to avoid UI crashes.
     @Override
     public List<Map<String, Object>> getByCandidat(Long userId) {
-        // Évite le crash du tableau de bord du candidat en renvoyant une liste vide
         return new ArrayList<>();
     }
 
+    // Fallback for fetching applications by company: returns an empty list to avoid UI crashes.
     @Override
     public List<Map<String, Object>> getByEntreprise(Long entrepriseId) {
-        // Évite le crash de l'espace Recruteur en renvoyant une liste vide
         return new ArrayList<>();
     }
 
+    // Fallback for company statistics: returns zeroed stats with a message.
     @Override
     public Map<String, Object> getStatsEntreprise(Long entrepriseId) {
         Map<String, Object> fallback = new HashMap<>();
@@ -40,17 +42,19 @@ public class CandidatureClientFallback implements CandidatureClient {
         return fallback;
     }
 
+    // Fallback for updating application status: throws an exception to inform the user.
     @Override
     public void updateStatut(Long id, String statut) {
         throw new RuntimeException("Impossible de modifier le statut de la candidature. Le service est hors-ligne.");
     }
 
+    // Fallback for matching score: returns a default score of 0 if the AI/matching service is down.
     @Override
     public int getScore(Long userId, Long offreId) {
-        // Renvoie un score par défaut de 0 si le moteur de matching/IA est injoignable
         return 0;
     }
 
+    // Fallback for scheduling an interview: throws an exception indicating failure.
     @Override
     public void planifierEntretien(Long candidatureId, String dateStr, String lieu, String notes) {
         throw new RuntimeException("Échec de la planification de l'entretien. Le service de candidature ne répond pas.");

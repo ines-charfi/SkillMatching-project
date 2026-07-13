@@ -5,25 +5,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+// Fallback implementation for OffreClient – called when the offer service is unavailable.
 @Component
 public class OffreClientFallback implements OffreClient {
 
+    // Fallback for fetching all offers: returns an empty list to avoid UI crashes.
     @Override
     public List<Map<String, Object>> getAllOffres() {
-        // En cas de panne, on renvoie une liste vide pour ne pas faire planter l'affichage
         return new ArrayList<>();
     }
 
+    // Fallback for deleting an offer: throws an exception to notify the admin of failure.
     @Override
     public void deleteOffre(Long id) {
-        // Si un admin essaie de supprimer une offre mais que le service offre est en panne,
-        // on jette une exception pour avertir que l'action a échoué.
         throw new RuntimeException("Impossible de supprimer l'offre. Le service des offres est indisponible.");
     }
 
+    // Fallback for counting offers: returns 0 to avoid breaking the admin dashboard stats.
     @Override
     public Long countAllOffres() {
-        // Si le service est hors-ligne, on renvoie 0 pour le compteur du tableau de bord Admin
         return 0L;
     }
 }

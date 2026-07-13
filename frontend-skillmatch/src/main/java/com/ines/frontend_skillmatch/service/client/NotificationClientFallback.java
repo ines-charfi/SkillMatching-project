@@ -12,24 +12,25 @@ public class NotificationClientFallback implements NotificationClient {
 
     private static final Logger logger = LoggerFactory.getLogger(NotificationClientFallback.class);
 
+    // Fallback for sending notifications: logs the error without blocking the main action.
     @Override
     public void envoyerNotification(Map<String, Object> notificationData) {
-        // Si le service de notification est en panne, on log l'erreur pour ne pas bloquer l'action principale (ex: une candidature)
         logger.error("[Fallback] Impossible d'envoyer la notification. Le service est hors-ligne. Données : {}", notificationData);
     }
 
+    // Fallback for fetching notifications: returns an empty list to avoid UI crashes.
     @Override
     public List<Map<String, Object>> getNotifications(Long userId, String role) {
-        // Renvoie une liste vide pour éviter un crash de l'interface utilisateur
         return new ArrayList<>();
     }
 
+    // Fallback for counting unread notifications: returns 0 to avoid breaking the UI header.
     @Override
     public Long countNonLues(Long userId, String role) {
-        // Si le service est en panne, la cloche affichera 0 notification au lieu de faire planter le header du site
         return 0L;
     }
 
+    // Fallback for marking notification as read: logs a warning.
     @Override
     public void marquerCommeLue(String id) {
         logger.warn("[Fallback] Impossible de marquer la notification {} comme lue. Le service est indisponible.", id);

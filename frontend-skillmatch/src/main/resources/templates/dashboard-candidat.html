@@ -26,7 +26,8 @@
                           th:text="${notifCount}">0</span>
                 </button>
 
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-0" aria-labelledby="candidatNotifBell" style="width: 320px; max-height: 400px; overflow-y: auto; border-radius: 12px;">
+                <!-- STYLE INLINE SUPPRIMÉ : remplacé par la classe .notif-dropdown -->
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-0 notif-dropdown" aria-labelledby="candidatNotifBell">
                     <li class="bg-light p-3 border-bottom">
                         <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-info-circle-fill text-primary me-2"></i>Notifications Système</h6>
                     </li>
@@ -82,7 +83,7 @@
                 <hr>
 
                 <div class="text-start">
-                    <h6 class="fw-bold small"><i class="bi bi-tools me-2"></i>COMPÉTENCES</h6>
+                    <h6 class="fw-bold small"><i class="bi bi-tools me-2"></i>MES COMPÉTENCES</h6>
                     <div th:if="${profil != null and profil['competences'] != null and profil['competences'] != ''}">
                         <span th:each="s : ${#strings.arraySplit(profil['competences'], ',')}" class="skill-badge" th:text="${s.trim()}">Java</span>
                     </div>
@@ -90,27 +91,33 @@
                         <p class="small text-muted">Aucune compétence renseignée.</p>
                     </div>
 
-                    <h6 class="fw-bold small"><i class="bi bi-mortarboard-fill me-2"></i>ÉDUCATION</h6>
+                    <h6 class="fw-bold small"><i class="bi bi-mortarboard-fill me-2"></i> MON ÉDUCATION</h6>
                     <p class="small text-muted" th:text="${profil != null and profil['niveauScolaire'] != null and profil['niveauScolaire'] != '' ? profil['niveauScolaire'] : 'Non renseigné'}">Bac+5</p>
 
-                    <h6 class="fw-bold small"><i class="bi bi-geo-alt-fill me-2"></i>LOCALISATION</h6>
+                    <h6 class="fw-bold small"><i class="bi bi-geo-alt-fill me-2"></i>MA LOCALISATION</h6>
                     <p class="small text-muted" th:text="${profil != null and profil['adresse'] != null and profil['adresse'] != '' ? profil['adresse'] : 'Non renseignée'}">Adresse...</p>
                 </div>
 
-                <div class="border-top border-light">
-                    <h6 class="fw-bold small"> DOCUMENT</h6>
+                <!-- Bloc DOCUMENT : les styles inline sont supprimés -->
+                <div class="border-top border-light pt-2">
+                    <h6 class="fw-bold small">
+                        <i class="bi bi-file-earmark-pdf-fill me-2 text-danger"></i>MES DOCUMENTS
+                    </h6>
                     <div th:if="${profil != null and profil['cvPath'] != null and profil['cvPath'] != ''}">
-                        <p class="text-muted mb-2 small" style="font-size: 0.72rem !important;">Votre CV est enregistré.</p>
+                        <!-- Remplacement de style="font-size:0.72rem !important;" par la classe .text-xs -->
+                        <p class="text-muted mb-2 small text-xs">Votre CV est enregistré.</p>
                         <a th:href="@{/api/candidats/download/cv/{id}(id=${profil.userId})}"
                            class="btn btn-outline-primary btn-sm px-3 rounded-pill" target="_blank">
                             <i class="bi bi-download me-1"></i> Voir mon CV
                         </a>
                     </div>
                     <div th:unless="${profil != null and profil['cvPath'] != null and profil['cvPath'] != ''}">
-                        <p class="text-danger small mb-0" style="font-size: 0.72rem !important;">⚠️ Aucun CV téléversé.</p>
+                        <!-- Remplacement de style="font-size:0.72rem !important;" par la classe .text-xs -->
+                        <p class="text-danger small mb-0 text-xs">⚠️ Aucun CV téléversé.</p>
                     </div>
                 </div>
-                <a href="/profil" class="btn btn-primary w-100 rounded-pill shadow-sm">Modifier le profil</a>
+                <!-- Bouton Modifier le profil avec marge supérieure -->
+                <a href="/profil" class="btn btn-primary w-100 rounded-pill shadow-sm mt-3">Modifier mon profil</a>
             </div>
         </div>
 
@@ -118,7 +125,7 @@
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
                     <div class="card stat-card p-3 d-flex flex-row align-items-center gap-3">
-                        <div class="bg-primary bg-opacity-10 p-3 rounded-3 text-primary"><i class="bi bi-briefcase-fill fs-4"></i></div>
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-3 text-primary">Mes offres</div>
                         <div>
                             <div class="h4 fw-bold mb-0" th:text="${offres != null ? offres.size() : 0}">0</div>
                             <div class="text-muted small">Offres disponibles</div>
@@ -128,7 +135,7 @@
 
                 <div class="col-md-6">
                     <div class="card stat-card p-3 d-flex flex-row align-items-center gap-3">
-                        <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success"><i class="bi bi-send-fill fs-4"></i></div>
+                        <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success">Mes candidatures</div>
                         <div>
                             <div class="h4 fw-bold mb-0" th:text="${candidatures != null ? candidatures.size() : 0}">0</div>
                             <div class="text-muted small">Candidatures envoyées</div>

@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+// Unit tests for EntrepriseService – tests business logic in isolation using Mockito.
 @ExtendWith(MockitoExtension.class)
 class EntrepriseServiceUnitTest {
 
@@ -28,6 +29,7 @@ class EntrepriseServiceUnitTest {
 
     private Entreprise entrepriseExemple;
 
+    // Sets up a sample company entity before each test.
     @BeforeEach
     void setUp() {
         entrepriseExemple = Entreprise.builder()
@@ -38,6 +40,7 @@ class EntrepriseServiceUnitTest {
                 .build();
     }
 
+    // Tests that initEntreprise saves a new company when it doesn't already exist.
     @Test
     void testInitEntreprise_WhenNotExists_ShouldSave() {
         Long userId = 100L;
@@ -51,6 +54,7 @@ class EntrepriseServiceUnitTest {
         verify(repository, times(1)).save(any(Entreprise.class));
     }
 
+    // Tests that initEntreprise does nothing when a company already exists for the user.
     @Test
     void testInitEntreprise_WhenAlreadyExists_ShouldNotSave() {
         Long userId = 100L;
@@ -61,6 +65,7 @@ class EntrepriseServiceUnitTest {
         verify(repository, never()).save(any());
     }
 
+    // Tests that getById returns the company when found.
     @Test
     void testGetById_Success() {
         when(repository.findById(1L)).thenReturn(Optional.of(entrepriseExemple));
@@ -71,6 +76,7 @@ class EntrepriseServiceUnitTest {
         assertEquals("TechCorp", result.getNomEntreprise());
     }
 
+    // Tests that getById throws an exception when the company is not found.
     @Test
     void testGetById_NotFound_ThrowsException() {
         when(repository.findById(99L)).thenReturn(Optional.empty());
@@ -78,6 +84,7 @@ class EntrepriseServiceUnitTest {
         assertThrows(RuntimeException.class, () -> service.getById(99L));
     }
 
+    // Tests that getByUserId returns the company when found.
     @Test
     void testGetByUserId_Found() {
         when(repository.findByUserId(100L)).thenReturn(Optional.of(entrepriseExemple));
@@ -88,6 +95,7 @@ class EntrepriseServiceUnitTest {
         assertEquals("TechCorp", result.getNomEntreprise());
     }
 
+    // Tests that getByUserId returns an empty company entity when not found (no exception).
     @Test
     void testGetByUserId_NotFound_ReturnsEmptyEntreprise() {
         when(repository.findByUserId(200L)).thenReturn(Optional.empty());
@@ -95,9 +103,10 @@ class EntrepriseServiceUnitTest {
         Entreprise result = service.getByUserId(200L);
 
         assertNotNull(result);
-        assertNull(result.getId()); // entité vide, sans builder
+        assertNull(result.getId());
     }
 
+    // Tests that updateProfil saves the company with a new logo file.
     @Test
     void testUpdateProfil_WithLogo() throws Exception {
         Long userId = 100L;
@@ -119,10 +128,11 @@ class EntrepriseServiceUnitTest {
 
         assertNotNull(updated);
         assertEquals("NouveauNom", updated.getNomEntreprise());
-        assertNotNull(updated.getLogoPath()); // le chemin doit être généré
+        assertNotNull(updated.getLogoPath());
         verify(repository).save(any(Entreprise.class));
     }
 
+    // Tests that updateProfil saves the company without a logo (logoPath remains null).
     @Test
     void testUpdateProfil_WithoutLogo() throws Exception {
         Long userId = 100L;

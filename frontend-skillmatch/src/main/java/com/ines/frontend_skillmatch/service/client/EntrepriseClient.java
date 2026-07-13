@@ -8,13 +8,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.Map;
 
-// CORRECTION : Changement de 'name' pour matcher Consul et suppression de l'URL en dur
 @FeignClient(name = "skillmatch-entreprise-service", configuration = FeignConfig.class, fallback = EntrepriseClientFallback.class)
 public interface EntrepriseClient {
 
+    // Fetches the company profile associated with a given user ID.
     @GetMapping("/api/entreprises/user/{userId}")
     Map<String, Object> getByUserId(@PathVariable("userId") Long userId);
 
+    // Updates the company profile. Supports multipart/form-data for optional logo upload.
     @PostMapping(value = "/api/entreprises/user/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     Map<String, Object> updateProfil(
             @PathVariable("userId") Long userId,
@@ -27,9 +28,7 @@ public interface EntrepriseClient {
             @RequestPart(value = "logo", required = false) MultipartFile logo
     );
 
-    /**
-     * Récupère le logo binaire d'une entreprise par son ID.
-     */
-    @GetMapping("/api/entreprises/{id}/logo") // Vérifie que l'URL correspond à l'endpoint de ton backend
+    // Retrieves the binary logo image of a company by its ID.
+    @GetMapping("/api/entreprises/{id}/logo")
     ResponseEntity<byte[]> getLogo(@PathVariable("id") Long id);
 }

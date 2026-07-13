@@ -20,21 +20,23 @@ import java.nio.file.Paths;
 public class EntrepriseController {
 
     private final EntrepriseService entrepriseService;
+    // Directory where uploaded company logos are stored (configurable via application properties).
     @Value("${app.upload.dir:uploads}")
     private String uploadDir;
 
-    // Appelé par Auth-Service lors du register
+    // Called by Auth-Service during registration to initialize a company profile.
     @PostMapping("/init")
     public void init(@RequestParam Long userId, @RequestParam String nom) {
         entrepriseService.initEntreprise(userId, nom);
     }
 
+    // Fetches a company profile by the associated user ID.
     @GetMapping("/user/{userId}")
     public ResponseEntity<Entreprise> getByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(entrepriseService.getByUserId(userId));
     }
 
-    // Mise à jour complète via le Dashboard Entreprise
+    // Updates the company profile from the Enterprise Dashboard. Accepts multipart/form-data for optional logo upload.
     @PostMapping(value = "/user/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Entreprise> update(
             @PathVariable Long userId,
@@ -57,26 +59,27 @@ public class EntrepriseController {
         return ResponseEntity.ok(entrepriseService.updateProfil(userId, dto, logo));
     }
 
+    // Retrieves and streams the company logo image as a byte array.
     @GetMapping("/{id}/logo")
     public ResponseEntity<byte[]> getLogo(@PathVariable Long id) {
         try {
             Entreprise entreprise = entrepriseService.getById(id);
             if (entreprise != null && entreprise.getLogoPath() != null) {
-                // Construit le chemin vers le fichier (ex: uploads/logos/nom_du_fichier.png)
                 Path path = Paths.get(uploadDir, "logos", entreprise.getLogoPath());
                 if (Files.exists(path)) {
                     byte[] image = Files.readAllBytes(path);
                     return ResponseEntity.ok()
-                            .contentType(MediaType.IMAGE_PNG) // Accepte PNG et JPG sur les navigateurs modernes
+                            .contentType(MediaType.IMAGE_PNG)
                             .body(image);
                 }
             }
-
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    // Fetches a company by its internal ID (for admin or internal use).
     @GetMapping("/{id}")
     public ResponseEntity<Entreprise> getById(@PathVariable Long id) {
         return ResponseEntity.ok(entrepriseService.findById(id));

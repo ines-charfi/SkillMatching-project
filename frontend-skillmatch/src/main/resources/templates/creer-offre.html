@@ -4,22 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillMatch - Publier une offre</title>
-    <!-- Bootstrap + Icons + Google Fonts -->
+
+    <!-- ============================================ -->
+    <!-- EXTERNAL DEPENDENCIES                        -->
+    <!-- Bootstrap CSS, Icons, Google Fonts           -->
+    <!-- ============================================ -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- CSS commun du site (global) -->
+
+    <!-- ============================================ -->
+    <!-- CUSTOM STYLES                                -->
+    <!-- Shared site-wide styles + page-specific     -->
+    <!-- ============================================ -->
     <link rel="stylesheet" th:href="@{/css/style.css}">
-    <!-- CSS spécifique à la page création d'offre -->
     <link rel="stylesheet" th:href="@{/css/offre.css}">
-    <!-- Le header et footer utiliseront les mêmes styles -->
 </head>
 <body>
 
-<!-- Inclusion du fragment header (navigation dynamique) -->
+<!-- ============================================ -->
+<!-- HEADER FRAGMENT (dynamic navigation)         -->
+<!-- ============================================ -->
 <div th:replace="~{fragments/header :: header}"></div>
 
-<!-- Conteneur principal -->
+<!-- ============================================ -->
+<!-- MAIN CONTENT                                -->
+<!-- Page wrapper with card and form for creating -->
+<!-- a new job offer                              -->
+<!-- ============================================ -->
 <div class="container offre-wrapper">
     <div class="row justify-content-center">
         <div class="col-lg-8">
@@ -27,17 +39,27 @@
                 <h2 class="fw-bold mb-4"> Publier une nouvelle opportunité</h2>
                 <p class="text-muted mb-4">Décrivez le poste et les compétences requises pour trouver les meilleurs talents grâce au matching.</p>
 
+                <!-- ============================================ -->
+                <!-- OFFER FORM                                 -->
+                <!-- Submits via POST to /offre/creer           -->
+                <!-- Includes title, description, education,    -->
+                <!-- salary, and required skills                -->
+                <!-- ============================================ -->
                 <form th:action="@{/offre/creer}" method="post">
+
+                    <!-- Offer title -->
                     <div class="mb-4">
                         <label class="form-label fw-bold">Titre de l'offre</label>
                         <input type="text" name="titre" class="form-control form-control-lg" placeholder="Ex: Développeur Full Stack Java/React" required>
                     </div>
 
+                    <!-- Full description -->
                     <div class="mb-4">
                         <label class="form-label fw-bold">Description complète</label>
                         <textarea name="description" class="form-control" rows="6" placeholder="Quelles seront les missions du candidat ?" required></textarea>
                     </div>
 
+                    <!-- Education level and salary -->
                     <div class="row">
                         <div class="col-md-6 mb-4">
                             <label class="form-label fw-bold">Niveau d'études requis</label>
@@ -57,6 +79,7 @@
                         </div>
                     </div>
 
+                    <!-- Required skills (comma-separated) -->
                     <div class="mb-4">
                         <label class="form-label fw-bold">Compétences techniques (Séparées par des virgules)</label>
                         <div class="input-group">
@@ -66,6 +89,7 @@
                         <div class="form-text mt-2">L'algorithme utilisera ces mots-clés pour calculer le score de matching.</div>
                     </div>
 
+                    <!-- Action buttons: submit and cancel -->
                     <div class="button-group">
                         <button type="submit" class="btn btn-primary btn-submit">Diffuser l'offre maintenant</button>
                         <a th:href="@{/dashboard-entreprise}" class="btn btn-light btn-cancel">Annuler</a>
@@ -76,7 +100,9 @@
     </div>
 </div>
 
-<!-- Inclusion du fragment footer -->
+<!-- ============================================ -->
+<!-- FOOTER FRAGMENT                              -->
+<!-- ============================================ -->
 <div th:replace="~{fragments/footer :: footer}"></div>
 
 </body>

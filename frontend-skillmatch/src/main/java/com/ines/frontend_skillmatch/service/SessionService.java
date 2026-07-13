@@ -1,6 +1,5 @@
 package com.ines.frontend_skillmatch.service;
 
-
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -9,10 +8,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Service de gestion de session utilisateur côté frontend.
- * Stocke les informations de l'utilisateur connecté dans la session HTTP.
- */
 @Service
 public class SessionService {
 
@@ -24,17 +19,13 @@ public class SessionService {
     private static final String USER_INITIALS_KEY = "user_initials";
     private static final String IS_AUTHENTICATED_KEY = "is_authenticated";
 
-    /**
-     * Récupère la session HTTP courante
-     */
+    // Retrieves the current HTTP session, creating one if it doesn't exist.
     private HttpSession getSession() {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
         return attributes.getRequest().getSession(true);
     }
 
-    /**
-     * Créer une session après connexion réussie
-     */
+    // Creates a new session after successful login, storing user info and JWT token.
     public void createSession(String token, Long userId, String email, String role) {
         HttpSession session = getSession();
         session.setAttribute(TOKEN_KEY, token);
@@ -43,18 +34,15 @@ public class SessionService {
         session.setAttribute(USER_ROLE_KEY, role);
         session.setAttribute(IS_AUTHENTICATED_KEY, true);
 
-        // Générer les initiales
+        // Generate initials from email (first letter)
         String initials = email != null ? email.substring(0, 1).toUpperCase() : "?";
         session.setAttribute(USER_INITIALS_KEY, initials);
 
-        // Durée de session : 24 heures
+        // Session timeout: 24 hours
         session.setMaxInactiveInterval(86400);
     }
 
-
-    /**
-     * Vérifie si l'utilisateur est authentifié
-     */
+    // Checks if the user is currently authenticated (session contains valid auth flag).
     public boolean isAuthenticated() {
         try {
             HttpSession session = getSession();
@@ -65,17 +53,12 @@ public class SessionService {
         }
     }
 
-    /**
-     * Créer une session OAuth2 après connexion Google/GitHub
-     */
+    // Creates an OAuth2 session (Google/GitHub) reusing the standard session creation.
     public void createOAuth2Session(String token, String email, String role, Long userId) {
         createSession(token, userId, email, role);
     }
 
-
-    /**
-     * Récupère le token JWT stocké en session
-     */
+    // Retrieves the JWT token stored in the session.
     public String getToken() {
         try {
             HttpSession session = getSession();
@@ -85,9 +68,7 @@ public class SessionService {
         }
     }
 
-    /**
-     * Récupère l'ID de l'utilisateur connecté
-     */
+    // Retrieves the logged-in user's ID from session.
     public Long getUserId() {
         try {
             HttpSession session = getSession();
@@ -97,9 +78,7 @@ public class SessionService {
         }
     }
 
-    /**
-     * Récupère l'email de l'utilisateur connecté
-     */
+    // Retrieves the logged-in user's email from session.
     public String getUserEmail() {
         try {
             HttpSession session = getSession();
@@ -109,9 +88,7 @@ public class SessionService {
         }
     }
 
-    /**
-     * Récupère le rôle de l'utilisateur connecté
-     */
+    // Retrieves the logged-in user's role from session.
     public String getUserRole() {
         try {
             HttpSession session = getSession();
@@ -121,9 +98,7 @@ public class SessionService {
         }
     }
 
-    /**
-     * Récupère les initiales de l'utilisateur
-     */
+    // Retrieves the user's initials from session (first letter of email or name).
     public String getUserInitials() {
         try {
             HttpSession session = getSession();
@@ -133,9 +108,7 @@ public class SessionService {
         }
     }
 
-    /**
-     * Récupère toutes les informations de session sous forme de Map
-     */
+    // Returns a map containing all session information (token, userId, email, role, initials, auth status).
     public Map<String, Object> getSessionInfo() {
         Map<String, Object> info = new HashMap<>();
         info.put("token", getToken());
@@ -147,38 +120,28 @@ public class SessionService {
         return info;
     }
 
-    /**
-     * Vérifie si l'utilisateur a un rôle spécifique
-     */
+    // Checks if the user has a specific role (case-insensitive).
     public boolean hasRole(String role) {
         String userRole = getUserRole();
         return userRole != null && userRole.equalsIgnoreCase(role);
     }
 
-    /**
-     * Vérifie si l'utilisateur est un ADMIN
-     */
+    // Checks if the user is an ADMIN.
     public boolean isAdmin() {
         return hasRole("ADMIN");
     }
 
-    /**
-     * Vérifie si l'utilisateur est un CANDIDAT
-     */
+    // Checks if the user is a CANDIDAT.
     public boolean isCandidat() {
         return hasRole("CANDIDAT");
     }
 
-    /**
-     * Vérifie si l'utilisateur est une ENTREPRISE
-     */
+    // Checks if the user is an ENTREPRISE.
     public boolean isEntreprise() {
         return hasRole("ENTREPRISE");
     }
 
-    /**
-     * Met à jour le nom d'utilisateur dans la session
-     */
+    // Updates the user's name in the session and regenerates initials.
     public void updateUserName(String name) {
         try {
             HttpSession session = getSession();
@@ -187,68 +150,57 @@ public class SessionService {
                 session.setAttribute(USER_INITIALS_KEY, name.substring(0, 1).toUpperCase());
             }
         } catch (Exception e) {
-            // Ignorer
+            // Ignore
         }
     }
 
-    /**
-     * Rafraîchit le token JWT
-     */
+    // Refreshes the stored JWT token in the session (e.g., after renewal).
     public void refreshToken(String newToken) {
         try {
             HttpSession session = getSession();
             session.setAttribute(TOKEN_KEY, newToken);
         } catch (Exception e) {
-            // Ignorer
+            // Ignore
         }
     }
 
-    /**
-     * Détruit la session (déconnexion)
-     */
+    // Invalidates the current session (logout).
     public void destroySession() {
         try {
             HttpSession session = getSession();
             session.invalidate();
         } catch (Exception e) {
-            // Ignorer
+            // Ignore
         }
     }
 
-    /**
-     * Récupère l'URL de redirection (le chemin qui s'affiche dans le navigateur)
-     * Doit commencer par un "/"
-     */
+    // Returns the redirect URL (path) based on the user's role (e.g., "/dashboard-entreprise").
     public String getRedirectUrlByRole() {
         String role = getUserRole();
         if (role == null) return "/login";
 
         return switch (role.toUpperCase()) {
-            case "ADMIN" -> "/admin"; // URL pour l'admin
-            case "ENTREPRISE" -> "/dashboard-entreprise"; // URL pour l'entreprise
-            case "CANDIDAT" -> "/dashboard-candidat"; // URL pour le candidat
+            case "ADMIN" -> "/admin";
+            case "ENTREPRISE" -> "/dashboard-entreprise";
+            case "CANDIDAT" -> "/dashboard-candidat";
             default -> "/login";
         };
     }
 
-    /**
-     * Récupère le NOM DU FICHIER HTML (sans le .html)
-     * Ne doit PAS commencer par un "/"
-     */
+    // Returns the name of the HTML template (without .html) to display for the user's role.
     public String getDashboardPage() {
         String role = getUserRole();
         if (role == null) return "login";
 
         return switch (role.toUpperCase()) {
             case "ADMIN" -> "dashboard-admin";
-            case "ENTREPRISE" -> "dashboard-entreprise"; // Le nom de ton fichier HTML
-            case "CANDIDAT" -> "dashboard-candidat";   // Le nom de ton fichier HTML
+            case "ENTREPRISE" -> "dashboard-entreprise";
+            case "CANDIDAT" -> "dashboard-candidat";
             default -> "login";
         };
     }
-    /**
-     * Vérifie si la session est expirée
-     */
+
+    // Checks if the session has expired (token missing).
     public boolean isSessionExpired() {
         try {
             HttpSession session = getSession();
