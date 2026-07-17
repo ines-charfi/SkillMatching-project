@@ -12,7 +12,7 @@ public class Notification {
     @Id
     private String id;
     private Long userIdTarget;
-    private String recipientRole; //  FIX : 'candidate' ou 'recruiter'
+    private String recipientRole; //  FIX : 'candidate' or 'recruiter'
     private String titreNotif;
     private String message;
     private boolean lu = false;

@@ -9,10 +9,10 @@ import java.util.List;
 
 @Entity
 @Table(name = "candidats")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Data                     // Generates getters, setters, toString, equals, hashCode
+@NoArgsConstructor        // Required by Hibernate (JPA)
+@AllArgsConstructor       // Required for @Builder to work fully
+@Builder                  // Provides a fluent builder pattern: Candidat.builder().nom("...").build()
 public class Candidat {
 
     @Id
@@ -52,15 +52,24 @@ public class Candidat {
     @Column(name = "niveau_scolaire")
     private String niveauScolaire;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING) // Store the enum name as a string in the database
     @Column(name = "validation_statut")
-    @Builder.Default
+    @Builder.Default // Provide a default value when using the builder
     private ValidationStatut validationStatut = ValidationStatut.EN_ATTENTE;
 
     @Column(name = "date_creation")
     @Builder.Default
     private LocalDateTime dateCreation = LocalDateTime.now();
-
+    /**
+     * One-to-many relationship with Experience entities.
+     *
+     * - mappedBy = "candidat": the Experience entity has a field named "candidat" that owns the relation.
+     * - cascade = CascadeType.ALL: persist/delete operations cascade to experiences.
+     * - orphanRemoval = true: if an experience is removed from the list, it is deleted from the database.
+     * - fetch = FetchType.LAZY: experiences are loaded only when explicitly accessed (performance optimization).
+     *
+     * The default is an empty ArrayList to avoid null pointer issues.
+     */
     @OneToMany(mappedBy = "candidat", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     private List<Experience> experiences = new ArrayList<>();

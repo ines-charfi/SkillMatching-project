@@ -24,18 +24,36 @@ import java.util.UUID;
 public class CandidatService {
 
     private final CandidatRepository candidatRepository;
-    private final NotificationClient notificationClient; // AJOUT : Injection du client Feign pour l'envoi de notifs
-
+    private final NotificationClient notificationClient; //  Injection of client Feign to send the notifs
+    /**
+     * Directory where uploaded files (CVs and photos) are stored.
+     * Injected from application.properties (default: "uploads").
+     */
     @Value("${app.upload.dir:uploads}")
     private String uploadDir;
 
-    // 1. RÉCUPÉRATION PAR ID
+    /**
+     * Retrieves a candidate by its internal database ID.
+     *
+     * @param id the candidate's primary key
+     * @return the Candidat entity
+     * @throws RuntimeException if no candidate is found with that ID
+     */
     public Candidat getById(Long id) {
         return candidatRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Candidat non trouvé avec l'ID: " + id));
     }
-
-    // 2. RÉCUPÉRATION PAR USER_ID
+    /**
+     * Retrieves a candidate by the authentication user ID.
+     * If no profile exists for the given userId, it creates a default one
+     * (with placeholder data) and returns it.
+     *
+     * This method is transactional to ensure that the creation and retrieval
+     * happen in a single database session.
+     *
+     * @param userId the user ID from the auth service
+     * @return the existing or newly created Candidat profile
+     */
     @Transactional
     public Candidat getByUserId(Long userId) {
         return candidatRepository.findByUserId(userId)
@@ -53,6 +71,14 @@ public class CandidatService {
     }
 
     // 3. INITIALISATION (Feign)
+    /**
+     * Initializes a candidate profile for a new user.
+     * Only creates the profile if it does not already exist.
+     *
+     * @param userId the authentication user ID
+     * @param nom    the candidate's last name
+     * @param prenom the candidate's first name
+     */
     @Transactional
     public void initCandidat(Long userId, String nom, String prenom) {
         if (candidatRepository.findByUserId(userId).isEmpty()) {
@@ -66,7 +92,15 @@ public class CandidatService {
         }
     }
 
-    // 4. VALIDATION ADMIN
+    // 4. VALIDATION OF ADMIN
+    /**
+     * Updates the validation status of a candidate profile.
+     * This is typically called by an administrator to approve or reject a profile.
+     *
+     * @param id     the candidate's internal ID
+     * @param statut the new validation status (EN_ATTENTE, VALIDE, REJETE)
+     * @return the updated Candidat entity
+     */
     @Transactional
     public Candidat updateValidationStatus(Long id, Candidat.ValidationStatut statut) {
         Candidat candidat = this.getById(id);
@@ -74,16 +108,38 @@ public class CandidatService {
         return candidatRepository.save(candidat);
     }
 
-    // 5. RECHERCHE
+    /**
+     * Searches for candidates whose skills (competences) contain the given keyword.
+     *
+     * @param competence the skill to search for (e.g., "Java")
+     * @return a list of matching candidates
+     */
     public List<Candidat> searchByCompetence(String competence) {
         return candidatRepository.findByCompetence(competence);
     }
-
+    /**
+     * Retrieves all candidate profiles.
+     *
+     * @return a list of all candidates
+     */
     public List<Candidat> getAll() {
         return candidatRepository.findAll();
     }
 
-    // 🎯 FIX SÉCURITÉ STOCKAGE : Évite l'accumulation d'UUID en cascade
+    //  FIX SÉCURITY OF  STOCKAGE : Évite l'accumulation d'UUID en cascade
+    /**
+     * Saves an uploaded file (CV or photo) to the filesystem.
+     * Generates a unique filename using UUID to avoid collisions.
+     * Creates the target directory if it does not exist.
+     *
+     * Security note: The UUID-based naming prevents path traversal attacks
+     * and avoids overwriting existing files.
+     *
+     * @param file   the MultipartFile to save
+     * @param subDir the subdirectory under the base upload directory (e.g., "cvs" or "photos")
+     * @return the generated filename (not the full path)
+     * @throws IOException if file I/O fails
+     */
     private String saveFile(MultipartFile file, String subDir) throws IOException {
         Path uploadPath = Paths.get(uploadDir, subDir);
         if (!Files.exists(uploadPath)) {
@@ -102,7 +158,30 @@ public class CandidatService {
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         return fileName;
     }
+    // ============================
+    // 6. MAIN PROFILE UPDATE (with file uploads and admin notification)
+    // ============================
 
+    /**
+     * Updates a candidate's profile with new information and optional file uploads.
+     * This is the core method called by the controller's update endpoint.
+     *
+     * The method:
+     * - Updates all textual fields from the DTO.
+     * - Saves new CV and/or photo files if provided.
+     * - If a new CV is uploaded, it sends a notification to an administrator
+     *   via the NotificationClient (to alert them of a new document to review).
+     *
+     * The notification is sent asynchronously; if it fails, the profile update
+     * is still committed (the operation is protected by a try-catch).
+     *
+     * @param userId the authentication user ID
+     * @param dto    the DTO containing the updated profile data
+     * @param cv     the CV file (MultipartFile) – optional
+     * @param photo  the profile photo file (MultipartFile) – optional
+     * @return the saved Candidat entity
+     * @throws IOException if file saving fails
+     */
     // 6. MISE À JOUR PRINCIPALE DU PROFIL (Appelée par ton contrôleur)
     @Transactional
     public Candidat updateProfilWithFile(Long userId, CandidatDTO dto, MultipartFile cv, MultipartFile photo) throws IOException {
