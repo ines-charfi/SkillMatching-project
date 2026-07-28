@@ -42,6 +42,7 @@
                         <div class="col-md-6 mb-4">
                             <label class="form-label fw-bold">Niveau d'études requis</label>
                             <select name="niveauRequis" class="form-select">
+                                <option value="CAP" th:selected="${offre != null and offre['niveauRequis'] == 'CAP'}">CAP</option>
                                 <option value="Bac+2" th:selected="${offre != null and offre['niveauRequis'] == 'Bac+2'}">Bac+2</option>
                                 <option value="Bac+3" th:selected="${offre != null and offre['niveauRequis'] == 'Bac+3'}">Bac+3 (Licence)</option>
                                 <option value="Bac+5" th:selected="${offre != null and (offre['niveauRequis'] == 'Bac+5' or offre['niveauRequis'] == null)}">Bac+5 (Master / Ingénieur)</option>

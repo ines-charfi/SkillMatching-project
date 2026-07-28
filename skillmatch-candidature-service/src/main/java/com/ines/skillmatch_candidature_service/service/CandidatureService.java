@@ -77,7 +77,7 @@ public class CandidatureService {
                     } else if (offre.get("user_id") != null) {
                         recruteurUserId = Long.valueOf(offre.get("user_id").toString());
                     } else {
-                        log.warn("⚠️ Pas de userId trouvé dans l'offre. Utilisation de l'ID Entreprise (entId) en secours.");
+                        log.warn(" Pas de userId trouvé dans l'offre. Utilisation de l'ID Entreprise (entId) en secours.");
                         recruteurUserId = entId;
                     }
 
@@ -94,14 +94,14 @@ public class CandidatureService {
                     notifData.put("message", prenomCand + " " + nomCand + " a postulé pour le poste : " + titreOffre + " (Score Matching : " + score + "%)");
                     notifData.put("lu", false);
 
-                    log.info("🚀 Envoi de la notification au Recruteur User ID cible : {}", recruteurUserId);
+                    log.info("Envoi de la notification au Recruteur User ID cible : {}", recruteurUserId);
                     notificationClient.envoyerNotification(notifData);
 
                 } else {
-                    log.warn("⚠️ Impossible d'envoyer la notification : entrepriseId introuvable dans l'offre.");
+                    log.warn("Impossible d'envoyer la notification : entrepriseId introuvable dans l'offre.");
                 }
             } catch (Exception ex) {
-                log.error("❌ Échec lors de l'envoi de la notification au recruteur : {}", ex.getMessage());
+                log.error(" Échec lors de l'envoi de la notification au recruteur : {}", ex.getMessage());
             }
 
             return savedCandidature;
@@ -133,15 +133,15 @@ public class CandidatureService {
             // Dynamic notification content based on workflow state
             switch (statut.toUpperCase()) {
                 case "ACCEPTE":
-                    titreNotif = "Candidature Acceptée ! 🎉";
+                    titreNotif = "Candidature Acceptée ! ";
                     message = "Excellente nouvelle ! Votre candidature pour le poste de \"" + titreOffre + "\" a été acceptée par le recruteur.";
                     break;
                 case "REFUSE":
-                    titreNotif = "Retour sur votre candidature 📨";
+                    titreNotif = "Retour sur votre candidature ";
                     message = "Malheureusement, votre profil n'a pas été retenu pour le poste de \"" + titreOffre + "\". Ne découragez pas, d'autres opportunités vous attendent !";
                     break;
                 case "ENTRETIEN":
-                    titreNotif = "Invitation à un entretien ! 🗓️";
+                    titreNotif = "Invitation à un entretien ! ";
                     message = "Bonne nouvelle ! Le recruteur souhaite planifier un entretien avec vous pour le poste de \"" + titreOffre + "\".";
                     break;
                 default:
@@ -157,10 +157,10 @@ public class CandidatureService {
             notifData.put("lu", false);
 
             notificationClient.envoyerNotification(notifData);
-            log.info("🚀 Notification de suivi envoyée avec succès au candidat ID {}", candidatUserId);
+            log.info(" Notification de suivi envoyée avec succès au candidat ID {}", candidatUserId);
 
         } catch (Exception ex) {
-            log.error("⚠️ Impossible d'envoyer la notification de statut au candidat : {}", ex.getMessage());
+            log.error(" Impossible d'envoyer la notification de statut au candidat : {}", ex.getMessage());
         }
 
         return updatedCandidature;
@@ -197,10 +197,14 @@ public class CandidatureService {
     }
 
     // Access methods for basic application retrieval and statistics
-    public List<Candidature> getByCandidat(Long userId) { return candidatureRepository.findByCandidatId(userId); }
-    public List<Candidature> getByOffre(Long offreId) { return candidatureRepository.findByOffreId(offreId); }
-    public long countByOffre(Long offreId) { return candidatureRepository.countByOffreId(offreId); }
-    public long countByCandidat(Long candidatId) { return candidatureRepository.countByCandidatId(candidatId); }
+    public List<Candidature> getByCandidat(Long userId) {
+        return candidatureRepository.findByCandidatId(userId); }
+    public List<Candidature> getByOffre(Long offreId) {
+        return candidatureRepository.findByOffreId(offreId); }
+    public long countByOffre(Long offreId) {
+        return candidatureRepository.countByOffreId(offreId); }
+    public long countByCandidat(Long candidatId) {
+        return candidatureRepository.countByCandidatId(candidatId); }
 
     /**
      * Aggregates recruitment statistics for a specific company's dashboard.

@@ -43,7 +43,7 @@ public class NotificationRestController {
             return ResponseEntity.ok(saved);
 
         } catch (Exception e) {
-            System.err.println("❌ Erreur lors de la désérialisation de la notification : " + e.getMessage());
+            System.err.println(" Erreur lors de la désérialisation de la notification : " + e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }

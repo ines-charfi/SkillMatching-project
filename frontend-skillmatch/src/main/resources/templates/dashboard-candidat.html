@@ -98,13 +98,11 @@
                     <p class="small text-muted" th:text="${profil != null and profil['adresse'] != null and profil['adresse'] != '' ? profil['adresse'] : 'Non renseignée'}">Adresse...</p>
                 </div>
 
-                <!-- Bloc DOCUMENT : les styles inline sont supprimés -->
                 <div class="border-top border-light pt-2">
                     <h6 class="fw-bold small">
                         <i class="bi bi-file-earmark-pdf-fill me-2 text-danger"></i>MES DOCUMENTS
                     </h6>
                     <div th:if="${profil != null and profil['cvPath'] != null and profil['cvPath'] != ''}">
-                        <!-- Remplacement de style="font-size:0.72rem !important;" par la classe .text-xs -->
                         <p class="text-muted mb-2 small text-xs">Votre CV est enregistré.</p>
                         <a th:href="@{/api/candidats/download/cv/{id}(id=${profil.userId})}"
                            class="btn btn-outline-primary btn-sm px-3 rounded-pill" target="_blank">
@@ -112,8 +110,7 @@
                         </a>
                     </div>
                     <div th:unless="${profil != null and profil['cvPath'] != null and profil['cvPath'] != ''}">
-                        <!-- Remplacement de style="font-size:0.72rem !important;" par la classe .text-xs -->
-                        <p class="text-danger small mb-0 text-xs">⚠️ Aucun CV téléversé.</p>
+                        <p class="text-danger small mb-0 text-xs"> Aucun CV téléversé.</p>
                     </div>
                 </div>
                 <!-- Bouton Modifier le profil avec marge supérieure -->

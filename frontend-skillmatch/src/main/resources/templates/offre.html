@@ -23,7 +23,7 @@
 
     <!-- Barre de recherche -->
     <div class="search-bar">
-        <input type="text" id="searchInput" class="search-input" placeholder="🔍 Titre, compétence, entreprise..." onkeyup="filterOffres()">
+        <input type="text" id="searchInput" class="search-input" placeholder=" Titre, compétence, entreprise..." onkeyup="filterOffres()">
     </div>
 
     <!-- Liste des offres gérée par Thymeleaf -->
@@ -38,7 +38,7 @@
             <div class="offre-header">
                 <div>
                     <h3 class="offre-title" th:text="${o['titre']}">Titre</h3>
-                    <p class="offre-company">🏢 <span th:text="${o['entrepriseNom']}">Entreprise</span> • <span th:text="${o['ville'] ?: 'France'}">Ville</span></p>
+                    <p class="offre-company"> <span th:text="${o['entrepriseNom']}">Entreprise</span> • <span th:text="${o['ville'] ?: 'France'}">Ville</span></p>
                 </div>
                 <span class="offre-salaire" th:text="${o['salaire'] ?: 'A négocier'}">Salaire</span>
             </div>

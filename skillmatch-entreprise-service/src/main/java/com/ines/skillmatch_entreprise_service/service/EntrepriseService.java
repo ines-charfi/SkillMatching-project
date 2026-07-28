@@ -90,11 +90,11 @@ public class EntrepriseService {
                 notifAdmin.put("lu", false);
 
                 notificationClient.envoyerNotification(notifAdmin);
-                log.info("🚀 Notification de nouveau logo envoyée à l'administrateur avec succès.");
+                log.info(" Notification de nouveau logo envoyée à l'administrateur avec succès.");
             } catch (Exception ex) {
                 // The try-catch protects the user: if the auth-service is down,
                 // the profile is still saved successfully!
-                log.error("⚠️ Échec de l'envoi de la notification de logo à l'admin : {}", ex.getMessage());
+                log.error(" Échec de l'envoi de la notification de logo à l'admin : {}", ex.getMessage());
             }
         }
 

@@ -228,11 +228,11 @@ public class AdminController {
 
                 if ("LOGO".equalsIgnoreCase(typeFichier)) {
                     notif.put("recipientRole", "recruiter");
-                    notif.put("titreNotif", "Profil Validé ! 🎉");
+                    notif.put("titreNotif", "Profil Validé ! ");
                     notif.put("message", "Félicitations ! Votre profil entreprise a été validé par l'administrateur. Vous pouvez désormais publier des offres.");
                 } else {
                     notif.put("recipientRole", "candidate");
-                    notif.put("titreNotif", "Profil Validé ! 🎉");
+                    notif.put("titreNotif", "Profil Validé ! ");
                     notif.put("message", "Félicitations, votre profil SkillMatch a été approuvé par l'administrateur.");
                 }
 

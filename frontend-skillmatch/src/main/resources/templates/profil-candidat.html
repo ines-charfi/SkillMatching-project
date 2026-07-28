@@ -54,10 +54,12 @@
                         <label class="form-label">Niveau Scolaire / Diplôme</label>
                         <select class="form-select" name="niveauScolaire">
                             <option value="" th:selected="${profil == null or profil['niveauScolaire'] == null}">Sélectionnez</option>
+                            <option value="Cap" th:selected="${profil != null and profil['niveauScolaire'] == 'CAP'}">CAP</option>
                             <option value="Bac" th:selected="${profil != null and profil['niveauScolaire'] == 'Bac'}">Bac</option>
                             <option value="Bac+2" th:selected="${profil != null and profil['niveauScolaire'] == 'Bac+2'}">Bac+2 (BTS, DUT)</option>
                             <option value="Bac+3" th:selected="${profil != null and profil['niveauScolaire'] == 'Bac+3'}">Bac+3 (Licence)</option>
                             <option value="Bac+5" th:selected="${profil != null and profil['niveauScolaire'] == 'Bac+5'}">Bac+5 (Master, Ingénieur)</option>
+                            <option value="Bac+5" th:selected="${profil != null and profil['niveauScolaire'] == 'Bac+8'}">Bac+8 (Doctorat, Doctorant)</option>
                         </select>
                     </div>
 

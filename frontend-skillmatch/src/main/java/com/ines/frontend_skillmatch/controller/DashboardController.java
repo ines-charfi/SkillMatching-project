@@ -366,8 +366,17 @@ public class DashboardController {
      * FUNCTION: Updates company information including the corporate logo.
      */
     @PostMapping("/profil-entreprise/update")
-    public String handleEntrepriseProfilUpdate(@RequestParam String nomEntreprise, @RequestParam(required = false) String secteur, @RequestParam(required = false) String description, @RequestParam(required = false) String contactEmail, @RequestParam(required = false) String telephone, @RequestParam(required = false) String siteWeb, @RequestParam(required = false) String ville, @RequestParam(required = false) MultipartFile logo, RedirectAttributes ra) {
-        try { entrepriseClient.updateProfil(sessionService.getUserId(), nomEntreprise, secteur, description, siteWeb, telephone, contactEmail, logo); ra.addFlashAttribute("message", "Profil entreprise mis à jour !"); } catch (Exception e) { ra.addFlashAttribute("error", "Échec."); }
+    public String handleEntrepriseProfilUpdate(@RequestParam String nomEntreprise,
+                                               @RequestParam(required = false) String secteur,
+                                               @RequestParam(required = false) String description,
+                                               @RequestParam(required = false) String contactEmail,
+                                               @RequestParam(required = false) String telephone,
+                                               @RequestParam(required = false) String siteWeb,
+                                               @RequestParam(required = false) String ville,
+                                               @RequestParam(required = false) MultipartFile logo, RedirectAttributes ra) {
+        try { entrepriseClient.updateProfil(sessionService.getUserId(), nomEntreprise, secteur, description, siteWeb, telephone, contactEmail, logo);
+            ra.addFlashAttribute("message", "Profil entreprise mis à jour !"); }
+        catch (Exception e) { ra.addFlashAttribute("error", "Échec."); }
         return "redirect:/dashboard-entreprise";
     }
 
@@ -378,7 +387,8 @@ public class DashboardController {
     @GetMapping("/offre/nouveau")
     public String nouvelleOffreForm(Model model) {
         if (!sessionService.isAuthenticated() || !sessionService.isEntreprise()) return "redirect:/login";
-        try { model.addAttribute("profil", entrepriseClient.getByUserId(sessionService.getUserId())); } catch (Exception e) { model.addAttribute("profil", new HashMap<>()); }
+        try { model.addAttribute("profil", entrepriseClient.getByUserId(sessionService.getUserId())); }
+        catch (Exception e) { model.addAttribute("profil", new HashMap<>()); }
         return "creer-offre";
     }
 
@@ -437,10 +447,17 @@ public class DashboardController {
      * FUNCTION: Updates an existing job offer's details.
      */
     @PostMapping("/offre/update/{id}")
-    public String handleOffreUpdate(@PathVariable("id") Long id, @RequestParam String titre, @RequestParam String description, @RequestParam String niveauRequis, @RequestParam String salaire, @RequestParam String competencesRequises, RedirectAttributes ra) {
+    public String handleOffreUpdate(@PathVariable("id") Long id,
+                                    @RequestParam String titre,
+                                    @RequestParam String description,
+                                    @RequestParam String niveauRequis,
+                                    @RequestParam String salaire,
+                                    @RequestParam String competencesRequises, RedirectAttributes ra) {
         try {
             Map<String, Object> offreData = new HashMap<>();
-            offreData.put("titre", titre); offreData.put("description", description); offreData.put("competencesRequises", competencesRequises); offreData.put("niveauRequis", niveauRequis); offreData.put("salaire", salaire);
+            offreData.put("titre", titre); offreData.put("description", description);
+            offreData.put("competencesRequises", competencesRequises);
+            offreData.put("niveauRequis", niveauRequis); offreData.put("salaire", salaire);
             offreClient.update(id, offreData);
             ra.addFlashAttribute("message", "Offre modifiée !");
         } catch (Exception e) { ra.addFlashAttribute("error", "Erreur."); }
@@ -453,7 +470,8 @@ public class DashboardController {
      */
     @PostMapping("/offre/supprimer/{id}")
     public String supprimerOffre(@PathVariable("id") Long id, RedirectAttributes ra) {
-        try { offreClient.delete(id); ra.addFlashAttribute("message", "Offre supprimée !"); } catch (Exception e) { ra.addFlashAttribute("error", "Erreur."); }
+        try { offreClient.delete(id); ra.addFlashAttribute("message", "Offre supprimée !"); }
+        catch (Exception e) { ra.addFlashAttribute("error", "Erreur."); }
         return "redirect:/dashboard-entreprise";
     }
 
@@ -463,7 +481,8 @@ public class DashboardController {
      */
     @PostMapping("/candidature/statut")
     public String updateCandidatureStatut(@RequestParam Long id, @RequestParam String statut, RedirectAttributes ra) {
-        try { candidatureClient.updateStatut(id, statut); ra.addFlashAttribute("message", "Statut changé !"); } catch (Exception e) { ra.addFlashAttribute("error", "Erreur."); }
+        try { candidatureClient.updateStatut(id, statut); ra.addFlashAttribute("message", "Statut changé !"); }
+        catch (Exception e) { ra.addFlashAttribute("error", "Erreur."); }
         return "redirect:/dashboard-entreprise";
     }
 
@@ -540,8 +559,11 @@ public class DashboardController {
      * FUNCTION: Creates a scheduled interview entry for a candidate.
      */
     @PostMapping("/entreprise/entretiens/planifier")
-    public String planifierEntretien(@RequestParam("candidatureId") Long candidatureId, @RequestParam("date") String dateStr, @RequestParam("lieu") String lieu, @RequestParam("notes") String notes, RedirectAttributes ra) {
-        try { candidatureClient.planifierEntretien(candidatureId, dateStr, lieu, notes); ra.addFlashAttribute("message", "Entretien planifié !");
+    public String planifierEntretien(@RequestParam("candidatureId") Long candidatureId,
+                                     @RequestParam("date") String dateStr, @RequestParam("lieu") String lieu,
+                                     @RequestParam("notes") String notes, RedirectAttributes ra) {
+        try { candidatureClient.planifierEntretien(candidatureId, dateStr, lieu, notes);
+            ra.addFlashAttribute("message", "Entretien planifié !");
         }
         catch (Exception e) { ra.addFlashAttribute("error", "Échec."); }
         return "redirect:/dashboard-entreprise";

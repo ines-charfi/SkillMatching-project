@@ -141,7 +141,7 @@ public class CandidatController {
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
-            System.err.println("❌ Erreur téléchargement CV : " + e.getMessage());
+            System.err.println(" Erreur téléchargement CV : " + e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -168,7 +168,7 @@ public class CandidatController {
             }
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
-            System.err.println("❌ Erreur affichage avatar : " + e.getMessage());
+            System.err.println(" Erreur affichage avatar : " + e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
     }

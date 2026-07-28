@@ -205,7 +205,7 @@ public class CandidatService {
         if (cv != null && !cv.isEmpty()) {
             String cvName = saveFile(cv, "cvs");
             candidatExistant.setCvPath(cvName);
-            hasNewCv = true; // 🎯 Le drapeau passe à true
+            hasNewCv = true; //  Le drapeau passe à true
         }
 
         // Sauvegarde de la Photo s'il y en a une nouvelle fournie
@@ -223,15 +223,15 @@ public class CandidatService {
                 notifAdmin.put("userIdTarget", 1L); // ID fixe de ton administrateur
                 notifAdmin.put("recipientRole", "admin"); // Pour cibler son Dashboard
                 notifAdmin.put("type", "new_cv");
-                notifAdmin.put("titreNotif", "Nouveau document à vérifier 📄");
+                notifAdmin.put("titreNotif", "Nouveau document à vérifier ");
                 notifAdmin.put("message", savedCandidat.getPrenom() + " " + savedCandidat.getNom() + " a ajouté ou modifié son CV. Une analyse est requise.");
                 notifAdmin.put("lu", false);
 
                 notificationClient.envoyerNotification(notifAdmin);
-                log.info("🚀 Notification de nouveau CV transmise à l'administrateur.");
+                log.info(" Notification de nouveau CV transmise à l'administrateur.");
             } catch (Exception ex) {
                 // Protège le candidat : le profil reste enregistré même si l'auth-service/notif ne répond pas
-                log.error("⚠️ Impossible de notifier l'admin pour le nouveau CV : {}", ex.getMessage());
+                log.error("⚠ Impossible de notifier l'admin pour le nouveau CV : {}", ex.getMessage());
             }
         }
 

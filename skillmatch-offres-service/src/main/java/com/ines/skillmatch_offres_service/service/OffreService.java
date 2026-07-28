@@ -49,15 +49,15 @@ public class OffreService {
             notifAdmin.put("userIdTarget", 1L); // Fixed admin user ID
             notifAdmin.put("recipientRole", "admin");
             notifAdmin.put("type", "new_offre");
-            notifAdmin.put("titreNotif", "Nouvelle offre publiée 💼");
+            notifAdmin.put("titreNotif", "Nouvelle offre publiée ");
             notifAdmin.put("message", "Une nouvelle offre intitulée '" + savedOffre.getTitre() + "' a été mise en ligne.");
             notifAdmin.put("lu", false);
 
             notificationClient.envoyerNotification(notifAdmin);
-            log.info("🚀 Notification de création d'offre transmise à l'administrateur.");
+            log.info(" Notification de création d'offre transmise à l'administrateur.");
         } catch (Exception e) {
             // Isolated try-catch ensures offer creation is not blocked if auth/notification service is down.
-            log.error("⚠️ Impossible de notifier l'admin pour la nouvelle offre : {}", e.getMessage());
+            log.error(" Impossible de notifier l'admin pour la nouvelle offre : {}", e.getMessage());
         }
 
         return savedOffre;
