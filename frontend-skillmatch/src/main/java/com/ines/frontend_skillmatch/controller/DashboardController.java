@@ -93,7 +93,7 @@ public class DashboardController {
             System.out.println(">>>> PROFIL BRUT RECU : " + profil);
             model.addAttribute("profil", profil);
         } catch (Exception e) {
-            System.err.println("❌ Erreur Feign getProfil : " + e.getMessage());
+            System.err.println(" Erreur Feign getProfil : " + e.getMessage());
         }
 
         try {
@@ -143,7 +143,7 @@ public class DashboardController {
             List<?> candidaturesData = candidatureClient.getByCandidat(userId);
             if (candidaturesData != null) model.addAttribute("candidatures", candidaturesData);
         } catch (Exception e) {
-            System.err.println("❌ Erreur candidatures : " + e.getMessage());
+            System.err.println(" Erreur candidatures : " + e.getMessage());
         }
 
         return "dashboard-candidat";
@@ -160,7 +160,7 @@ public class DashboardController {
             Map<String, Object> profil = candidatClient.getProfil(sessionService.getUserId());
             model.addAttribute("profil", profil != null ? profil : new HashMap<>());
         } catch (Exception e) {
-            System.err.println("❌ Impossible de charger la page de configuration profil : " + e.getMessage());
+            System.err.println(" Impossible de charger la page de configuration profil : " + e.getMessage());
             model.addAttribute("profil", new HashMap<>());
         }
         return "profil-candidat";
@@ -210,7 +210,7 @@ public class DashboardController {
 
             ra.addFlashAttribute("message", "Votre espace profil a été mis à jour avec succès !");
         } catch (Exception e) {
-            System.err.println("❌ ÉCHEC DU SOUFFLAGE DE DONNÉES FRONTEND : " + e.getMessage());
+            System.err.println(" ÉCHEC DU SOUFFLAGE DE DONNÉES FRONTEND : " + e.getMessage());
             ra.addFlashAttribute("error", "Erreur lors de la mise à jour : " + e.getMessage());
         }
         return "redirect:/dashboard-candidat";
@@ -261,7 +261,7 @@ public class DashboardController {
             }
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
-            System.err.println("❌ Erreur Proxy CV : " + e.getMessage());
+            System.err.println(" Erreur Proxy CV : " + e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
     }

@@ -53,7 +53,7 @@ Contrairement aux plateformes classiques, SkillMatch automatise la mise en relat
 
 | Dashboard Entreprise | Dashboard Candidat | Dashboard Admin |
 |----------------------|--------------------|-----------------|
-| ![Dashboard Entreprise](./screenshots/dashboard-entreprise.png) | ![Dashboard Candidat](./screenshots/dashboard-candi.png) | ![Dashboard Admin](./screenshots/dashboard-admin.png) |
+| ![Dashboard Entreprise](./screenshots/dashboard-entreprise.png) | ![Dashboard Candidat](./screenshots/dashboard-candidat.png) | ![Dashboard Admin](./screenshots/dashboard-admin.png) |
 
 | Palette de couleurs | Stack technique |
 |---------------------|-----------------|
@@ -125,8 +125,8 @@ Contrairement aux plateformes classiques, SkillMatch automatise la mise en relat
 | **Stockage fichiers** | système de fichiers local (`uploads/cvs`, `uploads/photos`, `uploads/logos`) |
 | **Tests** | JUnit 5, Mockito, @WebMvcTest, @SpringBootTest, H2 |
 
-![Architecture technique](./screenshots/tech.png)
-![architecture-globale](./screenshots/architecture.jpg)
+![Architecture technique](C:\Users\Hp\IdeaProjects\skillmatch-project\screenshots\tech.png)
+![architecture-globale](C:\Users\Hp\IdeaProjects\skillmatch-project\screenshots\architecture.png)
 
 ---
 
@@ -165,14 +165,16 @@ J’ai optimisé le déploiement via des **Builds Multi‑étapes** dans Docker 
 ### Prérequis
 - Docker & Docker Compose
 - Maven 3.8+ / Java 17
+  ![docker](./screenshots/docker final.png)
+  ![consul](./screenshots/consul-final.png)
 
 ### Commandes
 
 Clonez le projet :
 git clone https://github.com/ines-charfi/skillmatch-project.git
-cd skillmatch
-mvn clean install -DskipTests
-docker-compose up --build -d
+#cd skillmatch
+#mvn clean install -DskipTests
+#docker-compose up --build -d
 
 ##  Roadmap / Future Evolutions
  Apache Kafka : Passage à une architecture orientée événements.
